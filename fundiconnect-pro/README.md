@@ -132,14 +132,14 @@ All endpoints are same-origin under **/api**. Authenticated sessions use an opaq
 
 ### Direct-payment launch model
 
-FundiConnect does not collect or hold customer service payments. A provider controls their own payment instructions. Both booking parties may record their confirmations; admins may review disputes and the booking event timeline. The platform does not independently confirm transfers or guarantee refunds. Legacy platform M-Pesa endpoints are disabled in this release and return a direct-payment-model response.
+FundiConnect does not collect or hold customer service payments. A provider controls their default payment instructions and must save them before quoting. The quote stores a snapshot of those instructions so later edits to the provider's default Till/Paybill do not silently redirect an accepted booking. Both booking parties may record their confirmations; admins may review disputes and the booking event timeline. The platform does not independently confirm transfers or guarantee refunds. Legacy platform M-Pesa endpoints, including historical platform payment records, are disabled in this release and return a direct-payment-model response.
 
 ### Core data model
 
 - users, fundi_profiles, categories
-- bookings, reviews
-- user_sessions, notifications
-- audit_logs, schema_migrations
+- bookings, provider payment-instruction snapshots, booking event history, booking disputes
+- provider payment instructions, provider reports, verification-check records, reviews
+- user_sessions, notifications, audit_logs, schema_migrations
 
 Migrations are numbered and run once per database. Add a new numbered migration for future schema changes; do not edit an already-applied migration in a deployed environment.
 
