@@ -91,6 +91,7 @@ async function cleanup() {
     response = await request('/api/hubs/types');
     check('13 super-app hubs are available', response.status === 200 && response.data.hubs.length === 13);
     response = await request('/api/payments/mpesa/config');
+    const mpesaEnabled = response.status === 200 && response.data.enabled === true;
     check('M-Pesa readiness endpoint exposes status without credentials', response.status === 200 && typeof response.data.enabled === 'boolean' && !('consumerKey' in response.data));
 
     response = await request('/api/auth/register', {
@@ -185,6 +186,10 @@ async function cleanup() {
     check('customer can submit a persistent booking request', response.status === 201);
     bookingId = response.data.booking.id;
 
+    response = await request('/api/bookings/' + bookingId + '/status', {
+      method: 'PATCH', cookie: customerCookie, body: { status: 'accepted' }
+    });
+    check('customers cannot accept their own booking', response.status === 403);
     response = await request('/api/bookings/' + bookingId + '/quote', {
       method: 'PATCH', cookie: customerCookie, body: { amount: 2500 }
     });
@@ -193,10 +198,13 @@ async function cleanup() {
       method: 'PATCH', cookie: fundiCookie, body: { amount: 2500 }
     });
     check('assigned fundi can quote and accept a booking', response.status === 200 && Number(response.data.booking.quoted_price) === 2500 && response.data.booking.status === 'accepted');
-    response = await request('/api/bookings/' + bookingId + '/status', {
-      method: 'PATCH', cookie: customerCookie, body: { status: 'accepted' }
-    });
-    check('customers cannot accept their own booking', response.status === 403);
+    if (!mpesaEnabled) {
+      response = await request('/api/payments/mpesa/stk-push', {
+        method: 'POST', cookie: customerCookie,
+        body: { bookingId, phoneNumber: phone }
+      });
+      check('M-Pesa checkout fails closed while provider settings are absent', response.status === 503);
+    }
 
     for (const status of ['in_progress', 'completed']) {
       response = await request('/api/bookings/' + bookingId + '/status', {
