@@ -96,6 +96,12 @@ async function cleanup() {
 
     response = await request('/api/auth/register', {
       method: 'POST',
+      body: { fullName: 'FundiConnect Test Customer', email: emailCustomer, password, role: 'customer', persona: 'student' }
+    });
+    check('registration refuses account creation without policy acceptance', response.status === 400 && response.data.error === 'POLICY_CONSENT_REQUIRED');
+
+    response = await request('/api/auth/register', {
+      method: 'POST',
       body: { fullName: 'FundiConnect Test Customer', email: emailCustomer, password, role: 'customer', policyConsent: true, persona: 'student', campus: 'Integration Campus', course: 'Information Technology', studyLevel: 'Year 1' }
     });
     check('customer registration creates session', response.status === 201 && Boolean(response.cookie));
@@ -197,16 +203,25 @@ async function cleanup() {
     response = await request('/api/bookings/' + bookingId + '/quote', {
       method: 'PATCH', cookie: fundiCookie, body: { amount: 2500 }
     });
-    check('assigned fundi can quote and accept a booking', response.status === 200 && Number(response.data.booking.quoted_price) === 2500 && response.data.booking.status === 'accepted');
-
+    check('provider cannot issue a quote before payment instructions exist', response.status === 409 && response.data.error === 'PAYMENT_METHODS_NOT_SET');
+    response = await request('/api/fundi/payment-instructions', { method: 'PATCH', cookie: customerCookie, body: { acceptedMethods: ['mpesa_till'], mpesaTill: '1234567' } });
+    check('customers cannot edit provider payment instructions', response.status === 403);
     response = await request('/api/fundi/payment-instructions', { method: 'PATCH', cookie: fundiCookie, body: { acceptedMethods: ['mpesa_till','cash'], mpesaTill: '1234567', accountName: 'Fundi Test Recipient' } });
     check('fundi can save direct payment instructions without platform credentials', response.status === 200 && response.data.instructions.mpesa_till === '1234567' && response.data.instructions.accepted_methods.includes('cash'));
+    response = await request('/api/bookings/' + bookingId + '/quote', {
+      method: 'PATCH', cookie: fundiCookie, body: { amount: 2500 }
+    });
+    check('assigned fundi can quote after adding payment instructions', response.status === 200 && Number(response.data.booking.quoted_price) === 2500 && response.data.booking.status === 'accepted');
+    response = await request('/api/fundi/payment-instructions', { method: 'PATCH', cookie: fundiCookie, body: { acceptedMethods: ['mpesa_till','cash'], mpesaTill: '7654321', accountName: 'Changed Default Recipient' } });
+    check('provider can update defaults without silently changing an existing booking', response.status === 200 && response.data.instructions.mpesa_till === '7654321');
     response = await request('/api/bookings/' + bookingId + '/payment-instructions', { cookie: customerCookie });
-    check('accepted customer can view provider payment instructions', response.status === 200 && response.data.instructions.mpesa_till === '1234567' && response.data.paymentStatus === 'unpaid');
+    check('accepted customer sees the payment-instruction snapshot from the quote', response.status === 200 && response.data.instructions.mpesa_till === '1234567' && response.data.accountName === 'Fundi Test Recipient' && response.data.paymentStatus === 'unpaid');
     response = await request('/api/bookings/' + bookingId + '/payment-confirmation', { method: 'POST', cookie: customerCookie, body: { action: 'customer_paid', method: 'mpesa_till', reference: 'TEST-RECEIPT-01' } });
     check('customer payment report is timestamped but not independently verified', response.status === 200 && response.data.booking.direct_payment_status === 'customer_reported_paid' && Boolean(response.data.booking.customer_payment_confirmed_at));
     response = await request('/api/bookings/' + bookingId + '/payment-confirmation', { method: 'POST', cookie: fundiCookie, body: { action: 'provider_received', method: 'mpesa_till' } });
     check('provider receipt confirmation creates two-sided confirmed state', response.status === 200 && response.data.booking.direct_payment_status === 'confirmed' && Boolean(response.data.booking.provider_payment_confirmed_at));
+    response = await request('/api/bookings/' + bookingId + '/payment-confirmation', { method: 'POST', cookie: customerCookie, body: { action: 'customer_paid', method: 'mpesa_till' } });
+    check('duplicate customer payment confirmation is rejected', response.status === 409 && response.data.error === 'ALREADY_CONFIRMED');
 
     response = await request('/api/fundis/' + fundiProfileId + '/report', { method: 'POST', cookie: customerCookie, body: { reason: 'misleading', details: 'Profile details require an additional review.' } });
     check('customer can report a provider profile for moderation', response.status === 201 && response.data.report.status === 'open');
@@ -218,6 +233,8 @@ async function cleanup() {
       });
       check('platform M-Pesa checkout is removed for direct-to-provider launch', response.status === 410 && response.data.error === 'DIRECT_PAYMENT_MODEL');
     }
+    response = await request('/api/payments/legacy-test-id', { cookie: customerCookie });
+    check('legacy platform payment history routes are disabled', response.status === 410 && response.data.error === 'DIRECT_PAYMENT_MODEL');
 
     for (const status of ['in_progress', 'completed']) {
       response = await request('/api/bookings/' + bookingId + '/status', {
