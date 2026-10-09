@@ -7,6 +7,7 @@ const crypto = require('node:crypto');
 const { promisify } = require('node:util');
 const { Pool } = require('pg');
 const { handleHubRoutes } = require('./hubs');
+const { handlePaymentRoutes } = require('./payments');
 
 const scrypt = promisify(crypto.scrypt);
 const PORT = Number(process.env.PORT || 8080);
@@ -364,6 +365,8 @@ async function mainRouter(req, res, url) {
   }
 
   const user = await userFromRequest(req).catch(() => null);
+  const paymentHandled = await handlePaymentRoutes({req,res,url,method,pathname,user,pool,helpers:{json,fail,text,limited,requireRole,readBody,createNotification,logAudit}});
+  if (paymentHandled || res.writableEnded) return;
   const hubHandled = await handleHubRoutes({req,res,url,method,pathname,user,pool,helpers:{json,fail,text,limited,requireRole,createNotification,logAudit,hubTypes}});
   if (hubHandled) return;
 
