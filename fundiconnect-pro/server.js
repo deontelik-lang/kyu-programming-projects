@@ -146,7 +146,9 @@ async function readBody(req) {
 
 const attempts = new Map();
 function limited(req, key, max = 12, windowMs = 60000) {
-  const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown').toString().split(',')[0].trim().slice(0, 80);
+  const forwarded = req.headers['x-forwarded-for'];
+  // Proxies append the observed client address to X-Forwarded-For. Use the rightmost entry so a client-supplied leftmost value cannot trivially evade throttling.
+  const ip = (forwarded ? forwarded.toString().split(',').pop().trim() : (req.socket.remoteAddress || 'unknown')).slice(0, 80);
   const now = Date.now();
   const bucketKey = ip + ':' + key;
   let item = attempts.get(bucketKey);
