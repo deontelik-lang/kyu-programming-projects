@@ -10,6 +10,9 @@ ALTER TABLE bookings
   ADD COLUMN IF NOT EXISTS direct_payment_method text NOT NULL DEFAULT '',
   ADD COLUMN IF NOT EXISTS customer_payment_confirmed_at timestamptz,
   ADD COLUMN IF NOT EXISTS provider_payment_confirmed_at timestamptz;
+ALTER TABLE bookings
+  ADD COLUMN IF NOT EXISTS direct_payment_status_before_dispute text
+    CHECK (direct_payment_status_before_dispute IS NULL OR direct_payment_status_before_dispute IN ('unpaid','customer_reported_paid','provider_reported_received','confirmed'));
 
 CREATE TABLE IF NOT EXISTS provider_payment_instructions (
   fundi_id uuid PRIMARY KEY REFERENCES fundi_profiles(id) ON DELETE CASCADE,
