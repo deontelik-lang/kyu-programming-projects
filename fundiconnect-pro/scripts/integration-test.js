@@ -14,6 +14,7 @@ if (!process.env.DATABASE_URL) {
 const base = (process.env.FUNDICONNECT_BASE_URL || 'http://127.0.0.1:8080').replace(/\/+$/, '');
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 2, connectionTimeoutMillis: 10000 });
 const runId = Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+const testIp = '198.51.100.' + (Math.floor(Math.random() * 200) + 20);
 const password = 'IntegrationPassword#12345';
 const emailCustomer = 'fctest-' + runId + '-customer@example.invalid';
 const emailFundi = 'fctest-' + runId + '-fundi@example.invalid';
@@ -31,7 +32,8 @@ async function request(path, options = {}) {
     method: options.method || 'GET',
     headers: {
       ...(options.body !== undefined ? { 'content-type': 'application/json' } : {}),
-      ...(options.cookie ? { cookie: options.cookie } : {})
+      ...(options.cookie ? { cookie: options.cookie } : {}),
+      'x-forwarded-for': testIp
     },
     body: options.body !== undefined ? JSON.stringify(options.body) : undefined
   });
@@ -189,6 +191,16 @@ async function cleanup() {
 
     response = await request('/api/platform-profile', { method: 'PATCH', cookie: customerCookie, body: { persona: 'student', headline: 'IT student looking for internships', campus: 'Integration Campus', course: 'Information Technology', studyLevel: 'Year 1', graduationYear: 2029, bio: 'Testing CampusConnect profile', skills: ['C', 'Networking'], organisation: '', portfolioUrl: '' } });
     check('student profile can be edited', response.status === 200 && response.data.profile.campus === 'Integration Campus');
+    response = await request('/api/members?q=FundiConnect%20Test%20Customer');
+    check('campus directory keeps profiles private by default', response.status === 200 && !(response.data.members || []).some(m => m.user_id === customerId));
+    response = await request('/api/platform-profile', { method: 'PATCH', cookie: customerCookie, body: { persona: 'student', headline: 'IT student looking for internships', campus: 'Integration Campus', course: 'Information Technology', studyLevel: 'Year 1', graduationYear: 2029, bio: 'Testing CampusConnect profile', skills: ['C', 'Networking'], organisation: '', portfolioUrl: '', publicDirectory: true } });
+    check('member can opt into the public directory', response.status === 200 && response.data.profile.public_directory === true);
+    response = await request('/api/members?q=FundiConnect%20Test%20Customer');
+    check('public campus search returns opted-in members only', response.status === 200 && (response.data.members || []).some(m => m.user_id === customerId) && !('email' in ((response.data.members || []).find(m => m.user_id === customerId) || {})));
+    response = await request('/api/platform-profile', { method: 'PATCH', cookie: customerCookie, body: { persona: 'student', headline: 'IT student looking for internships', campus: 'Integration Campus', course: 'Information Technology', studyLevel: 'Year 1', graduationYear: 2029, bio: 'Testing CampusConnect profile', skills: ['C', 'Networking'], organisation: '', portfolioUrl: '', publicDirectory: false } });
+    check('member can opt out of the public directory', response.status === 200 && response.data.profile.public_directory === false);
+    response = await request('/api/members?q=FundiConnect%20Test%20Customer');
+    check('opted-out member is no longer discoverable', response.status === 200 && !(response.data.members || []).some(m => m.user_id === customerId));
     response = await request('/api/cv', { cookie: customerCookie });
     check('CV builder data is available', response.status === 200 && response.data.cv.full_name === 'FundiConnect Test Customer');
 
