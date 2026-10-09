@@ -4,7 +4,7 @@
 
 FundiConnect Pro is a Kenya-first marketplace MVP connecting customers with electricians, CCTV installers, and WiFi/network technicians. This repository contains the working browser UI, same-origin HTTP API, PostgreSQL migrations, operational scripts, and CI checks for both the Fundi services marketplace and CampusConnect student/opportunity hubs.
 
-> **Release status:** functional MVP, not yet a fully production-hardened marketplace. The deployed site is live. M-Pesa STK Push is implemented behind an explicit disabled-by-default configuration; it does not send payment prompts until Daraja credentials, shortcode, passkey, HTTPS callback URL, and the enable flag are configured. Identity checks, SMS OTP, email verification, live dispatch, and other integrations remain unconnected.
+> **Release status:** functional marketplace MVP, not yet a fully production-hardened marketplace. The launch payment model is direct-to-provider: customers pay providers using provider-controlled instructions, and FundiConnect records each party's confirmation without moving or independently verifying funds. Platform M-Pesa checkout is disabled. Real identity/phone verification, SMS OTP, email verification and live dispatch remain unconnected.
 
 ## Live preview
 
@@ -21,7 +21,7 @@ FundiConnect Pro is a Kenya-first marketplace MVP connecting customers with elec
 - Notifications for new bookings, status changes, and reviews.
 - Reviews tied to completed customer bookings; a database constraint prevents a second review for the same booking.
 - Transparent deterministic trust score derived from review volume, rating, completed jobs, verification level, observed responses, and profile completeness. It is not an AI model, background check, or guarantee of quality; new profiles have limited history.
-- Admin summary, recent booking list, protected manual verification control, moderation queue, hub analytics and 14-day signup/listing trend.
+- Admin summary, booking dispute timelines, provider report queue, evidence-based verification controls, moderation queue, hub analytics and 14-day signup/listing trend.
 - Company/employer registration and a company workspace with organisation profile, job/internship listing metrics, response counts, and an explicit unverified status.
 - Loyalty ledger that awards 10 points for a published listing and 2 points for a submitted opportunity action. Members can spend 20 points to feature one of their own published listings for seven days; repeat point awards are idempotent.
 - Audit events, parameterized database queries, basic rate limiting, security response headers, request-size limits, origin checks, and session revocation.
@@ -32,7 +32,7 @@ FundiConnect Pro is a Kenya-first marketplace MVP connecting customers with elec
 
 The app includes 13 database-backed opportunity hubs: student gigs, jobs, internships/graduate roles, housing, products, events, courses/skills academy listings, business directory, community posts, transport/delivery listings, student services, alumni/mentorship and professional service offers. Members can publish listings, search by hub and location, apply or inquire, RSVP, save items, comment on campus posts, exchange persistent listing messages, report abusive listings, and review incoming applications through owner dashboards. User profiles can include campus, course, study level, graduation year, organisation, portfolio and skills; a printable CV preview uses that profile data. The Campus & Alumni Directory is opt-in and private by default; users can make their profile discoverable or opt out at any time, and the directory does not expose account phone/email. Emergency request records are persistent but do not dispatch responders. A local rules-based study/career guide and user-input cost worksheet are included; neither is a connected generative AI service or external market-price engine.
 
-The release implements core marketplace flows and provides clear integration boundaries, not every item from the full vision. M-Pesa STK Push request handling, payment records, quote workflow and callback reconciliation have been coded, but checkout remains disabled until Daraja settings are configured and tested in sandbox. Wallet transfers, rent collection, paid ticketing, payout/escrow, real OTP/email delivery, identity document validation/background checks, live GPS, push notifications, real-time WebSocket chat, course content delivery, company team invitations, employer-system integrations, referral bonuses and AI-provider calls are **not enabled**. Company dashboards and point-based listing spotlights are implemented, but they do not imply that an organisation is verified or guarantee a listing's outcome.
+The release implements a direct-to-provider marketplace. Providers list their own payment instructions (such as M-Pesa Till/Paybill, cash or bank transfer); participants on an accepted booking can view the instructions and record timestamped confirmations. A customer report and provider receipt confirmation create a two-sided record, not independent bank verification. Booking disputes preserve a case timeline for admin review. Platform checkout, wallet transfers, escrow, provider payouts, rent collection, paid ticketing, real OTP/email delivery, automated identity validation/background checks, live GPS, push notifications, real-time WebSocket chat, course content delivery, company team invitations, employer-system integrations, referral bonuses and AI-provider calls are **not enabled**. Company dashboards and point-based listing spotlights are implemented, but do not imply an organisation is verified or guarantee a listing's outcome.
 
 ## Stack
 
@@ -73,7 +73,7 @@ To remove the administrator role:
 npm run admin:promote -- administrator@example.com --demote
 \`\`\`
 
-The script requires DATABASE_URL, updates an existing account only, and writes an audit event. This MVP does not verify email ownership itself; never promote an account based only on an unverified email claim. Admin verification controls should only be used after evidence has been reviewed through a separate trusted process. National ID/certificate uploads and automated background checks are not yet implemented.
+The script requires DATABASE_URL, updates an existing account only, and writes an audit event. This MVP does not verify email ownership itself; never promote an account based only on an unverified email claim. Verification levels require recorded checks for the relevant tier, but checks are entered by an authorised administrator and are not automated background checks. National ID/certificate uploads and automated background checks are not implemented.
 
 ## API summary
 
@@ -112,11 +112,17 @@ All endpoints are same-origin under **/api**. Authenticated sessions use an opaq
 | POST | **/api/bookings** | Customer requests a quote |
 | PATCH | **/api/bookings/:id/status** | Change an authorized booking status |
 | PATCH | **/api/bookings/:id/quote** | Assigned fundi sets a whole-KSh quote; booking becomes accepted |
-| GET | **/api/payments/mpesa/config** | Check whether Daraja checkout is fully configured (never returns credentials) |
-| POST | **/api/payments/mpesa/stk-push** | Customer requests an STK Push for an accepted, quoted booking |
-| GET | **/api/payments** | Current member's payment history (phone numbers masked) |
-| GET | **/api/payments/:id** | Authorized payment details (phone number masked) |
-| POST | **/api/payments/mpesa/callback/:secret** | Daraja callback; amount, phone, checkout ID and merchant ID must match before marking paid |
+| GET | **/api/fundi/payment-instructions** | Provider's own direct-payment instructions |
+| PATCH | **/api/fundi/payment-instructions** | Save Till/Paybill, cash, bank transfer or other payment instructions (never credentials) |
+| GET | **/api/bookings/:id/payment-instructions** | Booking participants view accepted quote and provider payment instructions |
+| POST | **/api/bookings/:id/payment-confirmation** | Customer reports payment or provider confirms receipt; timestamped, not independently verified |
+| POST | **/api/bookings/:id/disputes** | Booking participant opens a documented issue |
+| GET | **/api/admin/booking-disputes** | Admin-only dispute queue with booking event timeline |
+| PATCH | **/api/admin/booking-disputes/:id** | Admin updates case status and resolution note |
+| POST | **/api/fundis/:id/report** | Report a provider profile |
+| GET | **/api/admin/fundi-reports** | Admin-only provider report queue |
+| PATCH | **/api/admin/fundi-reports/:id** | Admin resolves a provider report |
+| GET / PATCH | **/api/admin/fundis/:id/verification-checks** | Record evidence checks before assigning a verification level |
 | POST | **/api/reviews** | Review a completed booking once |
 | GET | **/api/notifications** | Current account notifications |
 | POST | **/api/notifications/read** | Mark notifications read |
@@ -124,12 +130,9 @@ All endpoints are same-origin under **/api**. Authenticated sessions use an opaq
 | GET | **/api/admin/fundis** | Admin-only fundi verification queue |
 | PATCH | **/api/admin/fundis/:id/verification** | Admin-only manual verification-level update |
 
-### M-Pesa sandbox setup
+### Direct-payment launch model
 
-1. Register an app in the official Safaricom Daraja portal: https://developer.safaricom.co.ke/ and obtain sandbox credentials.
-2. In the hosting provider's private environment settings, set MPESA_ENABLED=true, MPESA_ENVIRONMENT=sandbox, PUBLIC_BASE_URL to this app's HTTPS origin, and the MPESA_CONSUMER_KEY, MPESA_CONSUMER_SECRET, MPESA_SHORTCODE, MPESA_PASSKEY, and a unique URL-safe MPESA_CALLBACK_SECRET of at least 32 characters. Choose MPESA_TRANSACTION_TYPE=CustomerPayBillOnline for Paybill or CustomerBuyGoodsOnline for Till.
-3. Keep credentials out of source control and chat. Restart the deployment after setting variables. /api/payments/mpesa/config should report enabled only when all required settings pass validation.
-4. Test only with Daraja sandbox credentials and the permitted test flow first. A successful API response means the prompt was accepted, not paid; the app records a payment as paid only after a matching callback. Do not switch to production before account approval, reconciliation, refunds/disputes, and operational procedures are in place.
+FundiConnect does not collect or hold customer service payments. A provider controls their own payment instructions. Both booking parties may record their confirmations; admins may review disputes and the booking event timeline. The platform does not independently confirm transfers or guarantee refunds. Legacy platform M-Pesa endpoints are disabled in this release and return a direct-payment-model response.
 
 ### Core data model
 
@@ -187,7 +190,7 @@ These remaining integrations need chosen providers, credentials, webhook URLs, o
 3. Set up external monitoring, structured log retention, alerting, automated dependency/security scans, and incident response.
 4. Replace in-memory throttling with a distributed limiter and add login/registration abuse monitoring.
 5. Run threat modelling, authorization tests, accessibility checks, and realistic load tests.
-6. Implement payment reconciliation, refunds, disputes, and webhook signature/idempotency checks before accepting customer funds.
+6. Before accepting customer funds in any future release, choose an authorised payments design and complete payment reconciliation, refunds, disputes, security review and applicable legal/compliance work. The current release does not collect customer funds.
 7. Configure a durable always-on deployment process and a managed production plan.
 
 **Deployment note:** this instance is on the BasicDeploy Free plan. It is suitable for an MVP preview, but the account does not currently include always-on hosting. A free container may sleep and a process is not guaranteed to relaunch after a container restart, so do not treat this deployment alone as a 24/7 production SLA.
