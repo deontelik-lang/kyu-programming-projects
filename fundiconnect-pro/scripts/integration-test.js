@@ -184,6 +184,14 @@ async function cleanup() {
     response = await request('/api/admin/overview', { cookie: customerCookie });
     check('admin endpoints enforce role-based access', response.status === 403);
 
+    await pool.query('UPDATE users SET role=$2,updated_at=now() WHERE id=$1', [customerId, 'admin']);
+    response = await request('/api/admin/overview', { cookie: customerCookie });
+    check('admin dashboard returns metrics for an admin', response.status === 200 && Array.isArray(response.data.users));
+    response = await request('/api/admin/fundis', { cookie: customerCookie });
+    check('admin can view verification queue', response.status === 200 && (response.data.fundis || []).some(item => item.profile_id === fundiProfileId));
+    response = await request('/api/admin/fundis/' + fundiProfileId + '/verification', { method: 'PATCH', cookie: customerCookie, body: { level: 'silver' } });
+    check('admin can update review status', response.status === 200 && response.data.level === 'silver');
+
     response = await request('/api/auth/logout', { method: 'POST', cookie: customerCookie, body: {} });
     response = await request('/api/bookings', { cookie: customerCookie });
     check('logout revokes the session', response.status === 401);
