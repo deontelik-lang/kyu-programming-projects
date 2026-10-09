@@ -8,7 +8,7 @@ for (const [index, source] of scripts.entries()) new vm.Script(source, { filenam
 for (const required of ['CampusConnect + FundiConnect', '/api/fundis', '/api/bookings', '/api/auth/register', '/api/members', 'Campus & alumni network', 'state.platformProfile=d.platformProfile', 'name="publicDirectory"', 'function showPolicy', 'directPaymentLabel', 'providerPaymentPanel', 'loadAdminBookingDisputes', 'loadAdminFundiReports', 'Report profile', 'const kenyaCounties=']) {
   if (!html.includes(required)) throw new Error('Required UI/API reference missing: ' + required);
 }
-const countyArray = html.match(/const kenyaCounties=(\\[[^;]+\\]);/);
+const countyArray = html.match(/const kenyaCounties=(\[[^;]+\]);/);
 if (!countyArray) throw new Error('Kenyan county list is missing.');
 const counties = vm.runInNewContext(countyArray[1]);
 if (counties.length !== 47 || new Set(counties).size !== 47) throw new Error('County dropdown must contain all 47 unique Kenyan counties.');
