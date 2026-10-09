@@ -18,6 +18,7 @@ const testIp = '198.51.100.' + (Math.floor(Math.random() * 200) + 20);
 const password = 'IntegrationPassword#12345';
 const emailCustomer = 'fctest-' + runId + '-customer@example.invalid';
 const emailFundi = 'fctest-' + runId + '-fundi@example.invalid';
+const emailCompany = 'fctest-' + runId + '-company@example.invalid';
 const phone = '2547' + String(Date.now()).slice(-8);
 const checks = [];
 let customerId = null;
@@ -55,7 +56,7 @@ async function cleanup() {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    const users = await client.query('SELECT id FROM users WHERE email=ANY($1::text[])', [[emailCustomer, emailFundi]]);
+    const users = await client.query('SELECT id FROM users WHERE email=ANY($1::text[])', [[emailCustomer, emailFundi, emailCompany]]);
     const userIds = users.rows.map(r => r.id);
     const profiles = await client.query('SELECT id FROM fundi_profiles WHERE user_id=ANY($1::uuid[])', [userIds]);
     const profileIds = profiles.rows.map(r => r.id);
@@ -112,6 +113,23 @@ async function cleanup() {
     });
     check('valid login issues a session cookie', response.status === 200 && Boolean(response.cookie));
     customerCookie = response.cookie;
+
+    response = await request('/api/auth/register', {
+      method: 'POST',
+      body: { fullName: 'FundiConnect Test Company', email: emailCompany, password, persona: 'employer', organisation: 'Integration Test Organisation', companyWebsite: 'https://example.invalid' }
+    });
+    check('business and employer sign-up creates a company account', response.status === 201 && response.data.user.role === 'company');
+    const companyCookie = response.cookie;
+    response = await request('/api/company/dashboard', { cookie: companyCookie });
+    check('company workspace initializes with a self-declared profile', response.status === 200 && response.data.profile.organization_name === 'Integration Test Organisation');
+    response = await request('/api/company/profile', { method: 'PATCH', cookie: companyCookie, body: { organizationName: 'Integration Test Organisation Ltd', website: 'https://example.invalid', description: 'A test company for hiring student developers.' } });
+    check('company can save its organisation profile', response.status === 200 && response.data.profile.organization_name === 'Integration Test Organisation Ltd');
+    response = await request('/api/hubs/listings', { method: 'POST', cookie: companyCookie, body: { type: 'internship', title: 'Company platform QA internship', description: 'A testing internship for students checking the company workspace.', category: 'Software testing', county: 'Nairobi', town: 'Kahawa' } });
+    check('company account can publish an internship', response.status === 201 && response.data.listing.hub_type === 'internship');
+    response = await request('/api/company/dashboard', { cookie: companyCookie });
+    check('company dashboard summarizes company listings', response.status === 200 && Number(response.data.metrics.total_listings) === 1 && Number(response.data.metrics.active_roles) === 1);
+    response = await request('/api/company/dashboard', { cookie: customerCookie });
+    check('company dashboard blocks non-company members', response.status === 403);
 
     response = await request('/api/auth/register', {
       method: 'POST',
@@ -226,6 +244,13 @@ async function cleanup() {
     response = await request('/api/hubs/listings', { method: 'POST', cookie: customerCookie, body: { type: 'community', title: 'Integration campus discussion', description: 'A community post for testing discussion replies.' } });
     check('community discussion can be created', response.status === 201);
     const communityId = response.data.listing.id;
+    response = await request('/api/rewards', { cookie: customerCookie });
+    check('publishing listings earns reward points', response.status === 200 && response.data.points >= 30 && response.data.reward.cost === 20);
+    response = await request('/api/rewards/feature-listing', { method: 'POST', cookie: customerCookie, body: { listingId: hubListingId } });
+    check('reward points can feature an owned listing for seven days', response.status === 200 && response.data.pointsSpent === 20 && Number(response.data.points) >= 10);
+    response = await request('/api/hubs/listings?type=job&q=junior%20web%20developer');
+    check('featured listing is visible with a spotlight flag', response.status === 200 && (response.data.listings || []).some(l => l.id === hubListingId && l.is_featured === true));
+
     response = await request('/api/hubs/listings/' + communityId + '/comments', { method: 'POST', cookie: fundiCookie, body: { body: 'This is a test reply from a community member.' } });
     check('community reply persists', response.status === 201);
     response = await request('/api/hubs/listings/' + communityId + '/comments');
@@ -257,6 +282,8 @@ async function cleanup() {
     await pool.query('UPDATE users SET role=$2,updated_at=now() WHERE id=$1', [customerId, 'admin']);
     response = await request('/api/admin/overview', { cookie: customerCookie });
     check('admin dashboard returns metrics for an admin', response.status === 200 && Array.isArray(response.data.users));
+    response = await request('/api/admin/analytics', { cookie: customerCookie });
+    check('admin can view hub, rewards and daily platform analytics', response.status === 200 && Array.isArray(response.data.listings) && Array.isArray(response.data.daily) && response.data.rewards);
     response = await request('/api/admin/fundis', { cookie: customerCookie });
     check('admin can view verification queue', response.status === 200 && (response.data.fundis || []).some(item => item.profile_id === fundiProfileId));
     response = await request('/api/admin/fundis/' + fundiProfileId + '/verification', { method: 'PATCH', cookie: customerCookie, body: { level: 'silver' } });
