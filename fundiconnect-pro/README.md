@@ -2,7 +2,7 @@
 
 **Kenya's Trusted Skilled Workers Marketplace**
 
-FundiConnect Pro is a Kenya-first marketplace MVP connecting customers with electricians, CCTV installers, and WiFi/network technicians. This repository contains the working browser UI, same-origin HTTP API, PostgreSQL migrations, operational scripts, and CI checks.
+FundiConnect Pro is a Kenya-first marketplace MVP connecting customers with electricians, CCTV installers, and WiFi/network technicians. This repository contains the working browser UI, same-origin HTTP API, PostgreSQL migrations, operational scripts, and CI checks for both the Fundi services marketplace and CampusConnect student/opportunity hubs.
 
 > **Release status:** functional MVP, not yet a fully production-hardened marketplace. The deployed site is live, but no payments are taken and identity checks, SMS OTP, email verification, live dispatch, and several planned features are not connected.
 
@@ -24,6 +24,12 @@ FundiConnect Pro is a Kenya-first marketplace MVP connecting customers with elec
 - Admin summary, recent booking list, and a protected manual verification-level control.
 - Audit events, parameterized database queries, basic rate limiting, security response headers, request-size limits, origin checks, and session revocation.
 - Numbered SQL migrations, code syntax checks, a browser-script check, guarded integration tests, and a GitHub Actions CI workflow.
+
+## CampusConnect super-app modules
+
+The app includes 13 database-backed opportunity hubs: student gigs, jobs, internships/graduate roles, housing, products, events, courses/skills academy listings, business directory, community posts, transport/delivery listings, student services, alumni/mentorship and professional service offers. Members can publish listings, search by hub and location, apply or inquire, RSVP, save items, comment on campus posts, exchange persistent listing messages, report abusive listings, and review incoming applications through owner dashboards. User profiles can include campus, course, study level, graduation year, organisation, portfolio and skills; a printable CV preview uses that profile data. Emergency request records are persistent but do not dispatch responders. A local rules-based study/career guide and user-input cost worksheet are included; neither is a connected generative AI service or external market-price engine.
+
+The initial version implements the core flows and provides clear integration boundaries, not every item from the full vision. Wallet transfers, M-Pesa, rent collection, paid ticketing, payout/escrow, real OTP/email delivery, identity document validation/background checks, live GPS, push notifications, real-time WebSocket chat, course content delivery, employer integrations, referral reward awards and AI-provider calls are **not enabled**.
 
 ## Stack
 
@@ -73,6 +79,18 @@ All endpoints are same-origin under **/api**. Authenticated sessions use an opaq
 | Method | Endpoint | Purpose |
 |---|---|---|
 | GET | **/api/health** | Application/database health |
+| GET | **/api/hubs/types** | Supported hubs |
+| GET | **/api/hubs/listings** | Search listings by hub, keyword, location |
+| POST | **/api/hubs/listings** | Publish a job, gig, event, product, housing or other hub listing |
+| POST | **/api/hubs/listings/:id/actions** | Apply, inquire, RSVP, enrol interest, mentor request or save |
+| GET | **/api/hubs/activity** | User-owned listings, applications, points summary |
+| GET/POST | **/api/hubs/listings/:id/comments** | Community replies |
+| GET/POST | **/api/hubs/messages** | Persistent listing messages (not live push) |
+| POST | **/api/hubs/listings/:id/report** | Report potentially abusive listings |
+| GET/POST | **/api/favorites** | Saved professionals/listings |
+| GET/POST | **/api/emergency-requests** | Record and list emergency requests (no dispatch) |
+| PATCH | **/api/platform-profile** | Update campus/career identity fields |
+| GET | **/api/cv** | Build CV preview data |
 | GET | **/api/categories** | Launch categories |
 | GET | **/api/fundis** | Search/filter available fundi profiles |
 | GET | **/api/fundis/:profileId** | Public fundi profile |
