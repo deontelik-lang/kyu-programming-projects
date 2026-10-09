@@ -208,7 +208,7 @@ async function mainRouter(req, res, url) {
 
   if (method === 'GET' && pathname === '/api/health') {
     const db = await pool.query('SELECT 1 AS ok');
-    return json(res, 200, { ok: true, database: db.rows[0].ok === 1, service: 'FundiConnect Pro API', time: new Date().toISOString() });
+    return json(res, 200, { ok: true, database: db.rows[0].ok === 1, service: 'FundiConnect Pro API', runtime: process.versions.node, time: new Date().toISOString() });
   }
 
   if (method === 'GET' && pathname === '/api/categories') {
