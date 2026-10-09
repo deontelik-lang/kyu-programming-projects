@@ -115,7 +115,11 @@ async function handleMarketplaceRoutes(ctx) {
     if (user.role !== 'admin' && booking.fundi_user_id !== user.id) return fail(res, 403, 'NOT_YOUR_BOOKING', 'Only the assigned professional can quote for this request.');
     if (!['pending','accepted'].includes(booking.status)) return fail(res, 409, 'QUOTE_NOT_ALLOWED', 'Quotes can only be set for pending or accepted requests.');
     if (['pending','paid'].includes(booking.payment_status) || ['customer_reported_paid','provider_reported_received','confirmed','disputed'].includes(booking.direct_payment_status)) return fail(res, 409, 'QUOTE_LOCKED', 'The quote cannot be changed after a payment has been recorded.');
-    const updated = await pool.query("UPDATE bookings SET quoted_price=$2,status='accepted',updated_at=now() WHERE id=$1 RETURNING id,quoted_price,status,direct_payment_status", [booking.id, amount]);
+    const instructionResult = await pool.query('SELECT * FROM provider_payment_instructions WHERE fundi_id=$1', [booking.fundi_id]);
+    const instructions = methodsForRecord(instructionResult.rows[0]);
+    if (!instructions.accepted_methods.length) return fail(res, 409, 'PAYMENT_METHODS_NOT_SET', 'Save your direct payment instructions before sending a quote.');
+    const snapshot = JSON.stringify(instructions);
+    const updated = await pool.query("UPDATE bookings SET quoted_price=$2,direct_payment_instructions_snapshot=$3::jsonb,status='accepted',updated_at=now() WHERE id=$1 RETURNING id,quoted_price,status,direct_payment_status,direct_payment_instructions_snapshot", [booking.id, amount, snapshot]);
     await addBookingEvent(pool, booking.id, user.id, 'quote_set', { amount });
     await createNotification(booking.customer_id, 'booking.quote', 'Service quote received', 'A quote of KSh ' + amount.toLocaleString('en-KE') + ' is ready for "' + booking.service_title + '". Review it in your dashboard.', booking.id);
     await logAudit(user.id, 'booking.quote_set', 'booking', booking.id, { amount });
@@ -127,8 +131,14 @@ async function handleMarketplaceRoutes(ctx) {
     const booking = await bookingParticipant(pool, bookingInstructionsPath[1]);
     if (!booking || !isParticipant(user, booking)) return fail(res, 404, 'BOOKING_NOT_FOUND', 'Booking not found for your account.');
     if (!['accepted','assigned','traveling','in_progress','completed'].includes(booking.status) || Number(booking.quoted_price || 0) < 1) return fail(res, 409, 'PAYMENT_INSTRUCTIONS_NOT_READY', 'Payment instructions appear after the provider accepts the request and sends a quote.');
-    const result = await pool.query('SELECT * FROM provider_payment_instructions WHERE fundi_id=$1', [booking.fundi_id]);
-    return json(res, 200, { instructions: methodsForRecord(result.rows[0]), quote: Number(booking.quoted_price), method: booking.direct_payment_method, paymentStatus: booking.direct_payment_status, providerName: booking.fundi_name, accountName: result.rows[0]?.account_name || '' });
+    const snapshot = booking.direct_payment_instructions_snapshot || {};
+    const snapshotMethods = Array.isArray(snapshot.accepted_methods) ? snapshot.accepted_methods : [];
+    let instructions = snapshotMethods.length ? snapshot : null;
+    if (!instructions) {
+      const result = await pool.query('SELECT * FROM provider_payment_instructions WHERE fundi_id=$1', [booking.fundi_id]);
+      instructions = methodsForRecord(result.rows[0]);
+    }
+    return json(res, 200, { instructions, quote: Number(booking.quoted_price), method: booking.direct_payment_method, paymentStatus: booking.direct_payment_status, providerName: booking.fundi_name, accountName: instructions.account_name || '' });
   }
 
   if (bookingConfirmationPath && method === 'POST') {
@@ -143,8 +153,13 @@ async function handleMarketplaceRoutes(ctx) {
     if (!isCustomer && !isFundi) return fail(res, 403, 'NOT_BOOKING_PARTICIPANT', 'Only the customer and assigned provider may confirm a payment.');
     if (!['accepted','assigned','traveling','in_progress','completed'].includes(booking.status) || Number(booking.quoted_price || 0) < 1) return fail(res, 409, 'QUOTE_REQUIRED', 'A positive quote and an accepted booking are required first.');
     if (booking.direct_payment_status === 'disputed') return fail(res, 409, 'PAYMENT_DISPUTED', 'This payment is disputed. The open case must be reviewed.');
-    const instructionsResult = await pool.query('SELECT accepted_methods FROM provider_payment_instructions WHERE fundi_id=$1', [booking.fundi_id]);
-    const accepted = instructionsResult.rows[0]?.accepted_methods || [];
+    const snapshot = booking.direct_payment_instructions_snapshot || {};
+    const snapshotMethods = Array.isArray(snapshot.accepted_methods) ? snapshot.accepted_methods : [];
+    let accepted = snapshotMethods;
+    if (!accepted.length) {
+      const instructionsResult = await pool.query('SELECT accepted_methods FROM provider_payment_instructions WHERE fundi_id=$1', [booking.fundi_id]);
+      accepted = instructionsResult.rows[0]?.accepted_methods || [];
+    }
     if (!accepted.length) return fail(res, 409, 'PAYMENT_METHODS_NOT_SET', 'The service provider has not added payment instructions yet.');
     const actionAllowed = (action === 'customer_paid' && isCustomer) || (action === 'provider_received' && isFundi);
     if (!actionAllowed) return fail(res, 403, 'INVALID_CONFIRMATION_ACTION', 'Customers report that they paid; providers confirm receipt.');
