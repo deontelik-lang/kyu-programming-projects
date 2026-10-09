@@ -205,7 +205,7 @@ async function handleHubRoutes(ctx) {
       if (action !== 'save') await createNotification(listing.owner_user_id, 'hub.' + action, 'New ' + action + ' on your listing', user.full_name + ' ' + action + 'ed your listing: ' + listing.title);
       await logAudit(user.id, 'hub.listing_action', 'hub_listing', listing.id, { action });
       const pointsAwarded = action === 'save' ? 0 : 2;
-      if (pointsAwarded) await awardPoints(pool, user.id, pointsAwarded, 'opportunity_action', 'hub_action', insert.rows[0].id);
+      if (pointsAwarded) await awardPoints(pool, user.id, pointsAwarded, 'opportunity_action', 'hub_action', listing.id + ':' + action);
       return json(res, 201, { action: insert.rows[0], pointsAwarded, confirmationCode: action === 'attend' ? 'CC-' + insert.rows[0].id.slice(0,8).toUpperCase() : undefined });
     } catch (e) {
       if (e.code === '23505') return fail(res, 409, 'ACTION_EXISTS', 'You have already completed this action for that listing.');
