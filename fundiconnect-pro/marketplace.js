@@ -184,7 +184,7 @@ async function handleMarketplaceRoutes(ctx) {
       if (error.code === '23505') return fail(res, 409, 'ACTIVE_DISPUTE_EXISTS', 'An open dispute already exists for this booking. Add information to the existing case through support.');
       throw error;
     }
-    await pool.query("UPDATE bookings SET direct_payment_status='disputed',updated_at=now() WHERE id=$1", [booking.id]);
+    await pool.query("UPDATE bookings SET direct_payment_status_before_dispute=CASE WHEN direct_payment_status<>'disputed' THEN direct_payment_status ELSE direct_payment_status_before_dispute END,direct_payment_status='disputed',updated_at=now() WHERE id=$1", [booking.id]);
     await addBookingEvent(pool, booking.id, user.id, 'dispute_opened', { disputeId, category, description });
     const recipient = user.id === booking.customer_id ? booking.fundi_user_id : booking.customer_id;
     await createNotification(recipient, 'booking.dispute', 'Booking dispute opened', 'A dispute has been opened for "' + booking.service_title + '". Please keep relevant evidence and respond through support.', booking.id);
@@ -221,6 +221,9 @@ async function handleMarketplaceRoutes(ctx) {
     const result = await pool.query('UPDATE booking_disputes SET status=$2,resolution_note=$3,reviewed_by=$4,updated_at=now(),closed_at=CASE WHEN $2 IN (\'resolved\',\'dismissed\') THEN now() ELSE NULL END WHERE id=$1 RETURNING *', [adminDisputePath[1], status, resolutionNote, user.id]);
     if (!result.rowCount) return fail(res, 404, 'DISPUTE_NOT_FOUND', 'Dispute not found.');
     const d = result.rows[0];
+    if (['resolved','dismissed'].includes(status)) {
+      await pool.query("UPDATE bookings SET direct_payment_status=COALESCE(direct_payment_status_before_dispute,'unpaid'),direct_payment_status_before_dispute=NULL,updated_at=now() WHERE id=$1 AND direct_payment_status='disputed'", [d.booking_id]);
+    }
     await addBookingEvent(pool, d.booking_id, user.id, 'dispute_status_changed', { disputeId: d.id, status, resolutionNote });
     await logAudit(user.id, 'booking.dispute_status_changed', 'booking_dispute', d.id, { status });
     return json(res, 200, { dispute: d });
