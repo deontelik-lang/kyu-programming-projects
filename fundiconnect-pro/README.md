@@ -27,7 +27,7 @@ FundiConnect Pro is a Kenya-first marketplace MVP connecting customers with elec
 
 ## Stack
 
-- Node.js 20+
+- Node.js 24 LTS (tested with 24.21.0)
 - PostgreSQL
 - pg database driver
 - Responsive HTML/CSS and vanilla JavaScript frontend served from the same origin
@@ -36,7 +36,7 @@ The current single-container stack was chosen to get the core marketplace workin
 
 ## Run locally
 
-1. Install Node.js 20 or newer and PostgreSQL.
+1. Install Node.js 24 LTS and PostgreSQL.
 2. Copy **.env.example** to **.env** and set **DATABASE_URL**. Do not commit **.env**.
 3. Install dependencies and run:
 
@@ -48,7 +48,7 @@ The current single-container stack was chosen to get the core marketplace workin
 
 4. Open http://localhost:8080.
 
-The server listens on **0.0.0.0:8080** by default. At startup it applies new numbered SQL files from the migrations directory and seeds the three launch categories. Use a dedicated development database locally, not a production database.
+The server listens on **0.0.0.0:8080** by default. On Linux x64/arm64, **run.sh** prefers the pinned Node.js 24.21.0 runtime if installed and fails closed if the current runtime is older than Node 24. Install the self-contained runtime with `sh scripts/install-node-runtime.sh`; the installer validates its archive against Node.js's official SHA-256 manifest before extracting it. The runtime binary is ignored by Git; only bootstrap scripts are committed. At startup, the server applies new numbered SQL files once and seeds the three launch categories. Use a dedicated development database locally, not a production database.
 
 ## Admin access
 
