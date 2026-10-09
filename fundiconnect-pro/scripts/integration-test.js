@@ -234,6 +234,14 @@ async function cleanup() {
     check('listing owner can see applications', response.status === 200 && (response.data.actions || []).some(a => a.id === applicationId));
     response = await request('/api/hubs/actions/' + applicationId + '/status', { method: 'PATCH', cookie: customerCookie, body: { status: 'accepted' } });
     check('listing owner can review an application', response.status === 200 && response.data.status === 'accepted');
+    response = await request('/api/rewards', { cookie: fundiCookie });
+    const pointsBeforeRepeat = Number(response.data.points || 0);
+    response = await request('/api/hubs/listings/' + hubListingId + '/actions/apply', { method: 'DELETE', cookie: fundiCookie });
+    check('member can withdraw an application', response.status === 200);
+    response = await request('/api/hubs/listings/' + hubListingId + '/actions', { method: 'POST', cookie: fundiCookie, body: { action: 'apply', note: 'Reapplying to verify reward idempotency.' } });
+    check('member may resubmit an application after withdrawing', response.status === 201);
+    response = await request('/api/rewards', { cookie: fundiCookie });
+    check('reapplying to the same listing cannot farm points', response.status === 200 && Number(response.data.points || 0) === pointsBeforeRepeat);
 
     response = await request('/api/hubs/listings', { method: 'POST', cookie: customerCookie, body: { type: 'event', title: 'Integration campus career event', description: 'A demo campus career event for testing the RSVP workflow.', county: 'Nairobi', town: 'Kahawa', startsAt: new Date(Date.now() + 86400000).toISOString() } });
     check('event listing can be published', response.status === 201);
