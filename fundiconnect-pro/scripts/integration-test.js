@@ -96,7 +96,7 @@ async function cleanup() {
 
     response = await request('/api/auth/register', {
       method: 'POST',
-      body: { fullName: 'FundiConnect Test Customer', email: emailCustomer, password, role: 'customer', persona: 'student', campus: 'Integration Campus', course: 'Information Technology', studyLevel: 'Year 1' }
+      body: { fullName: 'FundiConnect Test Customer', email: emailCustomer, password, role: 'customer', policyConsent: true, persona: 'student', campus: 'Integration Campus', course: 'Information Technology', studyLevel: 'Year 1' }
     });
     check('customer registration creates session', response.status === 201 && Boolean(response.cookie));
     customerCookie = response.cookie;
@@ -119,7 +119,7 @@ async function cleanup() {
 
     response = await request('/api/auth/register', {
       method: 'POST',
-      body: { fullName: 'FundiConnect Test Company', email: emailCompany, password, persona: 'employer', organisation: 'Integration Test Organisation', companyWebsite: 'https://example.invalid' }
+      body: { fullName: 'FundiConnect Test Company', email: emailCompany, password, policyConsent: true, persona: 'employer', organisation: 'Integration Test Organisation', companyWebsite: 'https://example.invalid' }
     });
     check('business and employer sign-up creates a company account', response.status === 201 && response.data.user.role === 'company');
     const companyCookie = response.cookie;
@@ -137,7 +137,7 @@ async function cleanup() {
     response = await request('/api/auth/register', {
       method: 'POST',
       body: {
-        fullName: 'FundiConnect Test Fundi', email: emailFundi, phone, password,
+        fullName: 'FundiConnect Test Fundi', email: emailFundi, phone, password, policyConsent: true,
         role: 'fundi', categorySlug: 'network', professionalTitle: 'Network Technician',
         county: 'Nairobi', town: 'Westlands'
       }
@@ -198,12 +198,25 @@ async function cleanup() {
       method: 'PATCH', cookie: fundiCookie, body: { amount: 2500 }
     });
     check('assigned fundi can quote and accept a booking', response.status === 200 && Number(response.data.booking.quoted_price) === 2500 && response.data.booking.status === 'accepted');
+
+    response = await request('/api/fundi/payment-instructions', { method: 'PATCH', cookie: fundiCookie, body: { acceptedMethods: ['mpesa_till','cash'], mpesaTill: '1234567', accountName: 'Fundi Test Recipient' } });
+    check('fundi can save direct payment instructions without platform credentials', response.status === 200 && response.data.instructions.mpesa_till === '1234567' && response.data.instructions.accepted_methods.includes('cash'));
+    response = await request('/api/bookings/' + bookingId + '/payment-instructions', { cookie: customerCookie });
+    check('accepted customer can view provider payment instructions', response.status === 200 && response.data.instructions.mpesa_till === '1234567' && response.data.paymentStatus === 'unpaid');
+    response = await request('/api/bookings/' + bookingId + '/payment-confirmation', { method: 'POST', cookie: customerCookie, body: { action: 'customer_paid', method: 'mpesa_till', reference: 'TEST-RECEIPT-01' } });
+    check('customer payment report is timestamped but not independently verified', response.status === 200 && response.data.booking.direct_payment_status === 'customer_reported_paid' && Boolean(response.data.booking.customer_payment_confirmed_at));
+    response = await request('/api/bookings/' + bookingId + '/payment-confirmation', { method: 'POST', cookie: fundiCookie, body: { action: 'provider_received', method: 'mpesa_till' } });
+    check('provider receipt confirmation creates two-sided confirmed state', response.status === 200 && response.data.booking.direct_payment_status === 'confirmed' && Boolean(response.data.booking.provider_payment_confirmed_at));
+
+    response = await request('/api/fundis/' + fundiProfileId + '/report', { method: 'POST', cookie: customerCookie, body: { reason: 'misleading', details: 'Profile details require an additional review.' } });
+    check('customer can report a provider profile for moderation', response.status === 201 && response.data.report.status === 'open');
+
     if (!mpesaEnabled) {
       response = await request('/api/payments/mpesa/stk-push', {
         method: 'POST', cookie: customerCookie,
         body: { bookingId, phoneNumber: phone }
       });
-      check('M-Pesa checkout fails closed while provider settings are absent', response.status === 503);
+      check('platform M-Pesa checkout is removed for direct-to-provider launch', response.status === 410 && response.data.error === 'DIRECT_PAYMENT_MODEL');
     }
 
     for (const status of ['in_progress', 'completed']) {
@@ -224,6 +237,12 @@ async function cleanup() {
       body: { bookingId, rating: 5, professionalism: 5, speed: 5, communication: 5, quality: 5, value: 5 }
     });
     check('duplicate review is prevented', response.status === 409);
+
+    response = await request('/api/bookings/' + bookingId + '/disputes', { method: 'POST', cookie: customerCookie, body: { category: 'quality', description: 'The delivered work needs a review against the original agreement.' } });
+    check('booking participant can open a documented dispute', response.status === 201 && response.data.dispute.status === 'open');
+    response = await request('/api/bookings', { cookie: customerCookie });
+    const testBooking = (response.data.bookings || []).find(b => b.id === bookingId);
+    check('booking dashboard exposes active dispute and recorded payment status', response.status === 200 && testBooking?.has_open_dispute === true && testBooking?.direct_payment_status === 'disputed');
 
     response = await request('/api/platform-profile', { method: 'PATCH', cookie: customerCookie, body: { persona: 'student', headline: 'IT student looking for internships', campus: 'Integration Campus', course: 'Information Technology', studyLevel: 'Year 1', graduationYear: 2029, bio: 'Testing CampusConnect profile', skills: ['C', 'Networking'], organisation: '', portfolioUrl: '' } });
     check('student profile can be edited', response.status === 200 && response.data.profile.campus === 'Integration Campus');
@@ -312,8 +331,30 @@ async function cleanup() {
     check('admin can view hub, rewards and daily platform analytics', response.status === 200 && Array.isArray(response.data.listings) && Array.isArray(response.data.daily) && response.data.rewards);
     response = await request('/api/admin/fundis', { cookie: customerCookie });
     check('admin can view verification queue', response.status === 200 && (response.data.fundis || []).some(item => item.profile_id === fundiProfileId));
+    response = await request('/api/admin/fundis/' + fundiProfileId + '/verification-checks', { method: 'PATCH', cookie: customerCookie, body: { checkType: 'identity', status: 'verified', evidenceNote: 'Test review of identity evidence' } });
+    check('admin can record an identity evidence check', response.status === 200 && response.data.check.status === 'verified');
+    response = await request('/api/admin/fundis/' + fundiProfileId + '/verification-checks', { method: 'PATCH', cookie: customerCookie, body: { checkType: 'phone', status: 'verified', evidenceNote: 'Test review of phone contact' } });
+    check('admin can record a phone evidence check', response.status === 200 && response.data.check.status === 'verified');
     response = await request('/api/admin/fundis/' + fundiProfileId + '/verification', { method: 'PATCH', cookie: customerCookie, body: { level: 'silver' } });
-    check('admin can update review status', response.status === 200 && response.data.level === 'silver');
+    check('verification level requires the matching evidence checks', response.status === 200 && response.data.level === 'silver');
+    response = await request('/api/admin/fundis/' + fundiProfileId + '/verification', { method: 'PATCH', cookie: customerCookie, body: { level: 'platinum' } });
+    check('admin cannot award higher verification without required evidence', response.status === 409 && response.data.error === 'VERIFICATION_EVIDENCE_REQUIRED');
+    response = await request('/api/admin/booking-disputes', { cookie: customerCookie });
+    const adminDispute = (response.data.disputes || []).find(d => d.booking_id === bookingId);
+    check('admin can view booking dispute and booking event timeline', response.status === 200 && Boolean(adminDispute) && adminDispute.timeline.length >= 4);
+    response = await request('/api/admin/booking-disputes/' + adminDispute.id, { method: 'PATCH', cookie: customerCookie, body: { status: 'reviewing', resolutionNote: 'Reviewing both parties records.' } });
+    check('admin can mark a booking dispute under review', response.status === 200 && response.data.dispute.status === 'reviewing');
+    response = await request('/api/admin/booking-disputes/' + adminDispute.id, { method: 'PATCH', cookie: customerCookie, body: { status: 'resolved', resolutionNote: 'Test case reviewed and closed.' } });
+    check('closing a dispute restores the underlying payment confirmation state', response.status === 200 && response.data.dispute.status === 'resolved');
+    response = await request('/api/bookings', { cookie: customerCookie });
+    check('resolved dispute is no longer shown as active and confirmed payment state is restored', response.status === 200 && (response.data.bookings || []).find(b=>b.id===bookingId)?.has_open_dispute===false && (response.data.bookings || []).find(b=>b.id===bookingId)?.direct_payment_status==='confirmed');
+
+    response = await request('/api/admin/fundi-reports', { cookie: customerCookie });
+    check('admin can view the provider moderation queue', response.status === 200 && (response.data.reports || []).some(r=>r.fundi_id===fundiProfileId));
+    const fundiReportId=(response.data.reports||[]).find(r=>r.fundi_id===fundiProfileId)?.id;
+    response = await request('/api/admin/fundi-reports/' + fundiReportId, { method:'PATCH',cookie:customerCookie,body:{status:'resolved',reviewNote:'Test report reviewed.'} });
+    check('admin can resolve a provider report with a note', response.status===200 && response.data.report.status==='resolved');
+
     response = await request('/api/admin/hubs/reports', { cookie: customerCookie });
     check('admin can view marketplace reports', response.status === 200 && (response.data.reports || []).some(r => r.listing_id === hubListingId));
     hubReportId = (response.data.reports || []).find(r => r.listing_id === hubListingId)?.id;
