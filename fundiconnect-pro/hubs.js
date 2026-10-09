@@ -438,7 +438,7 @@ async function handleHubRoutes(ctx) {
       pool.query('SELECT status,COUNT(*)::int AS count FROM hub_reports GROUP BY status ORDER BY status'),
       pool.query("SELECT COALESCE(SUM(points) FILTER(WHERE points>0),0)::int AS issued,COALESCE(SUM(-points) FILTER(WHERE points<0),0)::int AS redeemed,COUNT(DISTINCT user_id)::int AS participating_users FROM reward_ledger"),
       pool.query('SELECT status,COUNT(*)::int AS count FROM bookings GROUP BY status ORDER BY status'),
-      pool.query("SELECT to_char(d.day,'YYYY-MM-DD') AS day,COALESCE(u.count,0)::int AS signups,COALESCE(l.count,0)::int AS listings FROM generate_series(current_date-13,current_date,interval '1 day') d(day) LEFT JOIN (SELECT date_trunc('day',created_at)::date AS day,COUNT(*) AS count FROM users GROUP BY 1) u ON u.day=d.day::date LEFT JOIN (SELECT date_trunc('day',created_at)::date AS day,COUNT(*) AS count FROM hub_listings GROUP BY 1) l ON l.day=d.day::date ORDER BY d.day")
+      pool.query("SELECT to_char(d.day,'YYYY-MM-DD') AS day,COALESCE(u.count,0)::int AS signups,COALESCE(l.count,0)::int AS listings FROM generate_series(current_date::timestamptz-interval '13 days',current_date::timestamptz,interval '1 day') d(day) LEFT JOIN (SELECT date_trunc('day',created_at)::date AS day,COUNT(*) AS count FROM users GROUP BY 1) u ON u.day=d.day::date LEFT JOIN (SELECT date_trunc('day',created_at)::date AS day,COUNT(*) AS count FROM hub_listings GROUP BY 1) l ON l.day=d.day::date ORDER BY d.day")
     ]);
     return json(res, 200, { users: userCounts.rows, listings: listings.rows, actions: actions.rows, reports: reports.rows, rewards: points.rows[0], bookings: bookings.rows, daily: daily.rows });
   }
