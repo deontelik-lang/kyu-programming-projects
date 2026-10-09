@@ -1,0 +1,17 @@
+name: Validate FundiConnect Pro
+on:
+  push:
+    branches: [main, fundiconnect-pro-mvp]
+  pull_request:
+    branches: [main, fundiconnect-pro-mvp]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm test
