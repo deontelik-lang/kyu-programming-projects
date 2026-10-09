@@ -173,7 +173,7 @@ Set **FUNDICONNECT_BASE_URL** if the server is not on **http://127.0.0.1:8080**.
 - Upload pipeline for IDs, certificates, work portfolios, and videos
 - Email/SMS/push delivery to real devices
 - Real-time chat and GPS technician tracking
-- Safaricom Daraja STK Push, withdrawals, wallet, escrow, payout/reconciliation/refund workflows
+- Withdrawals, wallet, escrow, payout/reconciliation/refund workflows; the Daraja STK Push code is present but not enabled until provider configuration and sandbox validation are complete
 - Paid subscriptions and company-team invitations/permissions
 - External full-text search, Redis queues/rate limits, CDN/object storage media workflows
 - Automated abuse detection, dispute workflows, fraud monitoring, comprehensive observability, backups/restore drills, and performance/load testing
