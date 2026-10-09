@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "sh run.sh",
-    "check": "node --check server.js && node scripts/check-client.js",
+    "check": "node --check server.js && node --check hubs.js && node --check payments.js && node scripts/check-client.js",
     "test": "npm run check",
     "admin:promote": "node scripts/promote-admin.js",
     "test:integration": "node scripts/integration-test.js"
