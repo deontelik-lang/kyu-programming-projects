@@ -8,6 +8,7 @@ const { promisify } = require('node:util');
 const { Pool } = require('pg');
 const { handleHubRoutes } = require('./hubs');
 const { handlePaymentRoutes } = require('./payments');
+const { handleMarketplaceRoutes } = require('./marketplace');
 
 const scrypt = promisify(crypto.scrypt);
 const PORT = Number(process.env.PORT || 8080);
@@ -281,6 +282,8 @@ async function mainRouter(req, res, url) {
     const password = typeof body.password === 'string' ? body.password : '';
     const personaInput = text(body.persona, 30).toLowerCase();
     const roleRequested = body.role === 'fundi' ? 'fundi' : ((body.role === 'company' || ['business','employer'].includes(personaInput)) ? 'company' : 'customer');
+    const policyConsent = body.policyConsent === true || body.policyConsent === 'on';
+    if (!policyConsent) return fail(res, 400, 'POLICY_CONSENT_REQUIRED', 'Please read and accept the Terms and Privacy Policy before creating an account.');
     if (fullName.length < 2) return fail(res, 400, 'INVALID_NAME', 'Enter your full name.');
     if ((!email || !validEmail(email)) && !phone) return fail(res, 400, 'CONTACT_REQUIRED', 'Enter a valid email address or phone number.');
     if (email && !validEmail(email)) return fail(res, 400, 'INVALID_EMAIL', 'Enter a valid email address.');
@@ -297,7 +300,7 @@ async function mainRouter(req, res, url) {
     try {
       await client.query('BEGIN');
       await client.query(
-        'INSERT INTO users(id,full_name,email,phone,password_hash,role) VALUES($1,$2,$3,$4,$5,$6)',
+        "INSERT INTO users(id,full_name,email,phone,password_hash,role,terms_accepted_at,privacy_accepted_at,policy_version) VALUES($1,$2,$3,$4,$5,$6,now(),now(),'launch-2026-10')",
         [id, fullName, email, phone, passwordHash, role]
       );
       const persona = personas.includes(personaInput) ? personaInput : (role === 'fundi' ? 'worker' : (role === 'company' ? 'business' : 'customer'));
@@ -365,6 +368,8 @@ async function mainRouter(req, res, url) {
   }
 
   const user = await userFromRequest(req).catch(() => null);
+  const marketplaceHandled = await handleMarketplaceRoutes({req,res,url,method,pathname,user,pool,helpers:{json,fail,text,limited,requireRole,readBody,createNotification,logAudit}});
+  if (marketplaceHandled || res.writableEnded) return;
   const paymentHandled = await handlePaymentRoutes({req,res,url,method,pathname,user,pool,helpers:{json,fail,text,limited,requireRole,readBody,createNotification,logAudit}});
   if (paymentHandled || res.writableEnded) return;
   const hubHandled = await handleHubRoutes({req,res,url,method,pathname,user,pool,helpers:{json,fail,text,limited,requireRole,createNotification,logAudit,hubTypes}});
@@ -437,6 +442,7 @@ async function mainRouter(req, res, url) {
       'INSERT INTO bookings(id,customer_id,fundi_id,service_title,description,county,town,scheduled_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',
       [bookingId, user.id, fundiId, title, description, county, town, scheduledAt]
     );
+    await pool.query('INSERT INTO booking_events(id,booking_id,actor_user_id,event_type,details) VALUES($1,$2,$3,$4,$5)', [crypto.randomUUID(),bookingId,user.id,'booking_created',JSON.stringify({serviceTitle:title,county,town,scheduledAt:scheduledAt?scheduledAt.toISOString():null})]);
     await createNotification(profile.rows[0].user_id, 'booking.new', 'New service request', user.full_name + ' requested: ' + title, bookingId);
     await logAudit(user.id, 'booking.created', 'booking', bookingId, { fundiId });
     return json(res, 201, { booking: { id: bookingId, status: 'pending' }, message: 'Your service request has been sent.' });
@@ -469,6 +475,7 @@ async function mainRouter(req, res, url) {
     if (!updated.rowCount) return fail(res, 409, 'BOOKING_CHANGED', 'This booking was updated by another request. Refresh and try again.');
     const recipient = isCustomer ? b.fundi_user_id : b.customer_id;
     await createNotification(recipient, 'booking.status', 'Booking ' + nextStatus.replace('_',' '), 'The service request for "' + b.service_title + '" is now ' + nextStatus.replace('_',' ') + '.', b.id);
+    await pool.query('INSERT INTO booking_events(id,booking_id,actor_user_id,event_type,details) VALUES($1,$2,$3,$4,$5)', [crypto.randomUUID(),b.id,user.id,'booking_status_changed',JSON.stringify({from:b.status,to:nextStatus})]);
     await logAudit(user.id, 'booking.status_changed', 'booking', b.id, { from: b.status, to: nextStatus });
     return json(res, 200, { ok: true, status: nextStatus });
   }
@@ -538,8 +545,14 @@ async function mainRouter(req, res, url) {
     const body = await readBody(req);
     const level = text(body.level, 20).toLowerCase();
     if (!['none','bronze','silver','gold','platinum'].includes(level)) return fail(res, 400, 'INVALID_LEVEL', 'Unknown verification level.');
+    const profile = await pool.query('SELECT id FROM fundi_profiles WHERE id=$1', [verificationPath[1]]);
+    if (!profile.rowCount) return fail(res, 404, 'FUNDI_NOT_FOUND', 'Professional not found.');
+    const checks = await pool.query("SELECT check_type FROM fundi_verification_checks WHERE fundi_id=$1 AND status='verified'", [verificationPath[1]]);
+    const verifiedChecks = new Set(checks.rows.map(x => x.check_type));
+    const requirements = { none: [], bronze: ['identity'], silver: ['identity','phone'], gold: ['identity','phone','qualification'], platinum: ['identity','phone','qualification','reference'] };
+    const missing = requirements[level].filter(x => !verifiedChecks.has(x));
+    if (missing.length) return fail(res, 409, 'VERIFICATION_EVIDENCE_REQUIRED', 'Record verified checks first: ' + missing.join(', ') + '.');
     const result = await pool.query('UPDATE fundi_profiles SET verification_level=$2,updated_at=now() WHERE id=$1 RETURNING id', [verificationPath[1], level]);
-    if (!result.rowCount) return fail(res, 404, 'FUNDI_NOT_FOUND', 'Professional not found.');
     await logAudit(user.id, 'fundi.verification_changed', 'fundi_profile', verificationPath[1], { level });
     return json(res, 200, { ok: true, level });
   }
