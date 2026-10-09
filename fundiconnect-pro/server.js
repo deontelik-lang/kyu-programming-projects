@@ -278,7 +278,8 @@ async function mainRouter(req, res, url) {
     const rawPhone = text(body.phone, 32);
     const phone = rawPhone ? normalizePhone(rawPhone) : null;
     const password = typeof body.password === 'string' ? body.password : '';
-    const roleRequested = body.role === 'fundi' ? 'fundi' : 'customer';
+    const personaInput = text(body.persona, 30).toLowerCase();
+    const roleRequested = body.role === 'fundi' ? 'fundi' : ((body.role === 'company' || ['business','employer'].includes(personaInput)) ? 'company' : 'customer');
     if (fullName.length < 2) return fail(res, 400, 'INVALID_NAME', 'Enter your full name.');
     if ((!email || !validEmail(email)) && !phone) return fail(res, 400, 'CONTACT_REQUIRED', 'Enter a valid email address or phone number.');
     if (email && !validEmail(email)) return fail(res, 400, 'INVALID_EMAIL', 'Enter a valid email address.');
@@ -298,8 +299,7 @@ async function mainRouter(req, res, url) {
         'INSERT INTO users(id,full_name,email,phone,password_hash,role) VALUES($1,$2,$3,$4,$5,$6)',
         [id, fullName, email, phone, passwordHash, role]
       );
-      const personaInput = text(body.persona, 30).toLowerCase();
-      const persona = personas.includes(personaInput) ? personaInput : (role === 'fundi' ? 'worker' : 'customer');
+      const persona = personas.includes(personaInput) ? personaInput : (role === 'fundi' ? 'worker' : (role === 'company' ? 'business' : 'customer'));
       await client.query(
         'INSERT INTO platform_profiles(id,user_id,persona,headline,campus,course,study_level,graduation_year,bio,skills,organisation,portfolio_url) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)',
         [crypto.randomUUID(), id, persona, text(body.headline, 140), text(body.campus, 160), text(body.course, 160), text(body.studyLevel, 80), integer(body.graduationYear, 1990, 2100, null) || null, text(body.bio, 1800), [...new Set((Array.isArray(body.skills) ? body.skills : text(body.skills, 600).split(',')).map(v => text(String(v), 60)).filter(Boolean))].slice(0, 20), text(body.organisation, 180), text(body.portfolioUrl, 500)]
@@ -308,6 +308,15 @@ async function mainRouter(req, res, url) {
         await client.query(
           "INSERT INTO fundi_profiles(id,user_id,category_id,professional_title,county,town) VALUES($1,$2,$3,$4,$5,$6)",
           [profileId, id, categoryId, text(body.professionalTitle, 120) || 'Skilled Professional', text(body.county, 100), text(body.town, 100)]
+        );
+      }
+      if (role === 'company') {
+        const organization = text(body.organisation, 180);
+        const rawWebsite = text(body.companyWebsite, 500);
+        const website = rawWebsite && /^https?:\/\/\S+$/i.test(rawWebsite) ? rawWebsite : '';
+        await client.query(
+          'INSERT INTO company_profiles(id,user_id,organization_name,website) VALUES($1,$2,$3,$4)',
+          [crypto.randomUUID(), id, organization, website]
         );
       }
       await client.query('COMMIT');
