@@ -101,7 +101,7 @@ async function handlePaymentRoutes(ctx) {
     });
   }
 
-  if (pathname.startsWith('/api/payments/mpesa/') || pathname === '/api/payments') {
+  if (pathname.startsWith('/api/payments/') || pathname === '/api/payments') {
     return fail(res, 410, 'DIRECT_PAYMENT_MODEL', 'Platform M-Pesa checkout is disabled. Customers pay the service provider directly and record confirmations in their booking.');
   }
 
