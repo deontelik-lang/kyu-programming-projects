@@ -200,13 +200,14 @@ async function handlePaymentRoutes(ctx) {
       return fail(res, 400, 'INVALID_QUOTE', 'Enter a whole-number quote in Kenyan shillings.');
     }
     const result = await pool.query(
-      'SELECT b.id,b.status,b.customer_id,b.fundi_id,fp.user_id AS fundi_user_id,b.service_title FROM bookings b JOIN fundi_profiles fp ON fp.id=b.fundi_id WHERE b.id=$1',
+      'SELECT b.id,b.status,b.customer_id,b.fundi_id,b.payment_status,fp.user_id AS fundi_user_id,b.service_title FROM bookings b JOIN fundi_profiles fp ON fp.id=b.fundi_id WHERE b.id=$1',
       [quotePath[1]]
     );
     if (!result.rowCount) return fail(res, 404, 'BOOKING_NOT_FOUND', 'Booking not found.');
     const booking = result.rows[0];
     if (user.role !== 'admin' && booking.fundi_user_id !== user.id) return fail(res, 403, 'NOT_YOUR_BOOKING', 'Only the assigned professional can quote for this request.');
     if (!['pending','accepted'].includes(booking.status)) return fail(res, 409, 'QUOTE_NOT_ALLOWED', 'Quotes can only be set for pending or accepted requests.');
+    if (['pending','paid'].includes(booking.payment_status)) return fail(res, 409, 'QUOTE_LOCKED', 'The quote cannot be changed after a payment prompt has started or a payment has succeeded.');
     const updated = await pool.query(
       "UPDATE bookings SET quoted_price=$2,status='accepted',updated_at=now() WHERE id=$1 RETURNING id,quoted_price,status,payment_status",
       [booking.id, amount]
