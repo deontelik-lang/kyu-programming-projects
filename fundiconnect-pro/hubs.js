@@ -48,6 +48,17 @@ async function handleHubRoutes(ctx) {
     return p ? failResult(res, fail, p) : null;
   };
 
+  if (method === 'GET' && pathname === '/api/members') {
+    const q = bounded(url.searchParams.get('q'), 120).toLowerCase();
+    const campus = bounded(url.searchParams.get('campus'), 160);
+    const persona = bounded(url.searchParams.get('persona'), 30).toLowerCase();
+    if (persona && !personaChoices.has(persona)) return fail(res, 400, 'INVALID_PERSONA', 'Choose a supported profile type.');
+    const limit = Math.min(Math.max(Number(url.searchParams.get('limit')) || 36, 1), 80);
+    const r = await pool.query("SELECT pp.id AS profile_id,u.id AS user_id,u.full_name,pp.persona,pp.headline,pp.campus,pp.course,pp.study_level,pp.graduation_year,pp.bio,pp.skills,pp.organisation,pp.portfolio_url,pp.updated_at FROM platform_profiles pp JOIN users u ON u.id=pp.user_id WHERE pp.public_directory=true AND u.is_active=true AND ($1='' OR pp.persona=$1) AND ($2='' OR lower(pp.campus)=lower($2)) AND ($3='' OR lower(u.full_name || ' ' || pp.headline || ' ' || pp.campus || ' ' || pp.course || ' ' || pp.bio || ' ' || array_to_string(pp.skills,' ')) LIKE '%' || $3 || '%') ORDER BY pp.updated_at DESC LIMIT $4",
+      [persona,campus,q,limit]
+    );
+    return json(res, 200, { members: r.rows, count: r.rowCount, privacyNote: 'Only members who opt into the public directory appear here. Contact details are not exposed.' });
+  }
   if (method === 'GET' && pathname === '/api/hubs/types') {
     return json(res, 200, {
       hubs: Object.entries(hubTypes).map(([type, info]) => ({ type, ...info })),
@@ -75,8 +86,8 @@ async function handleHubRoutes(ctx) {
     if (portfolio && !/^https?:\/\/\S+$/i.test(portfolio)) return fail(res, 400, 'INVALID_PORTFOLIO_URL', 'Portfolio URL must begin with http:// or https://.');
     const skills = [...new Set((Array.isArray(body.skills) ? body.skills : bounded(body.skills, 1000).split(',')).map(v => bounded(String(v), 60)).filter(Boolean))].slice(0, 20);
     await pool.query(
-      'INSERT INTO platform_profiles(id,user_id,persona,headline,campus,course,study_level,graduation_year,bio,skills,organisation,portfolio_url,updated_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,now()) ON CONFLICT(user_id) DO UPDATE SET persona=EXCLUDED.persona,headline=EXCLUDED.headline,campus=EXCLUDED.campus,course=EXCLUDED.course,study_level=EXCLUDED.study_level,graduation_year=EXCLUDED.graduation_year,bio=EXCLUDED.bio,skills=EXCLUDED.skills,organisation=EXCLUDED.organisation,portfolio_url=EXCLUDED.portfolio_url,updated_at=now()',
-      [crypto.randomUUID(),user.id,persona,bounded(body.headline,140),bounded(body.campus,160),bounded(body.course,160),bounded(body.studyLevel,80),graduation,bounded(body.bio,1800),skills,bounded(body.organisation,180),portfolio]
+      'INSERT INTO platform_profiles(id,user_id,persona,headline,campus,course,study_level,graduation_year,bio,skills,organisation,portfolio_url,public_directory,updated_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,now()) ON CONFLICT(user_id) DO UPDATE SET persona=EXCLUDED.persona,headline=EXCLUDED.headline,campus=EXCLUDED.campus,course=EXCLUDED.course,study_level=EXCLUDED.study_level,graduation_year=EXCLUDED.graduation_year,bio=EXCLUDED.bio,skills=EXCLUDED.skills,organisation=EXCLUDED.organisation,portfolio_url=EXCLUDED.portfolio_url,public_directory=EXCLUDED.public_directory,updated_at=now()',
+      [crypto.randomUUID(),user.id,persona,bounded(body.headline,140),bounded(body.campus,160),bounded(body.course,160),bounded(body.studyLevel,80),graduation,bounded(body.bio,1800),skills,bounded(body.organisation,180),portfolio,body.publicDirectory===true]
     );
     await logAudit(user.id, 'platform.profile_updated', 'platform_profile', user.id, { persona });
     const r = await pool.query('SELECT * FROM platform_profiles WHERE user_id=$1', [user.id]);
