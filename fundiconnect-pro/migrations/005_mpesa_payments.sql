@@ -27,3 +27,5 @@ CREATE INDEX IF NOT EXISTS idx_mpesa_payments_booking_created
   ON mpesa_payments(booking_id,created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_mpesa_payments_status_created
   ON mpesa_payments(status,created_at DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_mpesa_one_open_payment_per_booking
+  ON mpesa_payments(booking_id) WHERE status IN ('initiating','pending');
