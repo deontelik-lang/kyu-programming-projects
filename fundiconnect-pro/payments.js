@@ -91,16 +91,18 @@ async function handlePaymentRoutes(ctx) {
     return true;
   };
 
+  // Launch model: customers pay providers directly. Platform STK Push and callback routes are deliberately disabled.
   if (method === 'GET' && pathname === '/api/payments/mpesa/config') {
-    const config = enabledConfig();
     return json(res, 200, {
-      provider: 'Safaricom Daraja / M-Pesa Express',
-      enabled: config.enabled,
-      environment: config.environment,
-      note: config.enabled
-        ? 'The payment prompt is enabled. A payment is only confirmed after a matching provider callback.'
-        : 'M-Pesa checkout is disabled until the Daraja keys, shortcode, passkey, HTTPS public URL, callback secret, and explicit enable flag are configured.'
+      provider: 'direct-to-provider',
+      enabled: false,
+      environment: 'not-applicable',
+      note: 'FundiConnect does not collect customer payments in this launch version. Follow payment instructions supplied by the service provider.'
     });
+  }
+
+  if (pathname.startsWith('/api/payments/mpesa/') || pathname === '/api/payments') {
+    return fail(res, 410, 'DIRECT_PAYMENT_MODEL', 'Platform M-Pesa checkout is disabled. Customers pay the service provider directly and record confirmations in their booking.');
   }
 
   const callbackPath = pathname.match(/^\/api\/payments\/mpesa\/callback\/([A-Za-z0-9_-]{32,})$/);
