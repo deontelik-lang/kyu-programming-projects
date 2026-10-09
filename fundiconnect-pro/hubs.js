@@ -39,6 +39,13 @@ function failResult(res, fail, problem) {
   return fail(res, problem.status, problem.code, problem.message);
 }
 
+async function awardPoints(pool, userId, points, reason, referenceType, referenceId) {
+  await pool.query(
+    'INSERT INTO reward_ledger(id,user_id,points,reason,reference_type,reference_id) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(user_id,reason,reference_type,reference_id) DO NOTHING',
+    [crypto.randomUUID(), userId, points, reason, referenceType, String(referenceId)]
+  );
+}
+
 async function handleHubRoutes(ctx) {
   const { req, res, url, method, pathname, user, pool, helpers } = ctx;
   const { json, fail, text, limited, requireRole, createNotification, logAudit, hubTypes } = helpers;
@@ -111,7 +118,7 @@ async function handleHubRoutes(ctx) {
     const viewerId = user?.id || null;
     const isAdmin = user?.role === 'admin';
     const r = await pool.query(
-      "SELECT l.id,l.owner_user_id,l.hub_type,l.title,l.description,l.category,l.county,l.town,l.price,l.currency,l.status,l.starts_at,l.ends_at,l.metadata,l.created_at,l.updated_at,u.full_name AS owner_name,COALESCE(pp.persona,CASE WHEN u.role='fundi' THEN 'worker' ELSE 'customer' END) AS owner_persona,COALESCE(ac.action_count,0)::int AS action_count,COALESCE(cc.comment_count,0)::int AS comment_count,EXISTS(SELECT 1 FROM hub_listing_actions a WHERE a.listing_id=l.id AND a.user_id=$5 AND a.action='save') AS is_saved FROM hub_listings l JOIN users u ON u.id=l.owner_user_id LEFT JOIN platform_profiles pp ON pp.user_id=u.id LEFT JOIN LATERAL (SELECT COUNT(*) AS action_count FROM hub_listing_actions a WHERE a.listing_id=l.id AND a.action<>'save') ac ON true LEFT JOIN LATERAL (SELECT COUNT(*) AS comment_count FROM hub_comments c WHERE c.listing_id=l.id) cc ON true WHERE ($1='' OR l.hub_type=$1) AND ($2='' OR lower(l.title || ' ' || l.description || ' ' || l.category || ' ' || l.metadata::text) LIKE '%' || $2 || '%') AND ($3='' OR lower(l.county)=lower($3)) AND ($4='' OR lower(l.town)=lower($4)) AND (l.status='published' OR (l.owner_user_id=$5 AND l.status<>'hidden') OR $6=true) AND (l.ends_at IS NULL OR l.ends_at>now()) ORDER BY l.created_at DESC LIMIT $7",
+      "SELECT l.id,l.owner_user_id,l.hub_type,l.title,l.description,l.category,l.county,l.town,l.price,l.currency,l.status,l.starts_at,l.ends_at,l.metadata,l.featured_until,(l.featured_until IS NOT NULL AND l.featured_until>now()) AS is_featured,l.created_at,l.updated_at,u.full_name AS owner_name,COALESCE(pp.persona,CASE WHEN u.role='fundi' THEN 'worker' ELSE 'customer' END) AS owner_persona,COALESCE(ac.action_count,0)::int AS action_count,COALESCE(cc.comment_count,0)::int AS comment_count,EXISTS(SELECT 1 FROM hub_listing_actions a WHERE a.listing_id=l.id AND a.user_id=$5 AND a.action='save') AS is_saved FROM hub_listings l JOIN users u ON u.id=l.owner_user_id LEFT JOIN platform_profiles pp ON pp.user_id=u.id LEFT JOIN LATERAL (SELECT COUNT(*) AS action_count FROM hub_listing_actions a WHERE a.listing_id=l.id AND a.action<>'save') ac ON true LEFT JOIN LATERAL (SELECT COUNT(*) AS comment_count FROM hub_comments c WHERE c.listing_id=l.id) cc ON true WHERE ($1='' OR l.hub_type=$1) AND ($2='' OR lower(l.title || ' ' || l.description || ' ' || l.category || ' ' || l.metadata::text) LIKE '%' || $2 || '%') AND ($3='' OR lower(l.county)=lower($3)) AND ($4='' OR lower(l.town)=lower($4)) AND (l.status='published' OR (l.owner_user_id=$5 AND l.status<>'hidden') OR $6=true) AND (l.ends_at IS NULL OR l.ends_at>now()) ORDER BY (l.featured_until IS NOT NULL AND l.featured_until>now()) DESC,l.created_at DESC LIMIT $7",
       [type,q,county,town,viewerId,isAdmin,limit]
     );
     return json(res, 200, { listings: r.rows, count: r.rowCount });
@@ -147,7 +154,8 @@ async function handleHubRoutes(ctx) {
       [id,user.id,type,title,description,category,county,town,price,startsAt,endsAt,JSON.stringify(metadata)]
     );
     await logAudit(user.id, 'hub.listing_created', 'hub_listing', id, { type });
-    return json(res, 201, { listing: r.rows[0] });
+    await awardPoints(pool, user.id, 10, 'listing_published', 'hub_listing', id);
+    return json(res, 201, { listing: r.rows[0], pointsAwarded: 10 });
   }
 
   const listingStatus = pathname.match(/^\/api\/hubs\/listings\/([0-9a-f-]{36})\/status$/i);
@@ -196,7 +204,9 @@ async function handleHubRoutes(ctx) {
       );
       if (action !== 'save') await createNotification(listing.owner_user_id, 'hub.' + action, 'New ' + action + ' on your listing', user.full_name + ' ' + action + 'ed your listing: ' + listing.title);
       await logAudit(user.id, 'hub.listing_action', 'hub_listing', listing.id, { action });
-      return json(res, 201, { action: insert.rows[0], confirmationCode: action === 'attend' ? 'CC-' + insert.rows[0].id.slice(0,8).toUpperCase() : undefined });
+      const pointsAwarded = action === 'save' ? 0 : 2;
+      if (pointsAwarded) await awardPoints(pool, user.id, pointsAwarded, 'opportunity_action', 'hub_action', insert.rows[0].id);
+      return json(res, 201, { action: insert.rows[0], pointsAwarded, confirmationCode: action === 'attend' ? 'CC-' + insert.rows[0].id.slice(0,8).toUpperCase() : undefined });
     } catch (e) {
       if (e.code === '23505') return fail(res, 409, 'ACTION_EXISTS', 'You have already completed this action for that listing.');
       throw e;
@@ -231,7 +241,7 @@ async function handleHubRoutes(ctx) {
     const p = problemFor(['customer','fundi','company','admin']);
     if (p) return true;
     const [owned, actions, messages, rewards] = await Promise.all([
-      pool.query("SELECT id,hub_type,title,status,created_at FROM hub_listings WHERE owner_user_id=$1 ORDER BY created_at DESC LIMIT 30", [user.id]),
+      pool.query("SELECT id,hub_type,title,status,created_at,featured_until FROM hub_listings WHERE owner_user_id=$1 ORDER BY created_at DESC LIMIT 30", [user.id]),
       pool.query("SELECT a.id,a.action,a.status AS action_status,a.note,a.created_at,l.id AS listing_id,l.hub_type,l.title,l.status AS listing_status,l.owner_user_id FROM hub_listing_actions a JOIN hub_listings l ON l.id=a.listing_id WHERE a.user_id=$1 ORDER BY a.created_at DESC LIMIT 50", [user.id]),
       pool.query('SELECT COUNT(*)::int AS unread FROM hub_messages WHERE recipient_user_id=$1 AND read_at IS NULL', [user.id]),
       pool.query('SELECT COALESCE(SUM(points),0)::int AS points FROM reward_ledger WHERE user_id=$1', [user.id])
@@ -311,6 +321,126 @@ async function handleHubRoutes(ctx) {
       throw e;
     }
     return json(res, 201, { ok: true, message: 'Report received for review.' });
+  }
+
+  if (method === 'GET' && pathname === '/api/rewards') {
+    const p = problemFor(['customer','fundi','company','admin']);
+    if (p) return true;
+    const [balanceResult, ledgerResult] = await Promise.all([
+      pool.query('SELECT COALESCE(SUM(points),0)::int AS points FROM reward_ledger WHERE user_id=$1', [user.id]),
+      pool.query('SELECT id,points,reason,reference_type,created_at FROM reward_ledger WHERE user_id=$1 ORDER BY created_at DESC LIMIT 25', [user.id])
+    ]);
+    const points = balanceResult.rows[0].points;
+    const tiers = [{ name: 'Starter', min: 0 }, { name: 'Builder', min: 100 }, { name: 'Connector', min: 300 }, { name: 'Champion', min: 750 }];
+    const tier = [...tiers].reverse().find(t => points >= t.min) || tiers[0];
+    const nextTier = tiers.find(t => t.min > points) || null;
+    return json(res, 200, {
+      points, tier: tier.name, nextTier,
+      progress: nextTier ? Math.max(0, Math.min(100, Math.round(((points-tier.min)/(nextTier.min-tier.min))*100))) : 100,
+      waysToEarn: [{ points: 10, label: 'Publish a listing' }, { points: 2, label: 'Apply, RSVP, enquire or send a request' }],
+      reward: { code: 'feature_listing', cost: 20, label: 'Feature one of your published listings for 7 days' },
+      ledger: ledgerResult.rows
+    });
+  }
+
+  if (method === 'POST' && pathname === '/api/rewards/feature-listing') {
+    const p = problemFor(['customer','fundi','company','admin']);
+    if (p) return true;
+    const body = object(await readBody(req));
+    const listingId = bounded(body.listingId, 60);
+    if (!uuid(listingId)) return fail(res, 400, 'INVALID_LISTING', 'Choose a valid listing.');
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query('SELECT id FROM users WHERE id=$1 FOR UPDATE', [user.id]);
+      const listingResult = await client.query('SELECT id,owner_user_id,status,featured_until FROM hub_listings WHERE id=$1 FOR UPDATE', [listingId]);
+      if (!listingResult.rowCount || listingResult.rows[0].owner_user_id !== user.id) {
+        await client.query('ROLLBACK');
+        return fail(res, 404, 'OWNED_LISTING_NOT_FOUND', 'Choose one of your own listings.');
+      }
+      const listing = listingResult.rows[0];
+      if (listing.status !== 'published') {
+        await client.query('ROLLBACK');
+        return fail(res, 409, 'LISTING_NOT_PUBLISHED', 'Only a published listing can be featured.');
+      }
+      if (listing.featured_until && new Date(listing.featured_until).getTime() > Date.now()) {
+        await client.query('ROLLBACK');
+        return fail(res, 409, 'ALREADY_FEATURED', 'This listing is already featured.');
+      }
+      const balanceResult = await client.query('SELECT COALESCE(SUM(points),0)::int AS points FROM reward_ledger WHERE user_id=$1', [user.id]);
+      const balance = balanceResult.rows[0].points;
+      if (balance < 20) {
+        await client.query('ROLLBACK');
+        return fail(res, 409, 'INSUFFICIENT_POINTS', 'You need 20 reward points to feature a listing.');
+      }
+      const featured = await client.query("UPDATE hub_listings SET featured_until=now()+interval '7 days',updated_at=now() WHERE id=$1 RETURNING featured_until", [listingId]);
+      const referenceId = listingId + ':' + Date.now();
+      await client.query(
+        'INSERT INTO reward_ledger(id,user_id,points,reason,reference_type,reference_id) VALUES($1,$2,-20,$3,$4,$5)',
+        [crypto.randomUUID(),user.id,'reward_feature_listing','hub_listing_feature',referenceId]
+      );
+      await client.query('COMMIT');
+      await logAudit(user.id, 'reward.listing_featured', 'hub_listing', listingId, { cost: 20 });
+      return json(res, 200, { ok: true, points: balance - 20, featuredUntil: featured.rows[0].featured_until, pointsSpent: 20 });
+    } catch (e) {
+      try { await client.query('ROLLBACK'); } catch {}
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
+
+  if (method === 'GET' && pathname === '/api/company/dashboard') {
+    const p = problemFor(['company']);
+    if (p) return true;
+    let profile = await pool.query('SELECT id,user_id,organization_name,website,description,verification_status,created_at,updated_at FROM company_profiles WHERE user_id=$1', [user.id]);
+    if (!profile.rowCount) {
+      profile = await pool.query("INSERT INTO company_profiles(id,user_id) VALUES($1,$2) RETURNING id,user_id,organization_name,website,description,verification_status,created_at,updated_at", [crypto.randomUUID(),user.id]);
+    }
+    const [metrics, listings] = await Promise.all([
+      pool.query(
+        "SELECT COUNT(*)::int AS total_listings,COUNT(*) FILTER(WHERE status='published')::int AS published_listings,COUNT(*) FILTER(WHERE status='closed')::int AS closed_listings,COUNT(*) FILTER(WHERE hub_type IN ('job','internship') AND status='published')::int AS active_roles,COUNT(*) FILTER(WHERE created_at>=now()-interval '30 days')::int AS listings_last_30_days,(SELECT COUNT(*)::int FROM hub_listing_actions a JOIN hub_listings l ON l.id=a.listing_id WHERE l.owner_user_id=$1 AND a.action<>'save') AS responses FROM hub_listings WHERE owner_user_id=$1",
+        [user.id]
+      ),
+      pool.query(
+        "SELECT l.id,l.hub_type,l.title,l.status,l.created_at,l.featured_until,(SELECT COUNT(*)::int FROM hub_listing_actions a WHERE a.listing_id=l.id AND a.action<>'save') AS responses FROM hub_listings l WHERE l.owner_user_id=$1 ORDER BY l.created_at DESC LIMIT 12",
+        [user.id]
+      )
+    ]);
+    return json(res, 200, { profile: profile.rows[0], metrics: metrics.rows[0], listings: listings.rows, verificationNote: 'Company accounts are self-declared. Verification is not automated and the profile should not be treated as verified.' });
+  }
+
+  if (method === 'PATCH' && pathname === '/api/company/profile') {
+    const p = problemFor(['company']);
+    if (p) return true;
+    const body = object(await readBody(req));
+    const name = bounded(body.organizationName, 180);
+    const website = bounded(body.website, 500);
+    const description = bounded(body.description, 1800);
+    if (name.length < 2) return fail(res, 400, 'COMPANY_NAME_REQUIRED', 'Enter your organisation name.');
+    if (website && !/^https?:\/\/\S+$/i.test(website)) return fail(res, 400, 'INVALID_WEBSITE', 'Website must begin with http:// or https://.');
+    const r = await pool.query(
+      "INSERT INTO company_profiles(id,user_id,organization_name,website,description,updated_at) VALUES($1,$2,$3,$4,$5,now()) ON CONFLICT(user_id) DO UPDATE SET organization_name=EXCLUDED.organization_name,website=EXCLUDED.website,description=EXCLUDED.description,updated_at=now() RETURNING id,user_id,organization_name,website,description,verification_status,updated_at",
+      [crypto.randomUUID(),user.id,name,website,description]
+    );
+    await pool.query("UPDATE platform_profiles SET persona='business',organisation=$2,portfolio_url=$3,bio=$4,updated_at=now() WHERE user_id=$1", [user.id,name,website,description]);
+    await logAudit(user.id, 'company.profile_updated', 'company_profile', user.id, {});
+    return json(res, 200, { profile: r.rows[0] });
+  }
+
+  if (method === 'GET' && pathname === '/api/admin/analytics') {
+    const p = problemFor(['admin']);
+    if (p) return true;
+    const [userCounts, listings, actions, reports, points, bookings, daily] = await Promise.all([
+      pool.query('SELECT role,COUNT(*)::int AS count FROM users GROUP BY role ORDER BY role'),
+      pool.query('SELECT hub_type,status,COUNT(*)::int AS count FROM hub_listings GROUP BY hub_type,status ORDER BY hub_type,status'),
+      pool.query("SELECT action,status,COUNT(*)::int AS count FROM hub_listing_actions GROUP BY action,status ORDER BY action,status"),
+      pool.query('SELECT status,COUNT(*)::int AS count FROM hub_reports GROUP BY status ORDER BY status'),
+      pool.query("SELECT COALESCE(SUM(points) FILTER(WHERE points>0),0)::int AS issued,COALESCE(SUM(-points) FILTER(WHERE points<0),0)::int AS redeemed,COUNT(DISTINCT user_id)::int AS participating_users FROM reward_ledger"),
+      pool.query('SELECT status,COUNT(*)::int AS count FROM bookings GROUP BY status ORDER BY status'),
+      pool.query("SELECT to_char(d.day,'YYYY-MM-DD') AS day,COALESCE(u.count,0)::int AS signups,COALESCE(l.count,0)::int AS listings FROM generate_series(current_date-13,current_date,interval '1 day') d(day) LEFT JOIN (SELECT date_trunc('day',created_at)::date AS day,COUNT(*) AS count FROM users GROUP BY 1) u ON u.day=d.day::date LEFT JOIN (SELECT date_trunc('day',created_at)::date AS day,COUNT(*) AS count FROM hub_listings GROUP BY 1) l ON l.day=d.day::date ORDER BY d.day")
+    ]);
+    return json(res, 200, { users: userCounts.rows, listings: listings.rows, actions: actions.rows, reports: reports.rows, rewards: points.rows[0], bookings: bookings.rows, daily: daily.rows });
   }
 
   if (method === 'GET' && pathname === '/api/favorites') {
