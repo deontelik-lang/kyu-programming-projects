@@ -5,10 +5,10 @@
   "description": "Kenya-first skilled services marketplace MVP",
   "main": "server.js",
   "engines": {
-    "node": ">=20"
+    "node": ">=24 <25"
   },
   "scripts": {
-    "start": "node server.js",
+    "start": "sh run.sh",
     "check": "node --check server.js && node scripts/check-client.js",
     "test": "npm run check",
     "admin:promote": "node scripts/promote-admin.js",
