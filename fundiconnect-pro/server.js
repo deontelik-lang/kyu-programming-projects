@@ -6,6 +6,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const { promisify } = require('node:util');
 const { Pool } = require('pg');
+const { handleHubRoutes } = require('./hubs');
 
 const scrypt = promisify(crypto.scrypt);
 const PORT = Number(process.env.PORT || 8080);
@@ -26,8 +27,36 @@ pool.on('error', (err) => console.error('Unexpected idle PostgreSQL client error
 const categories = [
   { name: 'CCTV Installers', slug: 'cctv', description: 'Security camera installation, repair and maintenance' },
   { name: 'WiFi & Network Technicians', slug: 'network', description: 'WiFi, routers, LAN, fiber and structured cabling' },
-  { name: 'Electricians', slug: 'electrician', description: 'Electrical installation, troubleshooting and maintenance' }
+  { name: 'Electricians', slug: 'electrician', description: 'Electrical installation, troubleshooting and maintenance' },
+  { name: 'Plumbers', slug: 'plumber', description: 'Pipe installation, drainage and plumbing repairs' },
+  { name: 'Carpenters', slug: 'carpenter', description: 'Furniture, fittings and woodworking' },
+  { name: 'Welders', slug: 'welder', description: 'Metal fabrication and welding' },
+  { name: 'Mechanics', slug: 'mechanic', description: 'Vehicle diagnostics, service and repairs' },
+  { name: 'Painters', slug: 'painter', description: 'Residential and commercial painting' },
+  { name: 'Cleaners', slug: 'cleaner', description: 'Home, office and move-out cleaning' },
+  { name: 'Gardeners', slug: 'gardener', description: 'Gardening, landscaping and grounds care' },
+  { name: 'Appliance Repair', slug: 'appliance-repair', description: 'Repair and maintenance for home appliances' },
+  { name: 'Security Installers', slug: 'security-installer', description: 'Access control, alarms and security equipment' },
+  { name: 'General Technicians', slug: 'technician', description: 'General technical troubleshooting and installation' }
 ];
+
+const hubTypes = {
+  student_gig: { label: 'Student gigs', action: 'apply', actionLabel: 'Apply / pitch', icon: '🎨' },
+  job: { label: 'Jobs', action: 'apply', actionLabel: 'Apply for job', icon: '💼' },
+  internship: { label: 'Jobs & internships', action: 'apply', actionLabel: 'Apply', icon: '🎓' },
+  housing: { label: 'Accommodation', action: 'inquire', actionLabel: 'Ask about housing', icon: '🏠' },
+  product: { label: 'Buy & sell', action: 'inquire', actionLabel: 'Contact seller', icon: '🛍️' },
+  event: { label: 'Events & tickets', action: 'attend', actionLabel: 'RSVP', icon: '🎟️' },
+  course: { label: 'Fundi Academy', action: 'enroll', actionLabel: 'Enquire / enroll', icon: '📚' },
+  business: { label: 'Business directory', action: 'inquire', actionLabel: 'Contact business', icon: '🏪' },
+  community: { label: 'Campus community', action: null, actionLabel: 'Discuss', icon: '💬' },
+  transport: { label: 'Transport & delivery', action: 'book', actionLabel: 'Request details', icon: '🚐' },
+  student_service: { label: 'Student services', action: 'inquire', actionLabel: 'Request service', icon: '🧑‍🎓' },
+  alumni: { label: 'Alumni & mentorship', action: 'mentor', actionLabel: 'Connect / mentor', icon: '🤝' },
+  service_offer: { label: 'Services & fundis', action: 'inquire', actionLabel: 'Ask a question', icon: '🛠️' }
+};
+const personas = ['student','worker','customer','business','employer','alumni'];
+const hubActionTypes = ['save','apply','inquire','attend','enroll','book','mentor'];
 
 const migrationsDir = path.join(__dirname, 'migrations');
 
@@ -267,6 +296,12 @@ async function mainRouter(req, res, url) {
         'INSERT INTO users(id,full_name,email,phone,password_hash,role) VALUES($1,$2,$3,$4,$5,$6)',
         [id, fullName, email, phone, passwordHash, role]
       );
+      const personaInput = text(body.persona, 30).toLowerCase();
+      const persona = personas.includes(personaInput) ? personaInput : (role === 'fundi' ? 'worker' : 'customer');
+      await client.query(
+        'INSERT INTO platform_profiles(id,user_id,persona,headline,campus,course,study_level,graduation_year,bio,skills,organisation,portfolio_url) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)',
+        [crypto.randomUUID(), id, persona, text(body.headline, 140), text(body.campus, 160), text(body.course, 160), text(body.studyLevel, 80), integer(body.graduationYear, 1990, 2100, null) || null, text(body.bio, 1800), [...new Set((Array.isArray(body.skills) ? body.skills : text(body.skills, 600).split(',')).map(v => text(String(v), 60)).filter(Boolean))].slice(0, 20), text(body.organisation, 180), text(body.portfolioUrl, 500)]
+      );
       if (role === 'fundi') {
         await client.query(
           "INSERT INTO fundi_profiles(id,user_id,category_id,professional_title,county,town) VALUES($1,$2,$3,$4,$5,$6)",
@@ -318,12 +353,16 @@ async function mainRouter(req, res, url) {
   }
 
   const user = await userFromRequest(req).catch(() => null);
+  const hubHandled = await handleHubRoutes({req,res,url,method,pathname,user,pool,helpers:{json,fail,text,limited,requireRole,createNotification,logAudit,hubTypes}});
+  if (hubHandled) return;
 
   if (method === 'GET' && pathname === '/api/me') {
     if (!user) return json(res, 200, { user: null });
     const profile = user.role === 'fundi' ? (await pool.query('SELECT fp.*,c.name AS category_name,c.slug AS category_slug FROM fundi_profiles fp LEFT JOIN categories c ON c.id=fp.category_id WHERE fp.user_id=$1', [user.id])).rows[0] || null : null;
+    let platformProfile = (await pool.query('SELECT * FROM platform_profiles WHERE user_id=$1', [user.id])).rows[0] || null;
+    if (!platformProfile) { const inserted = await pool.query('INSERT INTO platform_profiles(id,user_id,persona) VALUES($1,$2,$3) ON CONFLICT(user_id) DO NOTHING RETURNING *', [crypto.randomUUID(),user.id,user.role==='fundi'?'worker':'customer']); platformProfile = inserted.rows[0] || (await pool.query('SELECT * FROM platform_profiles WHERE user_id=$1',[user.id])).rows[0] || null; }
     const unread = await pool.query('SELECT COUNT(*)::int AS count FROM notifications WHERE user_id=$1 AND read_at IS NULL', [user.id]);
-    return json(res, 200, { user, profile, unreadNotifications: unread.rows[0].count });
+    return json(res, 200, { user, profile, platformProfile, unreadNotifications: unread.rows[0].count });
   }
 
   if (method === 'PATCH' && pathname === '/api/fundi/profile') {
