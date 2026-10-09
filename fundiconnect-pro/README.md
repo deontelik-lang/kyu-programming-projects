@@ -24,10 +24,11 @@ FundiConnect Pro is a Kenya-first marketplace MVP connecting customers with elec
 - Admin summary, recent booking list, and a protected manual verification-level control.
 - Audit events, parameterized database queries, basic rate limiting, security response headers, request-size limits, origin checks, and session revocation.
 - Numbered SQL migrations, code syntax checks, a browser-script check, guarded integration tests, and a GitHub Actions CI workflow.
+- An opt-in campus/alumni profile directory with search by name, course, skills, campus and persona. Contact information is excluded from public directory responses.
 
 ## CampusConnect super-app modules
 
-The app includes 13 database-backed opportunity hubs: student gigs, jobs, internships/graduate roles, housing, products, events, courses/skills academy listings, business directory, community posts, transport/delivery listings, student services, alumni/mentorship and professional service offers. Members can publish listings, search by hub and location, apply or inquire, RSVP, save items, comment on campus posts, exchange persistent listing messages, report abusive listings, and review incoming applications through owner dashboards. User profiles can include campus, course, study level, graduation year, organisation, portfolio and skills; a printable CV preview uses that profile data. Emergency request records are persistent but do not dispatch responders. A local rules-based study/career guide and user-input cost worksheet are included; neither is a connected generative AI service or external market-price engine.
+The app includes 13 database-backed opportunity hubs: student gigs, jobs, internships/graduate roles, housing, products, events, courses/skills academy listings, business directory, community posts, transport/delivery listings, student services, alumni/mentorship and professional service offers. Members can publish listings, search by hub and location, apply or inquire, RSVP, save items, comment on campus posts, exchange persistent listing messages, report abusive listings, and review incoming applications through owner dashboards. User profiles can include campus, course, study level, graduation year, organisation, portfolio and skills; a printable CV preview uses that profile data. The Campus & Alumni Directory is opt-in and private by default; users can make their profile discoverable or opt out at any time, and the directory does not expose account phone/email. Emergency request records are persistent but do not dispatch responders. A local rules-based study/career guide and user-input cost worksheet are included; neither is a connected generative AI service or external market-price engine.
 
 The initial version implements the core flows and provides clear integration boundaries, not every item from the full vision. Wallet transfers, M-Pesa, rent collection, paid ticketing, payout/escrow, real OTP/email delivery, identity document validation/background checks, live GPS, push notifications, real-time WebSocket chat, course content delivery, employer integrations, referral reward awards and AI-provider calls are **not enabled**.
 
@@ -80,6 +81,7 @@ All endpoints are same-origin under **/api**. Authenticated sessions use an opaq
 |---|---|---|
 | GET | **/api/health** | Application/database health |
 | GET | **/api/hubs/types** | Supported hubs |
+| GET | **/api/members** | Search opt-in public campus/alumni profiles; contact information is excluded |
 | GET | **/api/hubs/listings** | Search listings by hub, keyword, location |
 | POST | **/api/hubs/listings** | Publish a job, gig, event, product, housing or other hub listing |
 | POST | **/api/hubs/listings/:id/actions** | Apply, inquire, RSVP, enrol interest, mentor request or save |
