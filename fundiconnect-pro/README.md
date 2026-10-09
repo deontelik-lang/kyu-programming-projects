@@ -21,7 +21,9 @@ FundiConnect Pro is a Kenya-first marketplace MVP connecting customers with elec
 - Notifications for new bookings, status changes, and reviews.
 - Reviews tied to completed customer bookings; a database constraint prevents a second review for the same booking.
 - Transparent deterministic trust score derived from review volume, rating, completed jobs, verification level, observed responses, and profile completeness. It is not an AI model, background check, or guarantee of quality; new profiles have limited history.
-- Admin summary, recent booking list, and a protected manual verification-level control.
+- Admin summary, recent booking list, protected manual verification control, moderation queue, hub analytics and 14-day signup/listing trend.
+- Company/employer registration and a company workspace with organisation profile, job/internship listing metrics, response counts, and an explicit unverified status.
+- Loyalty ledger that awards 10 points for a published listing and 2 points for a submitted opportunity action. Members can spend 20 points to feature one of their own published listings for seven days; repeat point awards are idempotent.
 - Audit events, parameterized database queries, basic rate limiting, security response headers, request-size limits, origin checks, and session revocation.
 - Numbered SQL migrations, code syntax checks, a browser-script check, guarded integration tests, and a GitHub Actions CI workflow.
 - An opt-in campus/alumni profile directory with search by name, course, skills, campus and persona. Contact information is excluded from public directory responses.
@@ -30,7 +32,7 @@ FundiConnect Pro is a Kenya-first marketplace MVP connecting customers with elec
 
 The app includes 13 database-backed opportunity hubs: student gigs, jobs, internships/graduate roles, housing, products, events, courses/skills academy listings, business directory, community posts, transport/delivery listings, student services, alumni/mentorship and professional service offers. Members can publish listings, search by hub and location, apply or inquire, RSVP, save items, comment on campus posts, exchange persistent listing messages, report abusive listings, and review incoming applications through owner dashboards. User profiles can include campus, course, study level, graduation year, organisation, portfolio and skills; a printable CV preview uses that profile data. The Campus & Alumni Directory is opt-in and private by default; users can make their profile discoverable or opt out at any time, and the directory does not expose account phone/email. Emergency request records are persistent but do not dispatch responders. A local rules-based study/career guide and user-input cost worksheet are included; neither is a connected generative AI service or external market-price engine.
 
-The initial version implements the core flows and provides clear integration boundaries, not every item from the full vision. Wallet transfers, M-Pesa, rent collection, paid ticketing, payout/escrow, real OTP/email delivery, identity document validation/background checks, live GPS, push notifications, real-time WebSocket chat, course content delivery, employer integrations, referral reward awards and AI-provider calls are **not enabled**.
+The release implements core marketplace flows and provides clear integration boundaries, not every item from the full vision. Wallet transfers, M-Pesa, rent collection, paid ticketing, payout/escrow, real OTP/email delivery, identity document validation/background checks, live GPS, push notifications, real-time WebSocket chat, course content delivery, company team invitations, employer-system integrations, referral bonuses and AI-provider calls are **not enabled**. Company dashboards and point-based listing spotlights are implemented, but they do not imply that an organisation is verified or guarantee a listing's outcome.
 
 ## Stack
 
@@ -86,6 +88,11 @@ All endpoints are same-origin under **/api**. Authenticated sessions use an opaq
 | POST | **/api/hubs/listings** | Publish a job, gig, event, product, housing or other hub listing |
 | POST | **/api/hubs/listings/:id/actions** | Apply, inquire, RSVP, enrol interest, mentor request or save |
 | GET | **/api/hubs/activity** | User-owned listings, applications, points summary |
+| GET | **/api/rewards** | Current points, tier, progress and recent ledger activity |
+| POST | **/api/rewards/feature-listing** | Spend 20 points to feature an owned published listing for seven days |
+| GET | **/api/company/dashboard** | Company profile, listing metrics and response summary (company role only) |
+| PATCH | **/api/company/profile** | Save the company organisation name, website and description |
+| GET | **/api/admin/analytics** | Admin-only hub, moderation, reward and daily sign-up/listing analytics |
 | GET/POST | **/api/hubs/listings/:id/comments** | Community replies |
 | GET/POST | **/api/hubs/messages** | Persistent listing messages (not live push) |
 | POST | **/api/hubs/listings/:id/report** | Report potentially abusive listings |
@@ -96,7 +103,7 @@ All endpoints are same-origin under **/api**. Authenticated sessions use an opaq
 | GET | **/api/categories** | Launch categories |
 | GET | **/api/fundis** | Search/filter available fundi profiles |
 | GET | **/api/fundis/:profileId** | Public fundi profile |
-| POST | **/api/auth/register** | Customer/fundi sign-up |
+| POST | **/api/auth/register** | Customer/fundi sign-up; business owner/employer persona creates a company account |
 | POST | **/api/auth/login** | Email or phone + password |
 | POST | **/api/auth/logout** | Revoke current session |
 | GET | **/api/me** | Current account and fundi profile |
@@ -154,7 +161,7 @@ Set **FUNDICONNECT_BASE_URL** if the server is not on **http://127.0.0.1:8080**.
 - Email/SMS/push delivery to real devices
 - Real-time chat and GPS technician tracking
 - Safaricom Daraja STK Push, withdrawals, wallet, escrow, payout/reconciliation/refund workflows
-- Paid subscriptions, company/team management, product marketplace, and academy courses
+- Paid subscriptions and company-team invitations/permissions
 - External full-text search, Redis queues/rate limits, CDN/object storage media workflows
 - Automated abuse detection, dispute workflows, fraud monitoring, comprehensive observability, backups/restore drills, and performance/load testing
 
