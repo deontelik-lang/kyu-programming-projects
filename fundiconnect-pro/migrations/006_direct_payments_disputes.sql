@@ -1,4 +1,9 @@
--- Direct-to-provider payments, two-sided confirmations, disputes, and trust review.
+-- Direct-to-provider payments, two-sided confirmations, disputes, trust review, and policy acceptance.
+ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS terms_accepted_at timestamptz,
+  ADD COLUMN IF NOT EXISTS privacy_accepted_at timestamptz,
+  ADD COLUMN IF NOT EXISTS policy_version text NOT NULL DEFAULT '';
+
 ALTER TABLE bookings
   ADD COLUMN IF NOT EXISTS direct_payment_status text NOT NULL DEFAULT 'unpaid'
     CHECK (direct_payment_status IN ('unpaid','customer_reported_paid','provider_reported_received','confirmed','disputed')),
