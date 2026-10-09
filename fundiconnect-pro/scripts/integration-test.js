@@ -90,6 +90,8 @@ async function cleanup() {
     check('expanded service directory is seeded', response.status === 200 && response.data.categories.length >= 13 && response.data.categories.some(c => c.slug === 'plumber'));
     response = await request('/api/hubs/types');
     check('13 super-app hubs are available', response.status === 200 && response.data.hubs.length === 13);
+    response = await request('/api/payments/mpesa/config');
+    check('M-Pesa readiness endpoint exposes status without credentials', response.status === 200 && typeof response.data.enabled === 'boolean' && !('consumerKey' in response.data));
 
     response = await request('/api/auth/register', {
       method: 'POST',
@@ -183,12 +185,20 @@ async function cleanup() {
     check('customer can submit a persistent booking request', response.status === 201);
     bookingId = response.data.booking.id;
 
+    response = await request('/api/bookings/' + bookingId + '/quote', {
+      method: 'PATCH', cookie: customerCookie, body: { amount: 2500 }
+    });
+    check('customers cannot set their own service quote', response.status === 403);
+    response = await request('/api/bookings/' + bookingId + '/quote', {
+      method: 'PATCH', cookie: fundiCookie, body: { amount: 2500 }
+    });
+    check('assigned fundi can quote and accept a booking', response.status === 200 && Number(response.data.booking.quoted_price) === 2500 && response.data.booking.status === 'accepted');
     response = await request('/api/bookings/' + bookingId + '/status', {
       method: 'PATCH', cookie: customerCookie, body: { status: 'accepted' }
     });
     check('customers cannot accept their own booking', response.status === 403);
 
-    for (const status of ['accepted', 'in_progress', 'completed']) {
+    for (const status of ['in_progress', 'completed']) {
       response = await request('/api/bookings/' + bookingId + '/status', {
         method: 'PATCH', cookie: fundiCookie, body: { status }
       });
