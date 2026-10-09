@@ -23,6 +23,8 @@ let customerId = null;
 let fundiId = null;
 let fundiProfileId = null;
 let bookingId = null;
+let hubListingId = null;
+let hubReportId = null;
 
 async function request(path, options = {}) {
   const response = await fetch(base + path, {
@@ -82,16 +84,20 @@ async function cleanup() {
     check('API and PostgreSQL health', response.status === 200 && response.data.database === true);
 
     response = await request('/api/categories');
-    check('launch categories are seeded', response.status === 200 && response.data.categories.length === 3);
+    check('expanded service directory is seeded', response.status === 200 && response.data.categories.length >= 13 && response.data.categories.some(c => c.slug === 'plumber'));
+    response = await request('/api/hubs/types');
+    check('13 super-app hubs are available', response.status === 200 && response.data.hubs.length === 13);
 
     response = await request('/api/auth/register', {
       method: 'POST',
-      body: { fullName: 'FundiConnect Test Customer', email: emailCustomer, password, role: 'customer' }
+      body: { fullName: 'FundiConnect Test Customer', email: emailCustomer, password, role: 'customer', persona: 'student', campus: 'Integration Campus', course: 'Information Technology', studyLevel: 'Year 1' }
     });
     check('customer registration creates session', response.status === 201 && Boolean(response.cookie));
     customerCookie = response.cookie;
 
     customerId = response.data.user.id;
+    response = await request('/api/me', { cookie: customerCookie });
+    check('student persona and campus profile persist', response.status === 200 && response.data.platformProfile?.persona === 'student' && response.data.platformProfile?.campus === 'Integration Campus');
     response = await request('/api/auth/login', {
       method: 'POST',
       body: { identifier: emailCustomer, password: 'wrong-password' }
@@ -181,6 +187,58 @@ async function cleanup() {
     });
     check('duplicate review is prevented', response.status === 409);
 
+    response = await request('/api/platform-profile', { method: 'PATCH', cookie: customerCookie, body: { persona: 'student', headline: 'IT student looking for internships', campus: 'Integration Campus', course: 'Information Technology', studyLevel: 'Year 1', graduationYear: 2029, bio: 'Testing CampusConnect profile', skills: ['C', 'Networking'], organisation: '', portfolioUrl: '' } });
+    check('student profile can be edited', response.status === 200 && response.data.profile.campus === 'Integration Campus');
+    response = await request('/api/cv', { cookie: customerCookie });
+    check('CV builder data is available', response.status === 200 && response.data.cv.full_name === 'FundiConnect Test Customer');
+
+    response = await request('/api/hubs/listings', { method: 'POST', cookie: customerCookie, body: { type: 'job', title: 'Integration test junior web developer', description: 'Part-time web development work for a campus project and student portfolio.', category: 'Software development', county: 'Nairobi', town: 'Kahawa', price: 5000, metadata: { extra: 'Part-time' } } });
+    check('user can create a persistent job listing', response.status === 201 && response.data.listing.hub_type === 'job');
+    hubListingId = response.data.listing.id;
+    response = await request('/api/hubs/listings?type=job&q=junior%20web%20developer');
+    check('public hub listing search works', response.status === 200 && (response.data.listings || []).some(l => l.id === hubListingId));
+    response = await request('/api/hubs/listings/' + hubListingId + '/actions', { method: 'POST', cookie: fundiCookie, body: { action: 'apply', note: 'I have networking and coding skills and would like to apply.' } });
+    check('member can apply for an opportunity', response.status === 201 && response.data.action.action === 'apply');
+    const applicationId = response.data.action.id;
+    response = await request('/api/hubs/listings/' + hubListingId + '/actions', { cookie: customerCookie });
+    check('listing owner can see applications', response.status === 200 && (response.data.actions || []).some(a => a.id === applicationId));
+    response = await request('/api/hubs/actions/' + applicationId + '/status', { method: 'PATCH', cookie: customerCookie, body: { status: 'accepted' } });
+    check('listing owner can review an application', response.status === 200 && response.data.status === 'accepted');
+
+    response = await request('/api/hubs/listings', { method: 'POST', cookie: customerCookie, body: { type: 'event', title: 'Integration campus career event', description: 'A demo campus career event for testing the RSVP workflow.', county: 'Nairobi', town: 'Kahawa', startsAt: new Date(Date.now() + 86400000).toISOString() } });
+    check('event listing can be published', response.status === 201);
+    const eventId = response.data.listing.id;
+    response = await request('/api/hubs/listings/' + eventId + '/actions', { method: 'POST', cookie: fundiCookie, body: { action: 'attend', note: 'Planning to attend.' } });
+    check('event RSVP returns confirmation code', response.status === 201 && /^CC-/.test(response.data.confirmationCode));
+
+    response = await request('/api/hubs/listings', { method: 'POST', cookie: customerCookie, body: { type: 'community', title: 'Integration campus discussion', description: 'A community post for testing discussion replies.' } });
+    check('community discussion can be created', response.status === 201);
+    const communityId = response.data.listing.id;
+    response = await request('/api/hubs/listings/' + communityId + '/comments', { method: 'POST', cookie: fundiCookie, body: { body: 'This is a test reply from a community member.' } });
+    check('community reply persists', response.status === 201);
+    response = await request('/api/hubs/listings/' + communityId + '/comments');
+    check('community replies can be retrieved', response.status === 200 && response.data.comments.length === 1);
+
+    response = await request('/api/hubs/messages', { method: 'POST', cookie: fundiCookie, body: { listingId: hubListingId, body: 'Hello, I have a question about this opportunity.' } });
+    check('in-app message is stored', response.status === 201);
+    response = await request('/api/hubs/messages', { cookie: customerCookie });
+    check('listing owner can see inbound messages', response.status === 200 && response.data.messages.some(m => m.listing_id === hubListingId));
+    response = await request('/api/hubs/messages', { method: 'POST', cookie: customerCookie, body: { listingId: hubListingId, recipientUserId: fundiId, body: 'Thanks for reaching out.' } });
+    check('existing message participant can reply', response.status === 201);
+
+    response = await request('/api/favorites', { method: 'POST', cookie: customerCookie, body: { targetType: 'fundi', targetId: fundiProfileId } });
+    check('fundi can be saved as a favorite', response.status === 201);
+    response = await request('/api/favorites', { cookie: customerCookie });
+    check('favorite list persists', response.status === 200 && response.data.favorites.some(f => f.target_id === fundiProfileId));
+
+    response = await request('/api/emergency-requests', { method: 'POST', cookie: customerCookie, body: { serviceType: 'plumber', description: 'Pipe leak reported for integration test.', county: 'Nairobi', town: 'Kahawa', contactPhone: phone } });
+    check('emergency request can be recorded honestly', response.status === 201 && response.data.warning.includes('does not dispatch'));
+    response = await request('/api/emergency-requests', { cookie: customerCookie });
+    check('user can view own emergency request', response.status === 200 && response.data.requests.length === 1);
+
+    response = await request('/api/hubs/listings/' + hubListingId + '/report', { method: 'POST', cookie: fundiCookie, body: { reason: 'spam', details: 'Test moderation report.' } });
+    check('listing abuse report is stored', response.status === 201);
+
     response = await request('/api/admin/overview', { cookie: customerCookie });
     check('admin endpoints enforce role-based access', response.status === 403);
 
@@ -191,6 +249,16 @@ async function cleanup() {
     check('admin can view verification queue', response.status === 200 && (response.data.fundis || []).some(item => item.profile_id === fundiProfileId));
     response = await request('/api/admin/fundis/' + fundiProfileId + '/verification', { method: 'PATCH', cookie: customerCookie, body: { level: 'silver' } });
     check('admin can update review status', response.status === 200 && response.data.level === 'silver');
+    response = await request('/api/admin/hubs/reports', { cookie: customerCookie });
+    check('admin can view marketplace reports', response.status === 200 && (response.data.reports || []).some(r => r.listing_id === hubListingId));
+    hubReportId = (response.data.reports || []).find(r => r.listing_id === hubListingId)?.id;
+    response = await request('/api/admin/hubs/reports/' + hubReportId, { method: 'PATCH', cookie: customerCookie, body: { status: 'resolved' } });
+    check('admin can resolve a hub report', response.status === 200 && response.data.report.status === 'resolved');
+    response = await request('/api/admin/hubs/listings/' + hubListingId + '/status', { method: 'PATCH', cookie: customerCookie, body: { status: 'hidden' } });
+    check('admin can hide a reported listing', response.status === 200 && response.data.listing.status === 'hidden');
+    response = await request('/api/hubs/listings?type=job&q=junior%20web%20developer');
+    check('hidden listing is removed from public search', response.status === 200 && !(response.data.listings || []).some(l => l.id === hubListingId));
+
 
     response = await request('/api/auth/logout', { method: 'POST', cookie: customerCookie, body: {} });
     response = await request('/api/bookings', { cookie: customerCookie });
