@@ -4,7 +4,7 @@
 
 FundiConnect Pro is a Kenya-first marketplace MVP connecting customers with electricians, CCTV installers, and WiFi/network technicians. This repository contains the working browser UI, same-origin HTTP API, PostgreSQL migrations, operational scripts, and CI checks for both the Fundi services marketplace and CampusConnect student/opportunity hubs.
 
-> **Release status:** functional MVP, not yet a fully production-hardened marketplace. The deployed site is live, but no payments are taken and identity checks, SMS OTP, email verification, live dispatch, and several planned features are not connected.
+> **Release status:** functional MVP, not yet a fully production-hardened marketplace. The deployed site is live. M-Pesa STK Push is implemented behind an explicit disabled-by-default configuration; it does not send payment prompts until Daraja credentials, shortcode, passkey, HTTPS callback URL, and the enable flag are configured. Identity checks, SMS OTP, email verification, live dispatch, and other integrations remain unconnected.
 
 ## Live preview
 
@@ -32,7 +32,7 @@ FundiConnect Pro is a Kenya-first marketplace MVP connecting customers with elec
 
 The app includes 13 database-backed opportunity hubs: student gigs, jobs, internships/graduate roles, housing, products, events, courses/skills academy listings, business directory, community posts, transport/delivery listings, student services, alumni/mentorship and professional service offers. Members can publish listings, search by hub and location, apply or inquire, RSVP, save items, comment on campus posts, exchange persistent listing messages, report abusive listings, and review incoming applications through owner dashboards. User profiles can include campus, course, study level, graduation year, organisation, portfolio and skills; a printable CV preview uses that profile data. The Campus & Alumni Directory is opt-in and private by default; users can make their profile discoverable or opt out at any time, and the directory does not expose account phone/email. Emergency request records are persistent but do not dispatch responders. A local rules-based study/career guide and user-input cost worksheet are included; neither is a connected generative AI service or external market-price engine.
 
-The release implements core marketplace flows and provides clear integration boundaries, not every item from the full vision. Wallet transfers, M-Pesa, rent collection, paid ticketing, payout/escrow, real OTP/email delivery, identity document validation/background checks, live GPS, push notifications, real-time WebSocket chat, course content delivery, company team invitations, employer-system integrations, referral bonuses and AI-provider calls are **not enabled**. Company dashboards and point-based listing spotlights are implemented, but they do not imply that an organisation is verified or guarantee a listing's outcome.
+The release implements core marketplace flows and provides clear integration boundaries, not every item from the full vision. M-Pesa STK Push request handling, payment records, quote workflow and callback reconciliation have been coded, but checkout remains disabled until Daraja settings are configured and tested in sandbox. Wallet transfers, rent collection, paid ticketing, payout/escrow, real OTP/email delivery, identity document validation/background checks, live GPS, push notifications, real-time WebSocket chat, course content delivery, company team invitations, employer-system integrations, referral bonuses and AI-provider calls are **not enabled**. Company dashboards and point-based listing spotlights are implemented, but they do not imply that an organisation is verified or guarantee a listing's outcome.
 
 ## Stack
 
@@ -111,12 +111,25 @@ All endpoints are same-origin under **/api**. Authenticated sessions use an opaq
 | GET | **/api/bookings** | Participant bookings (admin can view platform bookings) |
 | POST | **/api/bookings** | Customer requests a quote |
 | PATCH | **/api/bookings/:id/status** | Change an authorized booking status |
+| PATCH | **/api/bookings/:id/quote** | Assigned fundi sets a whole-KSh quote; booking becomes accepted |
+| GET | **/api/payments/mpesa/config** | Check whether Daraja checkout is fully configured (never returns credentials) |
+| POST | **/api/payments/mpesa/stk-push** | Customer requests an STK Push for an accepted, quoted booking |
+| GET | **/api/payments** | Current member's payment history (phone numbers masked) |
+| GET | **/api/payments/:id** | Authorized payment details (phone number masked) |
+| POST | **/api/payments/mpesa/callback/:secret** | Daraja callback; amount, phone, checkout ID and merchant ID must match before marking paid |
 | POST | **/api/reviews** | Review a completed booking once |
 | GET | **/api/notifications** | Current account notifications |
 | POST | **/api/notifications/read** | Mark notifications read |
 | GET | **/api/admin/overview** | Admin-only summary |
 | GET | **/api/admin/fundis** | Admin-only fundi verification queue |
 | PATCH | **/api/admin/fundis/:id/verification** | Admin-only manual verification-level update |
+
+### M-Pesa sandbox setup
+
+1. Register an app in the official Safaricom Daraja portal: https://developer.safaricom.co.ke/ and obtain sandbox credentials.
+2. In the hosting provider's private environment settings, set MPESA_ENABLED=true, MPESA_ENVIRONMENT=sandbox, PUBLIC_BASE_URL to this app's HTTPS origin, and the MPESA_CONSUMER_KEY, MPESA_CONSUMER_SECRET, MPESA_SHORTCODE, MPESA_PASSKEY, and a unique URL-safe MPESA_CALLBACK_SECRET of at least 32 characters. Choose MPESA_TRANSACTION_TYPE=CustomerPayBillOnline for Paybill or CustomerBuyGoodsOnline for Till.
+3. Keep credentials out of source control and chat. Restart the deployment after setting variables. /api/payments/mpesa/config should report enabled only when all required settings pass validation.
+4. Test only with Daraja sandbox credentials and the permitted test flow first. A successful API response means the prompt was accepted, not paid; the app records a payment as paid only after a matching callback. Do not switch to production before account approval, reconciliation, refunds/disputes, and operational procedures are in place.
 
 ### Core data model
 
@@ -165,7 +178,7 @@ Set **FUNDICONNECT_BASE_URL** if the server is not on **http://127.0.0.1:8080**.
 - External full-text search, Redis queues/rate limits, CDN/object storage media workflows
 - Automated abuse detection, dispute workflows, fraud monitoring, comprehensive observability, backups/restore drills, and performance/load testing
 
-These integrations need chosen providers, credentials, webhook URLs, operational processes, and testing; the app does not simulate successful payments or messages.
+These remaining integrations need chosen providers, credentials, webhook URLs, operational processes, and testing; the app does not simulate successful payments or messages. The M-Pesa code stays disabled until its required settings are provided and sandbox-tested.
 
 ## Before public production launch
 
