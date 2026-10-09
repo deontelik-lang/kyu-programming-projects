@@ -258,10 +258,15 @@ async function handlePaymentRoutes(ctx) {
     if (pending.rowCount) return fail(res, 409, 'PAYMENT_ALREADY_PENDING', 'A payment prompt is already pending for this request. Check your phone and refresh the dashboard before trying again.');
 
     const paymentId = crypto.randomUUID();
-    await pool.query(
-      "INSERT INTO mpesa_payments(id,user_id,booking_id,amount,phone_number,environment,status) VALUES($1,$2,$3,$4,$5,$6,'initiating')",
-      [paymentId, user.id, booking.id, amount, phone, config.environment]
-    );
+    try {
+      await pool.query(
+        "INSERT INTO mpesa_payments(id,user_id,booking_id,amount,phone_number,environment,status) VALUES($1,$2,$3,$4,$5,$6,'initiating')",
+        [paymentId, user.id, booking.id, amount, phone, config.environment]
+      );
+    } catch (error) {
+      if (error.code === '23505') return fail(res, 409, 'PAYMENT_ALREADY_PENDING', 'A payment prompt is already being processed for this booking.');
+      throw error;
+    }
     const shortcode = process.env.MPESA_SHORTCODE || '';
     const transactionType = process.env.MPESA_TRANSACTION_TYPE === 'CustomerBuyGoodsOnline' ? 'CustomerBuyGoodsOnline' : 'CustomerPayBillOnline';
     const timestamp = kenyaTimestamp();
