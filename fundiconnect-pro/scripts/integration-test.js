@@ -354,6 +354,10 @@ async function cleanup() {
     }
     response = await request('/api/members?country=Kenya&q=StudentOS%20Test%20Customer');
     check('public member directory excludes profiles outside selected country', response.status === 200 && !(response.data.members || []).some(m => m.user_id === customerId));
+    for (const [filter,query,label] of [['city','Ottawa','city'],['region','Quebec','region'],['university','Other%20University','university']]) {
+      response = await request('/api/members?' + filter + '=' + query + '&q=StudentOS%20Test%20Customer');
+      check('public member directory excludes mismatched ' + label, response.status === 200 && !(response.data.members || []).some(m => m.user_id === customerId));
+    }
     response = await request('/api/platform-profile', { method: 'PATCH', cookie: customerCookie, body: { persona: 'student', headline: 'IT student looking for internships', campus: 'Integration Campus', course: 'Information Technology', studyLevel: 'Year 1', graduationYear: 2029, bio: 'Testing CampusConnect profile', skills: ['C', 'Networking'], organisation: '', portfolioUrl: '', publicDirectory: false } });
     check('member can opt out of the public directory', response.status === 200 && response.data.profile.public_directory === false);
     response = await request('/api/members?q=StudentOS%20Test%20Customer');
