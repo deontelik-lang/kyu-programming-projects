@@ -22,7 +22,7 @@ for (const required of ['StudentOSSounds','soIntroOverlay','soSoundPanel','Futur
   if (!soundscape.includes(required)) throw new Error('StudentOS soundscape requirement missing: ' + required);
 }
 const sw = fs.readFileSync('public/sw.js','utf8');
-if (!sw.includes('studentos-shell-v11') || !sw.includes('/soundscape.css?v=4') || !sw.includes('/soundscape.js?v=4') || !sw.includes('/studentos.css?v=4') || !sw.includes('/studentos.js?v=7')) throw new Error('Soundscape assets are missing from the refreshed PWA shell cache.');
+if (!sw.includes('studentos-shell-v12') || !sw.includes('/soundscape.css?v=4') || !sw.includes('/soundscape.js?v=5') || !sw.includes('/studentos.css?v=4') || !sw.includes('/studentos.js?v=7')) throw new Error('Soundscape assets are missing from the refreshed PWA shell cache.');
 const studentos = fs.readFileSync('public/studentos.js', 'utf8');
 for (const required of ['COUNTRY_DATA', 'studentosGlobal', 'studentosLaunchpad', 'studentosEntertainment', 'My country', 'Worldwide', 'languageOptions', 'save-location', 'use-location', 'so-world-map', 'soCountryMapLegend', 'UI_TEXT', 'navGlobal', 'tileCampus', 'One home. Your whole world.', 'A global window into opportunity', 'soWorldUniversities', 'soWorldEvents', 'soWorldMedia', 'Preferred supported currency', 'UNIVERSITIES_BY_COUNTRY', 'updateUniversitySuggestions', 'Start typing your institution', 'UNIVERSITIES_BY_COUNTRY', 'updateUniversitySuggestions', 'so-university-suggestions']) {
   if (!studentos.includes(required)) throw new Error('StudentOS global/app shell requirement missing: ' + required);
@@ -44,7 +44,7 @@ if (!countriesBlob) throw new Error('The StudentOS world country list is missing
 const countryPairs = countriesBlob[1].split('|').map(value => value.slice(0, value.indexOf(':')));
 if (countryPairs.length < 240 || new Set(countryPairs).size !== countryPairs.length) throw new Error('Global country list must contain at least 240 unique country/territory codes.');
 const serverContentForStudentOS = fs.readFileSync('server.js', 'utf8');
-if (!serverContentForStudentOS.includes('/studentos.css?v=4') || !serverContentForStudentOS.includes('/studentos.js?v=7') || !serverContentForStudentOS.includes('/soundscape.css?v=4') || !serverContentForStudentOS.includes('/soundscape.js?v=4') || !serverContentForStudentOS.includes('/api/public/global-stats')) throw new Error('StudentOS design or soundscape assets are not injected into the homepage.');
+if (!serverContentForStudentOS.includes('/studentos.css?v=4') || !serverContentForStudentOS.includes('/studentos.js?v=7') || !serverContentForStudentOS.includes('/soundscape.css?v=4') || !serverContentForStudentOS.includes('/soundscape.js?v=5') || !serverContentForStudentOS.includes('/api/public/global-stats')) throw new Error('StudentOS design or soundscape assets are not injected into the homepage.');
 
 const serverWithDiscovery = fs.readFileSync('server.js', 'utf8');
 if (!serverWithDiscovery.includes('/engagement.css?v=1') || !serverWithDiscovery.includes('/engagement.js?v=2')) throw new Error('Dynamic discovery assets are not injected into the homepage.');
