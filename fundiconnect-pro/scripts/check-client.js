@@ -12,4 +12,8 @@ const countyArray = html.match(/const kenyaCounties=(\[[^;]+\]);/);
 if (!countyArray) throw new Error('Kenyan county list is missing.');
 const counties = vm.runInNewContext(countyArray[1]);
 if (counties.length !== 47 || new Set(counties).size !== 47) throw new Error('County dropdown must contain all 47 unique Kenyan counties.');
-console.log('Client JavaScript syntax, key UI hooks and all 47 Kenyan counties are valid.');
+const upgradeMigration = fs.readFileSync('migrations/008_smart_requests_provider_toolkit.sql', 'utf8');
+for (const required of ['CREATE TABLE IF NOT EXISTS job_requests', 'CREATE TABLE IF NOT EXISTS job_quotes', 'CREATE TABLE IF NOT EXISTS fundi_portfolio_items', 'idx_bookings_unique_job_quote']) {
+  if (!upgradeMigration.includes(required)) throw new Error('Upgrade database migration is missing: ' + required);
+}
+console.log('Client syntax, smart-request UI hooks, upgrade migration and all 47 Kenyan counties are valid.');
