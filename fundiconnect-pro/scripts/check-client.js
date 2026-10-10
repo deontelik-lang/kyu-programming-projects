@@ -21,6 +21,10 @@ for (const required of ['COUNTRY_DATA', 'studentosGlobal', 'studentosLaunchpad',
   if (!studentos.includes(required)) throw new Error('StudentOS global/app shell requirement missing: ' + required);
 }
 if (!studentos.includes('function syncHomeLocationFilter') || !studentos.includes("navCommunity:'الحرم والمجتمع'")) throw new Error('Global location selector or Arabic navigation label is incorrect.');
+const hubRouteSource = fs.readFileSync('hubs.js','utf8');
+if (!hubRouteSource.includes('lower(pp.region)=lower($6)') || !hubRouteSource.includes('lower(pp.university)=lower($7)')) throw new Error('Public student discovery must filter by region and university as well as country/city.');
+if (!html.includes('m.university||m.campus') || !html.includes('m.city,m.region,m.country')) throw new Error('Public student cards must display selected global location data.');
+
 if (!html.includes('payload.county=payload.region||payload.county') || !html.includes('payload.town=payload.city||payload.town')) throw new Error('Provider profile must save the global region and city into the searchable legacy fields.');
 const discoverySource = fs.readFileSync('public/engagement.js','utf8');
 if (!discoverySource.includes('item.city || item.town') || !discoverySource.includes('item.region || item.county')) throw new Error('Discovery cards must show global listing locations.');
