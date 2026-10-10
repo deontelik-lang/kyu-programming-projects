@@ -649,6 +649,12 @@ const server = http.createServer(async (req, res) => {
         return json(res, 500, { error: 'SERVER_ERROR', message: 'Unable to read page.' });
       }
       const ext = path.extname(fullPath);
+      if (ext === '.html' && pathname === '/index.html') {
+        const source = data.toString('utf8');
+        const withCss = source.includes('/engagement.css') ? source : source.replace('</head>', '<link rel="stylesheet" href="/engagement.css?v=1"></head>');
+        const withJs = withCss.includes('/engagement.js') ? withCss : withCss.replace('</body>', '<script src="/engagement.js?v=1" defer></script></body>');
+        data = Buffer.from(withJs, 'utf8');
+      }
       const type = ext === '.html' ? 'text/html; charset=utf-8' : ext === '.css' ? 'text/css; charset=utf-8' : ext === '.js' ? 'text/javascript; charset=utf-8' : ext === '.svg' ? 'image/svg+xml' : ext === '.webmanifest' || ext === '.json' ? 'application/manifest+json; charset=utf-8' : 'application/octet-stream';
       res.writeHead(200, { 'Content-Type': type, 'Cache-Control': ext === '.html' ? 'no-store' : 'public, max-age=3600' });
       return req.method === 'HEAD' ? res.end() : res.end(data);
