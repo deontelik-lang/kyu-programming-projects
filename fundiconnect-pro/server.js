@@ -63,7 +63,18 @@ const hubTypes = {
   transport: { label: 'Transport & delivery', action: 'book', actionLabel: 'Request details', icon: '🚐' },
   student_service: { label: 'Student services', action: 'inquire', actionLabel: 'Request service', icon: '🧑‍🎓' },
   alumni: { label: 'Alumni & mentorship', action: 'mentor', actionLabel: 'Connect / mentor', icon: '🤝' },
-  service_offer: { label: 'Services & fundis', action: 'inquire', actionLabel: 'Ask a question', icon: '🛠️' }
+  service_offer: { label: 'Services & fundis', action: 'inquire', actionLabel: 'Ask a question', icon: '🛠️' },
+  scholarship: { label: 'Scholarships & funding', action: 'apply', actionLabel: 'Explore scholarship', icon: '🎓' },
+  study_abroad: { label: 'Study abroad', action: 'apply', actionLabel: 'Explore programme', icon: '🌍' },
+  language_exchange: { label: 'Language exchange', action: 'mentor', actionLabel: 'Find a language partner', icon: '🗣️' },
+  lost_found: { label: 'Lost & found', action: 'inquire', actionLabel: 'Contact poster', icon: '🔎' },
+  student_discount: { label: 'Student discounts', action: 'inquire', actionLabel: 'View offer', icon: '🏷️' },
+  club: { label: 'Clubs & societies', action: 'attend', actionLabel: 'Join / enquire', icon: '🎭' },
+  media_video: { label: 'CampusTV & videos', action: 'inquire', actionLabel: 'View video link', icon: '▶️' },
+  music: { label: 'Music & artists', action: 'inquire', actionLabel: 'Listen to music link', icon: '🎵' },
+  podcast: { label: 'Podcasts', action: 'inquire', actionLabel: 'Listen to podcast link', icon: '🎙️' },
+  student_original: { label: 'Student Originals', action: 'inquire', actionLabel: 'View creative work', icon: '🎬' },
+  creator: { label: 'Creator profiles', action: 'mentor', actionLabel: 'Contact creator', icon: '✨' }
 };
 const personas = ['student','worker','customer','business','employer','alumni'];
 const hubActionTypes = ['save','apply','inquire','attend','enroll','book','mentor'];
@@ -268,6 +279,59 @@ async function mainRouter(req, res, url) {
     });
   }
 
+  if (method === 'GET' && pathname === '/api/public/global-stats') {
+    const [profiles, providers, listings] = await Promise.all([
+      pool.query(
+        "SELECT pp.country,pp.country_code,COUNT(*)::int AS public_profiles,COUNT(DISTINCT NULLIF(trim(pp.university),''))::int AS universities FROM platform_profiles pp JOIN users u ON u.id=pp.user_id WHERE pp.public_directory=true AND u.is_active=true GROUP BY pp.country,pp.country_code"
+      ),
+      pool.query(
+        "SELECT fp.country,fp.country_code,COUNT(*)::int AS providers FROM fundi_profiles fp JOIN users u ON u.id=fp.user_id WHERE u.is_active=true AND fp.available=true AND fp.professional_title<>'Skilled Professional' AND fp.county<>'' AND fp.town<>'' GROUP BY fp.country,fp.country_code"
+      ),
+      pool.query(
+        "SELECT country,country_code,COUNT(*)::int AS opportunities,COUNT(*) FILTER(WHERE hub_type='event')::int AS events,COUNT(*) FILTER(WHERE hub_type IN ('media_video','music','podcast','student_original','creator'))::int AS media_items FROM hub_listings WHERE status='published' AND (ends_at IS NULL OR ends_at>now()) GROUP BY country,country_code"
+      )
+    ]);
+    const countryMap = new Map();
+    const keyFor = row => String(row.country_code || '').trim() || String(row.country || 'Unknown').toLowerCase();
+    const ensure = row => {
+      const key = keyFor(row);
+      if (!countryMap.has(key)) countryMap.set(key, {
+        country: String(row.country || 'Unknown').trim(),
+        countryCode: String(row.country_code || '').trim(),
+        publicProfiles: 0, providers: 0, universities: 0, opportunities: 0, events: 0, mediaItems: 0
+      });
+      return countryMap.get(key);
+    };
+    for (const row of profiles.rows) {
+      const target = ensure(row);
+      target.publicProfiles += Number(row.public_profiles || 0);
+      target.universities += Number(row.universities || 0);
+    }
+    for (const row of providers.rows) ensure(row).providers += Number(row.providers || 0);
+    for (const row of listings.rows) {
+      const target = ensure(row);
+      target.opportunities += Number(row.opportunities || 0);
+      target.events += Number(row.events || 0);
+      target.mediaItems += Number(row.media_items || 0);
+    }
+    const countries = [...countryMap.values()]
+      .filter(row => row.publicProfiles + row.providers + row.opportunities > 0)
+      .sort((a,b) => (b.opportunities + b.providers + b.publicProfiles) - (a.opportunities + a.providers + a.publicProfiles));
+    const totals = countries.reduce((out,row) => {
+      out.publicProfiles += row.publicProfiles;
+      out.providers += row.providers;
+      out.universities += row.universities;
+      out.opportunities += row.opportunities;
+      out.events += row.events;
+      out.mediaItems += row.mediaItems;
+      return out;
+    }, {publicProfiles:0,providers:0,universities:0,opportunities:0,events:0,mediaItems:0,countriesWithRecords:countries.length});
+    return json(res, 200, {
+      countries, totals, generatedAt: new Date().toISOString(),
+      note: 'Aggregates include only published listings, eligible available provider profiles and profiles that opted into the public directory. Counts do not represent total active users.'
+    });
+  }
+
   if (method === 'GET' && pathname === '/api/categories') {
     const r = await pool.query('SELECT id,name,slug,description FROM categories WHERE active=true ORDER BY name');
     return json(res, 200, { categories: r.rows });
@@ -279,9 +343,11 @@ async function mainRouter(req, res, url) {
     const town = text(url.searchParams.get('town'), 100);
     const category = text(url.searchParams.get('category'), 80);
     const available = url.searchParams.get('available') !== 'false';
+    const country = text(url.searchParams.get('country'), 80);
+    const city = text(url.searchParams.get('city'), 100);
     const result = await pool.query(
-      "SELECT fp.id AS profile_id, u.id AS user_id, u.full_name, fp.professional_title, fp.bio, fp.county, fp.town, fp.years_experience, fp.skills, fp.available, fp.verification_level, c.name AS category_name, c.slug AS category_slug, COALESCE(rv.rating,0)::float AS rating, COALESCE(rv.review_count,0)::int AS review_count, COALESCE(j.completed_jobs,0)::int AS completed_jobs, COALESCE(resp.total_jobs,0)::int AS total_jobs, COALESCE(resp.responded_jobs,0)::int AS responded_jobs, fp.created_at FROM fundi_profiles fp JOIN users u ON u.id=fp.user_id LEFT JOIN categories c ON c.id=fp.category_id LEFT JOIN LATERAL (SELECT ROUND(AVG(r.rating)::numeric,1) AS rating, COUNT(*) AS review_count FROM reviews r WHERE r.fundi_id=fp.id) rv ON true LEFT JOIN LATERAL (SELECT COUNT(*) AS completed_jobs FROM bookings b WHERE b.fundi_id=fp.id AND b.status='completed') j ON true LEFT JOIN LATERAL (SELECT COUNT(*) FILTER(WHERE b.status<>'cancelled') AS total_jobs,COUNT(*) FILTER(WHERE b.status NOT IN ('pending','cancelled')) AS responded_jobs FROM bookings b WHERE b.fundi_id=fp.id) resp ON true WHERE u.is_active=true AND ($1='' OR lower(u.full_name || ' ' || fp.professional_title || ' ' || fp.bio || ' ' || array_to_string(fp.skills,' ')) LIKE '%' || $1 || '%') AND ($2='' OR lower(fp.county)=lower($2)) AND ($3='' OR lower(fp.town)=lower($3)) AND ($4='' OR c.slug=$4) AND fp.professional_title<>'Skilled Professional' AND fp.county<>'' AND fp.town<>'' AND ($5=false OR fp.available=true) ORDER BY (CASE WHEN rv.rating IS NULL THEN 0 ELSE rv.rating END) DESC, fp.created_at DESC LIMIT 100",
-      [q, county, town, category, available]
+      "SELECT fp.id AS profile_id, u.id AS user_id, u.full_name, fp.professional_title, fp.bio, fp.county, fp.town, fp.country, fp.country_code, fp.region, fp.years_experience, fp.skills, fp.available, fp.verification_level, c.name AS category_name, c.slug AS category_slug, COALESCE(rv.rating,0)::float AS rating, COALESCE(rv.review_count,0)::int AS review_count, COALESCE(j.completed_jobs,0)::int AS completed_jobs, COALESCE(resp.total_jobs,0)::int AS total_jobs, COALESCE(resp.responded_jobs,0)::int AS responded_jobs, fp.created_at FROM fundi_profiles fp JOIN users u ON u.id=fp.user_id LEFT JOIN categories c ON c.id=fp.category_id LEFT JOIN LATERAL (SELECT ROUND(AVG(r.rating)::numeric,1) AS rating, COUNT(*) AS review_count FROM reviews r WHERE r.fundi_id=fp.id) rv ON true LEFT JOIN LATERAL (SELECT COUNT(*) AS completed_jobs FROM bookings b WHERE b.fundi_id=fp.id AND b.status='completed') j ON true LEFT JOIN LATERAL (SELECT COUNT(*) FILTER(WHERE b.status<>'cancelled') AS total_jobs,COUNT(*) FILTER(WHERE b.status NOT IN ('pending','cancelled')) AS responded_jobs FROM bookings b WHERE b.fundi_id=fp.id) resp ON true WHERE u.is_active=true AND ($1='' OR lower(u.full_name || ' ' || fp.professional_title || ' ' || fp.bio || ' ' || array_to_string(fp.skills,' ')) LIKE '%' || $1 || '%') AND ($2='' OR lower(fp.county)=lower($2)) AND ($3='' OR lower(fp.town)=lower($3)) AND ($4='' OR c.slug=$4) AND fp.professional_title<>'Skilled Professional' AND fp.county<>'' AND fp.town<>'' AND ($5=false OR fp.available=true) AND ($6='' OR lower(fp.country)=lower($6)) AND ($7='' OR lower(fp.town)=lower($7)) ORDER BY (CASE WHEN rv.rating IS NULL THEN 0 ELSE rv.rating END) DESC, fp.created_at DESC LIMIT 100",
+      [q, county, town, category, available, country, city]
     );
     return json(res, 200, { fundis: result.rows.map(p => ({ ...p, trust_score: calculateTrustScore(p) })) });
   }
@@ -289,7 +355,7 @@ async function mainRouter(req, res, url) {
   const individualFundi = pathname.match(/^\/api\/fundis\/([0-9a-f-]{36})$/i);
   if (method === 'GET' && individualFundi) {
     const result = await pool.query(
-      "SELECT fp.id AS profile_id, u.id AS user_id, u.full_name, fp.professional_title, fp.bio, fp.county, fp.town, fp.years_experience, fp.skills, fp.available, fp.verification_level, c.name AS category_name, c.slug AS category_slug, COALESCE(rv.rating,0)::float AS rating, COALESCE(rv.review_count,0)::int AS review_count, COALESCE(j.completed_jobs,0)::int AS completed_jobs, COALESCE(resp.total_jobs,0)::int AS total_jobs, COALESCE(resp.responded_jobs,0)::int AS responded_jobs, fp.created_at FROM fundi_profiles fp JOIN users u ON u.id=fp.user_id LEFT JOIN categories c ON c.id=fp.category_id LEFT JOIN LATERAL (SELECT ROUND(AVG(r.rating)::numeric,1) AS rating, COUNT(*) AS review_count FROM reviews r WHERE r.fundi_id=fp.id) rv ON true LEFT JOIN LATERAL (SELECT COUNT(*) AS completed_jobs FROM bookings b WHERE b.fundi_id=fp.id AND b.status='completed') j ON true LEFT JOIN LATERAL (SELECT COUNT(*) FILTER(WHERE b.status<>'cancelled') AS total_jobs,COUNT(*) FILTER(WHERE b.status NOT IN ('pending','cancelled')) AS responded_jobs FROM bookings b WHERE b.fundi_id=fp.id) resp ON true WHERE fp.id=$1 AND u.is_active=true",
+      "SELECT fp.id AS profile_id, u.id AS user_id, u.full_name, fp.professional_title, fp.bio, fp.county, fp.town, fp.country, fp.country_code, fp.region, fp.years_experience, fp.skills, fp.available, fp.verification_level, c.name AS category_name, c.slug AS category_slug, COALESCE(rv.rating,0)::float AS rating, COALESCE(rv.review_count,0)::int AS review_count, COALESCE(j.completed_jobs,0)::int AS completed_jobs, COALESCE(resp.total_jobs,0)::int AS total_jobs, COALESCE(resp.responded_jobs,0)::int AS responded_jobs, fp.created_at FROM fundi_profiles fp JOIN users u ON u.id=fp.user_id LEFT JOIN categories c ON c.id=fp.category_id LEFT JOIN LATERAL (SELECT ROUND(AVG(r.rating)::numeric,1) AS rating, COUNT(*) AS review_count FROM reviews r WHERE r.fundi_id=fp.id) rv ON true LEFT JOIN LATERAL (SELECT COUNT(*) AS completed_jobs FROM bookings b WHERE b.fundi_id=fp.id AND b.status='completed') j ON true LEFT JOIN LATERAL (SELECT COUNT(*) FILTER(WHERE b.status<>'cancelled') AS total_jobs,COUNT(*) FILTER(WHERE b.status NOT IN ('pending','cancelled')) AS responded_jobs FROM bookings b WHERE b.fundi_id=fp.id) resp ON true WHERE fp.id=$1 AND u.is_active=true",
       [individualFundi[1]]
     );
     if (!result.rowCount) return fail(res, 404, 'NOT_FOUND', 'This professional profile could not be found.');
@@ -329,13 +395,13 @@ async function mainRouter(req, res, url) {
       );
       const persona = personas.includes(personaInput) ? personaInput : (role === 'fundi' ? 'worker' : (role === 'company' ? 'business' : 'customer'));
       await client.query(
-        'INSERT INTO platform_profiles(id,user_id,persona,headline,campus,course,study_level,graduation_year,bio,skills,organisation,portfolio_url) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)',
-        [crypto.randomUUID(), id, persona, text(body.headline, 140), text(body.campus, 160), text(body.course, 160), text(body.studyLevel, 80), integer(body.graduationYear, 1990, 2100, null) || null, text(body.bio, 1800), [...new Set((Array.isArray(body.skills) ? body.skills : text(body.skills, 600).split(',')).map(v => text(String(v), 60)).filter(Boolean))].slice(0, 20), text(body.organisation, 180), text(body.portfolioUrl, 500)]
+        'INSERT INTO platform_profiles(id,user_id,persona,headline,campus,course,study_level,graduation_year,bio,skills,organisation,portfolio_url,country,country_code,region,city,university,language,currency) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)',
+        [crypto.randomUUID(), id, persona, text(body.headline, 140), text(body.campus, 160), text(body.course, 160), text(body.studyLevel, 80), integer(body.graduationYear, 1990, 2100, null) || null, text(body.bio, 1800), [...new Set((Array.isArray(body.skills) ? body.skills : text(body.skills, 600).split(',')).map(v => text(String(v), 60)).filter(Boolean))].slice(0, 20), text(body.organisation, 180), text(body.portfolioUrl, 500), text(body.country,80)||'Kenya', /^[A-Z]{2}$/.test(text(body.countryCode,2).toUpperCase()) ? text(body.countryCode,2).toUpperCase() : 'KE', text(body.region,100), text(body.city,100), text(body.university,180)||text(body.campus,160), text(body.language,10)||'en', text(body.currency,3)||'KES']
       );
       if (role === 'fundi') {
         await client.query(
-          "INSERT INTO fundi_profiles(id,user_id,category_id,professional_title,county,town) VALUES($1,$2,$3,$4,$5,$6)",
-          [profileId, id, categoryId, text(body.professionalTitle, 120) || 'Skilled Professional', text(body.county, 100), text(body.town, 100)]
+          "INSERT INTO fundi_profiles(id,user_id,category_id,professional_title,county,town,country,country_code,region) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)",
+          [profileId, id, categoryId, text(body.professionalTitle, 120) || 'Skilled Professional', text(body.region,100)||text(body.county,100), text(body.city,100)||text(body.town,100), text(body.country,80)||'Kenya', /^[A-Z]{2}$/.test(text(body.countryCode,2).toUpperCase()) ? text(body.countryCode,2).toUpperCase() : 'KE', text(body.region,100)||text(body.county,100)]
         );
       }
       if (role === 'company') {
@@ -416,8 +482,11 @@ async function mainRouter(req, res, url) {
     const body = await readBody(req);
     const title = text(body.professionalTitle, 120);
     const bio = text(body.bio, 1800);
-    const county = text(body.county, 100);
-    const town = text(body.town, 100);
+    const county = text(body.region,100) || text(body.county, 100);
+    const town = text(body.city,100) || text(body.town, 100);
+    const country = text(body.country,80) || 'Kenya';
+    const countryCodeInput = text(body.countryCode,2).toUpperCase();
+    const countryCode = /^[A-Z]{2}$/.test(countryCodeInput) ? countryCodeInput : (country.toLowerCase()==='kenya'?'KE':'ZZ');
     const years = integer(body.yearsExperience, 0, 70, 0);
     const categorySlug = text(body.categorySlug, 80);
     const skills = [...new Set((Array.isArray(body.skills) ? body.skills : text(body.skills, 600).split(',')).map(s => text(String(s), 60)).filter(Boolean))].slice(0, 15);
@@ -425,7 +494,7 @@ async function mainRouter(req, res, url) {
     if (title.length < 3 || county.length < 2 || town.length < 2) return fail(res, 400, 'PROFILE_INCOMPLETE', 'Add a professional title, county and town (at least 2 characters each).');
     const result = await pool.query('SELECT id FROM categories WHERE slug=$1 AND active=true', [categorySlug]);
     if (!result.rowCount) return fail(res, 400, 'INVALID_CATEGORY', 'Choose one of the active launch categories.');
-    await pool.query('UPDATE fundi_profiles SET professional_title=$2,bio=$3,county=$4,town=$5,years_experience=$6,category_id=$7,skills=$8,available=COALESCE($9,available),updated_at=now() WHERE user_id=$1', [user.id, title, bio, county, town, years, result.rows[0].id, skills, available]);
+    await pool.query('UPDATE fundi_profiles SET professional_title=$2,bio=$3,county=$4,town=$5,years_experience=$6,category_id=$7,skills=$8,available=COALESCE($9,available),country=$10,country_code=$11,region=$4,updated_at=now() WHERE user_id=$1', [user.id, title, bio, county, town, years, result.rows[0].id, skills, available, country, countryCode]);
     await logAudit(user.id, 'fundi.profile_updated', 'fundi_profile', user.id);
     return json(res, 200, { ok: true });
   }
@@ -651,8 +720,12 @@ const server = http.createServer(async (req, res) => {
       const ext = path.extname(fullPath);
       if (ext === '.html' && pathname === '/index.html') {
         const source = data.toString('utf8');
-        const withCss = source.includes('/engagement.css') ? source : source.replace('</head>', '<link rel="stylesheet" href="/engagement.css?v=1"></head>');
-        const withJs = withCss.includes('/engagement.js') ? withCss : withCss.replace('</body>', '<script src="/engagement.js?v=1" defer></script></body>');
+        let withCss = source;
+        if (!withCss.includes('/engagement.css')) withCss = withCss.replace('</head>', '<link rel="stylesheet" href="/engagement.css?v=1"></head>');
+        if (!withCss.includes('/studentos.css')) withCss = withCss.replace('</head>', '<link rel="stylesheet" href="/studentos.css?v=2"></head>');
+        let withJs = withCss;
+        if (!withJs.includes('/engagement.js')) withJs = withJs.replace('</body>', '<script src="/engagement.js?v=1" defer></script></body>');
+        if (!withJs.includes('/studentos.js')) withJs = withJs.replace('</body>', '<script src="/studentos.js?v=2" defer></script></body>');
         data = Buffer.from(withJs, 'utf8');
       }
       const type = ext === '.html' ? 'text/html; charset=utf-8' : ext === '.css' ? 'text/css; charset=utf-8' : ext === '.js' ? 'text/javascript; charset=utf-8' : ext === '.svg' ? 'image/svg+xml' : ext === '.webmanifest' || ext === '.json' ? 'application/manifest+json; charset=utf-8' : 'application/octet-stream';
