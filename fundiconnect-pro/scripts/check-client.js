@@ -17,7 +17,7 @@ for (const asset of ['public/engagement.css', 'public/engagement.js', 'public/st
 new vm.Script(fs.readFileSync('public/engagement.js', 'utf8'), { filename: 'public/engagement.js' });
 new vm.Script(fs.readFileSync('public/studentos.js', 'utf8'), { filename: 'public/studentos.js' });
 const studentos = fs.readFileSync('public/studentos.js', 'utf8');
-for (const required of ['COUNTRY_DATA', 'studentosGlobal', 'studentosLaunchpad', 'studentosEntertainment', 'My country', 'Worldwide', 'languageOptions', 'save-location', 'use-location', 'so-world-map', 'soCountryMapLegend', 'UI_TEXT', 'navGlobal', 'tileCampus', 'One home. Your whole world.', 'A global window into opportunity', 'soWorldUniversities', 'soWorldEvents', 'soWorldMedia', 'Preferred supported currency']) {
+for (const required of ['COUNTRY_DATA', 'studentosGlobal', 'studentosLaunchpad', 'studentosEntertainment', 'My country', 'Worldwide', 'languageOptions', 'save-location', 'use-location', 'so-world-map', 'soCountryMapLegend', 'UI_TEXT', 'navGlobal', 'tileCampus', 'One home. Your whole world.', 'A global window into opportunity', 'soWorldUniversities', 'soWorldEvents', 'soWorldMedia', 'Preferred supported currency', 'UNIVERSITIES_BY_COUNTRY', 'updateUniversitySuggestions', 'so-university-suggestions']) {
   if (!studentos.includes(required)) throw new Error('StudentOS global/app shell requirement missing: ' + required);
 }
 if (!studentos.includes('function syncHomeLocationFilter') || !studentos.includes("navCommunity:'الحرم والمجتمع'")) throw new Error('Global location selector or Arabic navigation label is incorrect.');
