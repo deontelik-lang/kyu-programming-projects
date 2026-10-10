@@ -11,7 +11,7 @@ function failRole(user, roles, helpers, res) {
   return true;
 }
 async function notifySafely(createNotification, ...args) {
-  try { await notifySafely(createNotification, ...args); }
+  try { await createNotification(...args); }
   catch (error) { console.error('Notification delivery failed after saved action:', error.message); }
 }
 function futureDate(raw) {
