@@ -1,8 +1,8 @@
 {
-  "name": "fundiconnect-pro",
+  "name": "campushub",
   "version": "0.2.0",
   "private": true,
-  "description": "Kenya-first skilled services marketplace MVP",
+  "description": "Campus and local services opportunity super app",
   "main": "server.js",
   "engines": {
     "node": ">=24 <25"
