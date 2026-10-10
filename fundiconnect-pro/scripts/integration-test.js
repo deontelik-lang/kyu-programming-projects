@@ -88,7 +88,7 @@ async function cleanup() {
   try {
     const homepageResponse = await fetch(base + '/', { headers: { 'x-forwarded-for': testIp } });
     const homepageHtml = await homepageResponse.text();
-    check('homepage injects StudentOS discovery and refreshed cinematic assets', homepageResponse.status === 200 && homepageHtml.includes('/engagement.css?v=1') && homepageHtml.includes('/engagement.js?v=2') && homepageHtml.includes('/studentos.css?v=4') && homepageHtml.includes('/studentos.js?v=7') && homepageHtml.includes('/soundscape.css?v=4') && homepageHtml.includes('/soundscape.js?v=5'));
+    check('homepage injects StudentOS discovery and refreshed cinematic assets', homepageResponse.status === 200 && homepageHtml.includes('/engagement.css?v=1') && homepageHtml.includes('/engagement.js?v=2') && homepageHtml.includes('/studentos.css?v=4') && homepageHtml.includes('/studentos.js?v=7') && homepageHtml.includes('/soundscape.css?v=5') && homepageHtml.includes('/soundscape.js?v=6'));
     const discoveryCss = await fetch(base + '/engagement.css?v=1');
     const discoveryJs = await fetch(base + '/engagement.js?v=2');
     const studentosCss = await fetch(base + '/studentos.css?v=4');
