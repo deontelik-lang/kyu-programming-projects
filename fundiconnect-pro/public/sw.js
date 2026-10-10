@@ -1,7 +1,7 @@
 'use strict';
 
-const CACHE_NAME = 'campushub-shell-v1';
-const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/campushub-icon.svg'];
+const CACHE_NAME = 'campushub-shell-v2';
+const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/campushub-icon.svg', '/engagement.css?v=1', '/engagement.js?v=1'];
 
 self.addEventListener('install', event => {
   event.waitUntil(
