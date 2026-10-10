@@ -88,27 +88,33 @@ async function cleanup() {
   try {
     const homepageResponse = await fetch(base + '/', { headers: { 'x-forwarded-for': testIp } });
     const homepageHtml = await homepageResponse.text();
-    check('homepage injects the CampusHub discovery experience', homepageResponse.status === 200 && homepageHtml.includes('/engagement.css?v=1') && homepageHtml.includes('/engagement.js?v=1'));
+    check('homepage injects the CampusHub discovery experience', homepageResponse.status === 200 && homepageHtml.includes('/engagement.css?v=1') && homepageHtml.includes('/engagement.js?v=1') && homepageHtml.includes('/studentos.css?v=2') && homepageHtml.includes('/studentos.js?v=2'));
     const discoveryCss = await fetch(base + '/engagement.css?v=1');
     const discoveryJs = await fetch(base + '/engagement.js?v=1');
-    const [cssText, jsText] = await Promise.all([discoveryCss.text(), discoveryJs.text()]);
+    const studentosCss = await fetch(base + '/studentos.css?v=2');
+    const studentosJs = await fetch(base + '/studentos.js?v=2');
+    const [cssText, jsText, soCssText, soJsText] = await Promise.all([discoveryCss.text(), discoveryJs.text(), studentosCss.text(), studentosJs.text()]);
     check('discovery styles are served', discoveryCss.status === 200 && cssText.includes('.dh-glass') && cssText.includes('prefers-reduced-motion'));
-    check('discovery interaction layer is served', discoveryJs.status === 200 && jsText.includes('Your momentum') && jsText.includes('/api/hubs/listings?limit=80'));
+    check('discovery interaction layer is served', discoveryJs.status === 200 && jsText.includes('Your momentum') && jsText.includes('/api/hubs/listings?'));
+    check('StudentOS responsive app shell styles are served', studentosCss.status === 200 && soCssText.includes('.so-launch-grid') && soCssText.includes('.so-mobile-nav'));
+    check('StudentOS global country engine, interactive map and media view are served', studentosJs.status === 200 && soJsText.includes('COUNTRY_DATA') && soJsText.includes('studentosEntertainment') && soJsText.includes('My university') && soJsText.includes('so-world-map') && soJsText.includes('UI_TEXT'));
 
     let response = await request('/api/health');
     check('API and PostgreSQL health', response.status === 200 && response.data.database === true);
 
     response = await request('/api/public/stats');
     check('public statistics reveal aggregate counts without identities', response.status === 200 && Number.isInteger(response.data.members) && Number.isInteger(response.data.providers) && Number.isInteger(response.data.opportunities) && !('users' in response.data));
+    response = await request('/api/public/global-stats');
+    check('global map exposes privacy-safe country aggregates', response.status === 200 && Array.isArray(response.data.countries) && Number.isInteger(response.data.totals?.providers) && Number.isInteger(response.data.totals?.opportunities) && Number.isInteger(response.data.totals?.publicProfiles) && !('users' in response.data) && !('coordinates' in response.data));
     response = await request('/manifest.webmanifest');
-    check('CampusHub progressive web app manifest is served', response.status === 200 && response.data.short_name === 'CampusHub' && response.data.display === 'standalone');
+    check('StudentOS progressive web app manifest is served', response.status === 200 && response.data.short_name === 'StudentOS' && response.data.display === 'standalone');
     response = await request('/sw.js');
     check('offline shell service worker is served', response.status === 200);
 
     response = await request('/api/categories');
     check('expanded service directory is seeded', response.status === 200 && response.data.categories.length >= 20 && ['plumber','solar','computer-repair','moving','handyperson','locksmith','tutor','freelancer'].every(slug => response.data.categories.some(c => c.slug === slug)));
     response = await request('/api/hubs/types');
-    check('13 super-app hubs are available', response.status === 200 && response.data.hubs.length === 13);
+    check('expanded StudentOS hub catalogue is available', response.status === 200 && response.data.hubs.length >= 24 && ['scholarship','study_abroad','language_exchange','lost_found','student_discount','club','media_video','music','podcast','student_original','creator'].every(type => response.data.hubs.some(h => h.type === type)));
     response = await request('/api/payments/mpesa/config');
     const mpesaEnabled = response.status === 200 && response.data.enabled === true;
     check('M-Pesa readiness endpoint exposes status without credentials', response.status === 200 && typeof response.data.enabled === 'boolean' && !('consumerKey' in response.data));
@@ -121,14 +127,14 @@ async function cleanup() {
 
     response = await request('/api/auth/register', {
       method: 'POST',
-      body: { fullName: 'FundiConnect Test Customer', email: emailCustomer, password, role: 'customer', policyConsent: true, persona: 'student', campus: 'Integration Campus', course: 'Information Technology', studyLevel: 'Year 1' }
+      body: { fullName: 'StudentOS Test Customer', email: emailCustomer, password, role: 'customer', policyConsent: true, persona: 'student', campus: 'Integration Campus', course: 'Information Technology', studyLevel: 'Year 1', country: 'Canada', countryCode: 'CA', region: 'Ontario', city: 'Toronto', university: 'Integration University', language: 'en', currency: 'CAD' }
     });
     check('customer registration creates session', response.status === 201 && Boolean(response.cookie));
     customerCookie = response.cookie;
 
     customerId = response.data.user.id;
     response = await request('/api/me', { cookie: customerCookie });
-    check('student persona and campus profile persist', response.status === 200 && response.data.platformProfile?.persona === 'student' && response.data.platformProfile?.campus === 'Integration Campus');
+    check('student persona, campus and global profile persist', response.status === 200 && response.data.platformProfile?.persona === 'student' && response.data.platformProfile?.campus === 'Integration Campus' && response.data.platformProfile?.country === 'Canada' && response.data.platformProfile?.city === 'Toronto' && response.data.platformProfile?.university === 'Integration University' && response.data.platformProfile?.currency === 'CAD');
     response = await request('/api/auth/login', {
       method: 'POST',
       body: { identifier: emailCustomer, password: 'wrong-password' }
@@ -142,6 +148,27 @@ async function cleanup() {
     check('valid login issues a session cookie', response.status === 200 && Boolean(response.cookie));
     customerCookie = response.cookie;
 
+    response = await request('/api/hubs/listings', {
+      method:'POST', cookie:customerCookie,
+      body:{type:'scholarship',title:'International scholarship opportunity',description:'A member-posted scholarship listing for global opportunity discovery tests.',category:'Funding',country:'Canada',countryCode:'CA',region:'Ontario',city:'Toronto',university:'Integration University',currency:'CAD'}
+    });
+    check('scholarship posts persist with global location fields', response.status === 201 && response.data.listing?.hub_type === 'scholarship' && response.data.listing.country === 'Canada' && response.data.listing.city === 'Toronto');
+
+    response = await request('/api/hubs/listings', {
+      method:'POST', cookie:customerCookie,
+      body:{type:'study_abroad',title:'Study abroad exchange programme',description:'An international exchange opportunity published by a community member for integration tests.',category:'Exchange',country:'Germany',countryCode:'DE',region:'Berlin',city:'Berlin',university:'International Integration University',currency:'EUR'}
+    });
+    check('study-abroad programmes can be published internationally', response.status === 201 && response.data.listing?.hub_type === 'study_abroad' && response.data.listing.country === 'Germany' && response.data.listing.currency === 'EUR');
+
+    response = await request('/api/hubs/listings', {
+      method:'POST', cookie:customerCookie,
+      body:{type:'media_video',title:'CampusTV creator video',description:'A student-created media listing using a public external video URL.',category:'Student Originals',country:'Kenya',countryCode:'KE',region:'Nairobi County',city:'Nairobi',university:'Integration University',currency:'KES',metadata:{mediaUrl:'https://example.com/campus-video'}}
+    });
+    check('creator media links can be published without pretending to upload files', response.status === 201 && response.data.listing?.hub_type === 'media_video');
+
+    response = await request('/api/hubs/listings?type=study_abroad&country=Germany&city=Berlin&university=International%20Integration%20University');
+    check('global study-abroad search filters by country city and institution', response.status === 200 && response.data.listings?.some(listing => listing.hub_type === 'study_abroad' && listing.city === 'Berlin'));
+
     response = await request('/api/auth/register', {
       method: 'POST',
       body: { fullName: 'FundiConnect Test Company', email: emailCompany, password, policyConsent: true, persona: 'employer', organisation: 'Integration Test Organisation', companyWebsite: 'https://example.invalid' }
@@ -152,8 +179,12 @@ async function cleanup() {
     check('company workspace initializes with a self-declared profile', response.status === 200 && response.data.profile.organization_name === 'Integration Test Organisation');
     response = await request('/api/company/profile', { method: 'PATCH', cookie: companyCookie, body: { organizationName: 'Integration Test Organisation Ltd', website: 'https://example.invalid', description: 'A test company for hiring student developers.' } });
     check('company can save its organisation profile', response.status === 200 && response.data.profile.organization_name === 'Integration Test Organisation Ltd');
-    response = await request('/api/hubs/listings', { method: 'POST', cookie: companyCookie, body: { type: 'internship', title: 'Company platform QA internship', description: 'A testing internship for students checking the company workspace.', category: 'Software testing', county: 'Nairobi', town: 'Kahawa' } });
-    check('company account can publish an internship', response.status === 201 && response.data.listing.hub_type === 'internship');
+    response = await request('/api/hubs/listings', { method: 'POST', cookie: companyCookie, body: { type: 'internship', title: 'Company platform QA internship', description: 'A testing internship for students checking the company workspace.', category: 'Software testing', county: 'Ontario', town: 'Toronto', country: 'Canada', countryCode: 'CA', region: 'Ontario', city: 'Toronto', university: 'Integration University', currency: 'CAD' } });
+    check('company account can publish an internship', response.status === 201 && response.data.listing.hub_type === 'internship' && response.data.listing.country === 'Canada' && response.data.listing.currency === 'CAD');
+    response = await request('/api/hubs/listings?type=internship&country=Canada&city=Toronto&university=Integration%20University&limit=10');
+    check('global country, city and university filters return matching listing records', response.status === 200 && response.data.listings.some(listing => listing.country === 'Canada' && listing.city === 'Toronto' && listing.university === 'Integration University'));
+    response = await request('/api/hubs/listings?country=Kenya&limit=10');
+    check('global country filter can select Kenya independently', response.status === 200 && Array.isArray(response.data.listings));
     response = await request('/api/company/dashboard', { cookie: companyCookie });
     check('company dashboard summarizes company listings', response.status === 200 && Number(response.data.metrics.total_listings) === 1 && Number(response.data.metrics.active_roles) === 1);
     response = await request('/api/company/dashboard', { cookie: customerCookie });
@@ -311,18 +342,18 @@ async function cleanup() {
 
     response = await request('/api/platform-profile', { method: 'PATCH', cookie: customerCookie, body: { persona: 'student', headline: 'IT student looking for internships', campus: 'Integration Campus', course: 'Information Technology', studyLevel: 'Year 1', graduationYear: 2029, bio: 'Testing CampusConnect profile', skills: ['C', 'Networking'], organisation: '', portfolioUrl: '' } });
     check('student profile can be edited', response.status === 200 && response.data.profile.campus === 'Integration Campus');
-    response = await request('/api/members?q=FundiConnect%20Test%20Customer');
+    response = await request('/api/members?q=StudentOS%20Test%20Customer');
     check('campus directory keeps profiles private by default', response.status === 200 && !(response.data.members || []).some(m => m.user_id === customerId));
     response = await request('/api/platform-profile', { method: 'PATCH', cookie: customerCookie, body: { persona: 'student', headline: 'IT student looking for internships', campus: 'Integration Campus', course: 'Information Technology', studyLevel: 'Year 1', graduationYear: 2029, bio: 'Testing CampusConnect profile', skills: ['C', 'Networking'], organisation: '', portfolioUrl: '', publicDirectory: true } });
     check('member can opt into the public directory', response.status === 200 && response.data.profile.public_directory === true);
-    response = await request('/api/members?q=FundiConnect%20Test%20Customer');
+    response = await request('/api/members?q=StudentOS%20Test%20Customer');
     check('public campus search returns opted-in members only', response.status === 200 && (response.data.members || []).some(m => m.user_id === customerId) && !('email' in ((response.data.members || []).find(m => m.user_id === customerId) || {})));
     response = await request('/api/platform-profile', { method: 'PATCH', cookie: customerCookie, body: { persona: 'student', headline: 'IT student looking for internships', campus: 'Integration Campus', course: 'Information Technology', studyLevel: 'Year 1', graduationYear: 2029, bio: 'Testing CampusConnect profile', skills: ['C', 'Networking'], organisation: '', portfolioUrl: '', publicDirectory: false } });
     check('member can opt out of the public directory', response.status === 200 && response.data.profile.public_directory === false);
-    response = await request('/api/members?q=FundiConnect%20Test%20Customer');
+    response = await request('/api/members?q=StudentOS%20Test%20Customer');
     check('opted-out member is no longer discoverable', response.status === 200 && !(response.data.members || []).some(m => m.user_id === customerId));
     response = await request('/api/cv', { cookie: customerCookie });
-    check('CV builder data is available', response.status === 200 && response.data.cv.full_name === 'FundiConnect Test Customer');
+    check('CV builder data is available', response.status === 200 && response.data.cv.full_name === 'StudentOS Test Customer');
 
     response = await request('/api/hubs/listings', { method: 'POST', cookie: customerCookie, body: { type: 'job', title: 'Integration test junior web developer', description: 'Part-time web development work for a campus project and student portfolio.', category: 'Software development', county: 'Nairobi', town: 'Kahawa', price: 5000, metadata: { extra: 'Part-time' } } });
     check('user can create a persistent job listing', response.status === 201 && response.data.listing.hub_type === 'job');
