@@ -9,6 +9,7 @@ const { Pool } = require('pg');
 const { handleHubRoutes } = require('./hubs');
 const { handlePaymentRoutes } = require('./payments');
 const { handleMarketplaceRoutes } = require('./marketplace');
+const { handleUpgradeRoutes } = require('./upgrades');
 
 const scrypt = promisify(crypto.scrypt);
 const PORT = Number(process.env.PORT || 8080);
@@ -370,6 +371,8 @@ async function mainRouter(req, res, url) {
   const user = await userFromRequest(req).catch(() => null);
   const marketplaceHandled = await handleMarketplaceRoutes({req,res,url,method,pathname,user,pool,helpers:{json,fail,text,limited,requireRole,readBody,createNotification,logAudit}});
   if (marketplaceHandled || res.writableEnded) return;
+  const upgradeHandled = await handleUpgradeRoutes({req,res,url,method,pathname,user,pool,helpers:{json,fail,text,limited,requireRole,readBody,createNotification,logAudit}});
+  if (upgradeHandled || res.writableEnded) return;
   const paymentHandled = await handlePaymentRoutes({req,res,url,method,pathname,user,pool,helpers:{json,fail,text,limited,requireRole,readBody,createNotification,logAudit}});
   if (paymentHandled || res.writableEnded) return;
   const hubHandled = await handleHubRoutes({req,res,url,method,pathname,user,pool,helpers:{json,fail,text,limited,requireRole,createNotification,logAudit,hubTypes}});
