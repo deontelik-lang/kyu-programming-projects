@@ -17,8 +17,12 @@ FundiConnect Pro is a Kenya-first marketplace MVP connecting customers with elec
 - Server-side role checks for customers, fundis, and administrator endpoints.
 - Fundi profiles with category, professional title, bio, location, skills, experience, and an availability toggle.
 - Search/filter by service category and county/town plus text search and sorting.
-- Persistent quote requests and booking status transitions: pending, accepted, assigned, traveling, in progress, completed, and cancelled, with validated transitions.
-- Notifications for new bookings, status changes, and reviews.
+- Persistent single-provider quote requests and booking status transitions: pending, accepted, assigned, traveling, in progress, completed, and cancelled, with validated transitions.
+- Smart multi-provider job requests: one request is shared with up to 30 available fundis matching the selected service category and county (when supplied); providers send comparable quotes with scope notes and proposed start times; customers compare quotes and select one. Selecting a quote transactionally creates a regular booking and closes competing quotes.
+- Fundi Job Desk with lead and booking counts, upcoming appointments, and quote response tracking.
+- Provider work portfolio with public/private project descriptions, county/year metadata, and customer-facing public portfolio viewing.
+- Printable job summaries containing booking scope, status, quote, and payment-confirmation record; summaries are explicitly not tax invoices, receipts or proof of transfer.
+- In-app database notifications for new booking requests, status changes, quotes and reviews; outbound email/SMS/push delivery is not connected.
 - Reviews tied to completed customer bookings; a database constraint prevents a second review for the same booking.
 - Transparent deterministic trust score derived from review volume, rating, completed jobs, verification level, observed responses, and profile completeness. It is not an AI model, background check, or guarantee of quality; new profiles have limited history.
 - Admin summary, booking dispute timelines, provider report queue, evidence-based verification controls, moderation queue, hub analytics and 14-day signup/listing trend.
@@ -109,7 +113,16 @@ All endpoints are same-origin under **/api**. Authenticated sessions use an opaq
 | GET | **/api/me** | Current account and fundi profile |
 | PATCH | **/api/fundi/profile** | Update signed-in fundi profile |
 | GET | **/api/bookings** | Participant bookings (admin can view platform bookings) |
-| POST | **/api/bookings** | Customer requests a quote |
+| POST | **/api/bookings** | Customer requests a quote from one provider |
+| GET/POST | **/api/job-requests** | Create a multi-provider request or list customer requests/provider invitations |
+| POST | **/api/job-requests/:id/quotes** | Submit or update a quote for a matching invited request |
+| PATCH | **/api/job-requests/:id/quotes/:quoteId/accept** | Customer selects a quote and atomically creates a booking |
+| PATCH | **/api/job-requests/:id** | Customer cancels an open multi-provider request |
+| POST | **/api/job-requests/:id/decline** | Provider declines a job invitation |
+| GET | **/api/fundi/toolkit** | Provider job-desk counts and upcoming bookings |
+| GET/POST | **/api/fundi/portfolio** | List/create portfolio items owned by the provider |
+| DELETE | **/api/fundi/portfolio/:id** | Delete an owned portfolio item |
+| GET | **/api/fundis/:id/portfolio** | Read public portfolio projects |
 | PATCH | **/api/bookings/:id/status** | Change an authorized booking status |
 | PATCH | **/api/bookings/:id/quote** | Assigned fundi sets a whole-KSh quote; booking becomes accepted |
 | GET | **/api/fundi/payment-instructions** | Provider's own direct-payment instructions |
@@ -173,13 +186,14 @@ Set **FUNDICONNECT_BASE_URL** if the server is not on **http://127.0.0.1:8080**.
 ## Not implemented yet
 
 - Real phone OTP and email verification, password recovery, MFA/passkeys
-- Upload pipeline for IDs, certificates, work portfolios, and videos
-- Email/SMS/push delivery to real devices
+- Customer job-photo uploads (requires a secure upload pipeline and configured object storage; this release does not accept or store image uploads)
+- Upload pipeline for IDs, certificates, and portfolio photos/videos (text-based portfolio projects are implemented)
+- Email/SMS/push delivery to real devices (current alerts are in-app database notifications only)
 - Real-time chat and GPS technician tracking
 - Withdrawals, wallet, escrow, payout/reconciliation/refund workflows; the Daraja STK Push code is present but not enabled until provider configuration and sandbox validation are complete
 - Paid subscriptions and company-team invitations/permissions
 - External full-text search, Redis queues/rate limits, CDN/object storage media workflows
-- Automated abuse detection, dispute workflows, fraud monitoring, comprehensive observability, backups/restore drills, and performance/load testing
+- Automated abuse detection, advanced fraud monitoring, comprehensive observability, backups/restore drills, and performance/load testing
 
 These remaining integrations need chosen providers, credentials, webhook URLs, operational processes, and testing; the app does not simulate successful payments or messages. The M-Pesa code stays disabled until its required settings are provided and sandbox-tested.
 
