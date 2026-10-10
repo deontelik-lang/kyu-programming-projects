@@ -33,7 +33,7 @@ if (!countriesBlob) throw new Error('The StudentOS world country list is missing
 const countryPairs = countriesBlob[1].split('|').map(value => value.slice(0, value.indexOf(':')));
 if (countryPairs.length < 240 || new Set(countryPairs).size !== countryPairs.length) throw new Error('Global country list must contain at least 240 unique country/territory codes.');
 const serverContentForStudentOS = fs.readFileSync('server.js', 'utf8');
-if (!serverContentForStudentOS.includes('/studentos.css?v=2') || !serverContentForStudentOS.includes('/studentos.js?v=3') || !serverContentForStudentOS.includes('/api/public/global-stats')) throw new Error('StudentOS design assets are not injected into the homepage.');
+if (!serverContentForStudentOS.includes('/studentos.css?v=2') || !serverContentForStudentOS.includes('/studentos.js?v=4') || !serverContentForStudentOS.includes('/api/public/global-stats')) throw new Error('StudentOS design assets are not injected into the homepage.');
 
 const serverWithDiscovery = fs.readFileSync('server.js', 'utf8');
 if (!serverWithDiscovery.includes('/engagement.css?v=1') || !serverWithDiscovery.includes('/engagement.js?v=2')) throw new Error('Dynamic discovery assets are not injected into the homepage.');
