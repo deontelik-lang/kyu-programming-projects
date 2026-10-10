@@ -86,6 +86,15 @@ async function cleanup() {
   let fundiCookie = '';
   let failure = null;
   try {
+    const homepageResponse = await fetch(base + '/', { headers: { 'x-forwarded-for': testIp } });
+    const homepageHtml = await homepageResponse.text();
+    check('homepage injects the CampusHub discovery experience', homepageResponse.status === 200 && homepageHtml.includes('/engagement.css?v=1') && homepageHtml.includes('/engagement.js?v=1'));
+    const discoveryCss = await fetch(base + '/engagement.css?v=1');
+    const discoveryJs = await fetch(base + '/engagement.js?v=1');
+    const [cssText, jsText] = await Promise.all([discoveryCss.text(), discoveryJs.text()]);
+    check('discovery styles are served', discoveryCss.status === 200 && cssText.includes('.dh-glass') && cssText.includes('prefers-reduced-motion'));
+    check('discovery interaction layer is served', discoveryJs.status === 200 && jsText.includes('Your momentum') && jsText.includes('/api/hubs/listings?limit=80'));
+
     let response = await request('/api/health');
     check('API and PostgreSQL health', response.status === 200 && response.data.database === true);
 
