@@ -348,7 +348,7 @@
         <button class="btn outline" type="button" data-so-action="assistant" data-so-i18n="assistantButton">Ask StudentOS ↗</button>
       </div>
       <div class="so-loc-strip"><span class="so-loc-orb">⌖</span><div class="so-loc-copy"><b data-so-i18n="locationTitle">Your discovery region</b><span id="studentosCurrentLocation">${esc([location.city,location.region,location.country].filter(Boolean).join(' · ')||'Worldwide')}</span></div><button class="so-loc-button" type="button" data-so-page="global" data-so-i18n="locationEdit">Edit location ↗</button></div>
-      <p class="so-translation-note">Navigation and the app launcher can be translated into your preferred language. Listings and much of the remaining interface stay in the language provided by their authors.</p>
+      <p class="so-translation-note">Navigation and key app-shell labels adapt to your preferred language. Listing text and many remaining descriptions stay in the language provided by their authors.</p>
     </section>`;
   }
   function entertainmentMarkup() {
