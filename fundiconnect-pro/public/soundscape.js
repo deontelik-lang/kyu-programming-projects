@@ -25,6 +25,7 @@
   var settings=readSettings(),ctx=null,master=null,ambientNodes=[],introTimer=0,activeScene=0,lastHover=0,ambientStarted=false;
   var $=function(id){return document.getElementById(id);};
   var cinemaCanvas=null,cinemaCtx=null,cinemaFrameId=0,cinemaStart=0,cinemaDpr=1,cinemaWidth=0,cinemaHeight=0,cinemaStars=[],cinemaLastTime=0,ambientBeatTimer=0,cinemaSnapshotCanvas=null,cinemaSnapshotCtx=null,cinemaHasFrame=false,cinemaSceneTransitionAt=0,cinemaSceneTransitionDuration=860,cinemaSceneTransitionTimer=0;
+  var cinemaSceneStartedAt=0,heroCanvas=null,heroCtx=null,heroFrameId=0,heroWidth=0,heroHeight=0,heroDpr=1,heroStars=[],heroLastFrame=0,heroObserver=null,heroVisible=true,heroReducedMotion=false;
   var scenes=[
     {id:'car',kicker:'01 / FIRST CONTACT',title:'The future starts here.',description:'A new kind of student experience is coming into view.',duration:2200},
     {id:'acceleration',kicker:'02 / BUILT TO MOVE',title:'Your world. In motion.',description:'Ideas, people and opportunities move with you.',duration:1850},
@@ -198,7 +199,7 @@
       '<div class="so-intro-progress" aria-hidden="true">'+points+'</div><div class="so-intro-actions"><button id="soIntroEnter" class="primary" type="button" data-sound-action="enter-intro" hidden>Explore StudentOS ↗</button></div></div></div>';
   }
   function uiMarkup(){
-    return '<div class="so-intro-banner"><div class="so-intro-banner-copy"><div class="so-intro-banner-kicker">OPTIONAL IMMERSIVE PREVIEW</div><strong>Your future. One connected universe.</strong><small>A short cinematic StudentOS reveal with optional browser-generated sound. Sound stays off until you choose to start.</small></div><button class="so-intro-launch" type="button" data-sound-action="intro">▶ Launch experience</button></div>'+
+    return '<div class="so-intro-banner"><div class="so-intro-banner-copy"><div class="so-intro-banner-kicker">STUDENTOS · GLOBAL EXPERIENCE</div><strong>Your future. One connected universe.</strong><small>A live animated preview, then a cinematic journey through a futuristic city, light tunnel and connected world. Sound stays off until you choose to start.</small><div class="so-preview-meta"><span><i></i> LIVE VISUAL</span><span>2.5D CINEMATIC</span><span>PERSONALISE YOUR SOUND</span></div></div><div class="so-intro-preview" aria-hidden="true"><canvas id="soHeroPreviewCanvas"></canvas><span class="so-preview-coordinate">GLOBAL NETWORK <b>01 — 08</b></span></div><button class="so-intro-launch" type="button" data-sound-action="intro"><span aria-hidden="true">▶</span><span>Launch experience</span><small>ENTER STUDENTOS</small></button></div>'+
       '<div id="soSoundDock" class="so-sound-dock" data-enabled="false"><button id="soSoundToggle" type="button" data-sound-action="toggle-sound" aria-pressed="false" aria-label="Turn StudentOS sounds on"><span class="so-sound-indicator" aria-hidden="true"></span><span class="so-sound-label">Sound off</span></button><button id="soSoundSettings" class="so-sound-gear" type="button" data-sound-action="toggle-panel" aria-expanded="false" aria-controls="soSoundPanel" aria-label="Sound settings">⚙</button></div>'+
       '<section id="soSoundPanel" class="so-sound-panel" aria-label="StudentOS sound settings" hidden><div class="so-sound-panel-head"><div><strong>Soundscape</strong><small>Shape the atmosphere. Your settings stay on this device.</small></div><button type="button" class="so-sound-close" data-sound-action="toggle-panel" aria-label="Close sound settings">×</button></div>'+
       '<div class="so-sound-row"><label for="soSoundTheme">Ambient theme</label><select id="soSoundTheme"><option value="off">No background music</option><option value="future">Future City</option><option value="global">Global Explorer</option><option value="study">Study Mode</option><option value="premium">Premium Experience</option></select></div>'+
@@ -229,6 +230,7 @@
       overlay.classList.remove('so-scene-transition');
     }
     activeScene=index;
+    cinemaSceneStartedAt=performance.now();
     overlay.dataset.scene=scene.id;
     $('soIntroKicker').textContent=scene.kicker;
     $('soIntroTitle').innerHTML=scene.title;
@@ -266,6 +268,119 @@
       return;
     }
     introTimer=window.setTimeout(function(){renderScene(activeScene+1);advanceIntro();},scenes[activeScene].duration);
+  }
+  function heroResize(){
+    if(!heroCanvas)return;
+    var box=heroCanvas.getBoundingClientRect();
+    if(!box.width||!box.height)return;
+    heroDpr=Math.min(1.5,window.devicePixelRatio||1);
+    heroWidth=box.width;heroHeight=box.height;
+    var pw=Math.round(heroWidth*heroDpr),ph=Math.round(heroHeight*heroDpr);
+    if(heroCanvas.width!==pw||heroCanvas.height!==ph){heroCanvas.width=pw;heroCanvas.height=ph;}
+    heroCtx=heroCanvas.getContext('2d',{alpha:true,desynchronized:true});
+    if(heroCtx)heroCtx.setTransform(heroDpr,0,0,heroDpr,0,0);
+    heroStars=Array.from({length:36},function(_,i){return {x:((i*37)%101)/100,y:((i*61)%97)/100,z:.3+((i*17)%70)/100,r:.35+((i*11)%12)/10,p:i*1.37};});
+  }
+  function heroDraw(now){
+    heroFrameId=0;
+    if(!heroCanvas||!heroCtx||!heroVisible||document.hidden)return;
+    var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(!reduced&&now-heroLastFrame<30){heroFrameId=window.requestAnimationFrame(heroDraw);return;}
+    heroLastFrame=now;
+    var c=heroCtx,w=heroWidth,h=heroHeight,t=reduced?950:now;
+    c.clearRect(0,0,w,h);
+    var bg=c.createLinearGradient(0,0,w,h);bg.addColorStop(0,'rgba(3,10,27,.18)');bg.addColorStop(.5,'rgba(16,24,58,.08)');bg.addColorStop(1,'rgba(35,9,58,.24)');
+    c.fillStyle=bg;c.fillRect(0,0,w,h);
+    heroStars.forEach(function(star){
+      var x=((star.x*w-t*.008*star.z)%w+w)%w,y=(star.y*h+Math.sin(t*.0005+star.p)*4+h)%h;
+      c.globalAlpha=.25+.5*(.5+.5*Math.sin(t*.002+star.p));c.fillStyle=star.p%2?'#a5f3fc':'#c4b5fd';
+      c.beginPath();c.arc(x,y,star.r,0,Math.PI*2);c.fill();
+    });
+    c.globalAlpha=1;
+    var cx=w*.69,cy=h*.5,r=Math.min(h*.37,w*.165,62);
+    // Layered 2.5D holographic planet with lit surface, longitude/latitude motion and a living network.
+    var glow=c.createRadialGradient(cx,cy,1,cx,cy,r*2.3);glow.addColorStop(0,'rgba(34,211,238,.20)');glow.addColorStop(.45,'rgba(99,102,241,.12)');glow.addColorStop(1,'rgba(139,92,246,0)');
+    c.fillStyle=glow;c.fillRect(cx-r*2.3,cy-r*2.3,r*4.6,r*4.6);
+    c.save();c.translate(cx,cy);
+    for(var orbit=0;orbit<3;orbit++){
+      c.save();c.rotate(t*.00012*(orbit%2?-1:1)+orbit*.8);c.scale(1,[.24,.38,.16][orbit]);
+      c.beginPath();c.ellipse(0,0,r*(1.32+orbit*.17),r*.5,0,0,Math.PI*2);
+      c.strokeStyle=['rgba(103,232,249,.75)','rgba(196,181,253,.62)','rgba(240,171,252,.44)'][orbit];c.lineWidth=orbit===0?1.3:.8;c.stroke();
+      c.restore();
+    }
+    c.restore();
+    var planet=c.createRadialGradient(cx-r*.42,cy-r*.45,r*.04,cx+r*.22,cy+r*.2,r*1.35);
+    planet.addColorStop(0,'#dbeafe');planet.addColorStop(.13,'#67e8f9');planet.addColorStop(.43,'#2563eb');planet.addColorStop(.76,'#1e1b4b');planet.addColorStop(1,'#030817');
+    c.save();c.shadowColor='#22d3ee';c.shadowBlur=20;c.fillStyle=planet;c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.fill();c.restore();
+    c.save();c.beginPath();c.arc(cx,cy,r*.995,0,Math.PI*2);c.clip();
+    c.strokeStyle='rgba(165,243,252,.37)';c.lineWidth=.65;
+    for(var lng=0;lng<7;lng++){var angle=lng*Math.PI/7+t*.00034; c.beginPath();c.ellipse(cx+Math.sin(angle)*r*.25,cy,r*Math.max(.035,Math.abs(Math.sin(angle))),r,0,0,Math.PI*2);c.stroke();}
+    for(var lat=-2;lat<=2;lat++){var yy=cy+lat*r*.29,rx=r*Math.sqrt(Math.max(.05,1-Math.pow(lat*.29,2)));c.beginPath();c.ellipse(cx,yy,rx,Math.max(1,r*.09),0,0,Math.PI*2);c.stroke();}
+    // Abstract luminous landmasses are intentionally stylised rather than presented as a geographic map.
+    var landSets=[
+      [[-.77,-.24],[-.48,-.44],[-.23,-.32],[-.31,-.08],[-.54,.03],[-.67,-.03]],
+      [[-.12,-.16],[.08,-.29],[.24,-.2],[.2,.02],[.05,.22],[-.1,.11]],
+      [[.28,-.39],[.55,-.35],[.72,-.14],[.54,.01],[.39,-.04],[.2,-.18]],
+      [[.21,.15],[.49,.16],[.55,.35],[.42,.58],[.24,.42]]
+    ];
+    landSets.forEach(function(points,index){
+      c.beginPath();points.forEach(function(pt,i){var x=cx+pt[0]*r+Math.sin(t*.00025+index)*r*.025,y=cy+pt[1]*r;if(i)c.lineTo(x,y);else c.moveTo(x,y);});c.closePath();
+      c.fillStyle=index%2?'rgba(45,212,191,.70)':'rgba(103,232,249,.73)';c.strokeStyle='rgba(207,250,254,.7)';c.lineWidth=.55;c.fill();c.stroke();
+    });
+    c.restore();
+    // A moving route orbit, pulses and small lens glints add depth even before the intro is launched.
+    var nodes=[];
+    for(var n=0;n<6;n++){
+      var a=t*.0003+n*Math.PI/3.4,pt={x:cx+Math.cos(a)*r*.94,y:cy+Math.sin(a)*r*.58};
+      nodes.push(pt);
+    }
+    c.save();c.setLineDash([2,4]);c.lineDashOffset=-t*.018;c.strokeStyle='rgba(240,171,252,.7)';c.lineWidth=.8;
+    c.beginPath();nodes.forEach(function(pt,i){if(i)c.lineTo(pt.x,pt.y);else c.moveTo(pt.x,pt.y);});c.closePath();c.stroke();c.restore();
+    nodes.forEach(function(pt,i){
+      var pulse=1.4+1.4*(.5+.5*Math.sin(t*.004+i));
+      c.save();c.globalAlpha=.68+.32*Math.sin(t*.002+i)**2;c.shadowColor=i%2?'#c4b5fd':'#67e8f9';c.shadowBlur=8;
+      c.fillStyle=i%2?'#e9d5ff':'#cffafe';c.beginPath();c.arc(pt.x,pt.y,pulse,0,Math.PI*2);c.fill();c.restore();
+    });
+    // Electric hairline sweeps cross the composition, independent of user input.
+    for(var streak=0;streak<3;streak++){
+      var sx=((t*(.035+streak*.011)+streak*83)%(w+60))-30,sy=h*(.15+streak*.27);
+      var lg=c.createLinearGradient(sx-38,sy,sx+38,sy);lg.addColorStop(0,'rgba(103,232,249,0)');lg.addColorStop(.5,streak%2?'rgba(240,171,252,.78)':'rgba(103,232,249,.9)');lg.addColorStop(1,'rgba(103,232,249,0)');
+      c.strokeStyle=lg;c.lineWidth=1.1;c.beginPath();c.moveTo(sx-38,sy);c.lineTo(sx+38,sy);c.stroke();
+    }
+    // A tiny vehicle follows a light rail under the globe to echo the launch sequence.
+    var carX=((t*.055)%(w+42))-21,carY=h*.83;
+    c.save();c.translate(carX,carY);c.shadowColor='#67e8f9';c.shadowBlur=8;
+    c.fillStyle='#dbeafe';c.beginPath();c.moveTo(-13,2);c.lineTo(-8,-3);c.lineTo(-3,-7);c.lineTo(5,-6);c.lineTo(10,-2);c.lineTo(14,2);c.closePath();c.fill();
+    c.strokeStyle='#67e8f9';c.lineWidth=1.4;c.beginPath();c.moveTo(-17,5);c.lineTo(15,5);c.stroke();c.restore();
+    c.globalAlpha=1;
+    if(!reduced)heroFrameId=window.requestAnimationFrame(heroDraw);
+  }
+  function startHeroPreview(){
+    if(!heroCanvas)return;
+    heroReducedMotion=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    heroResize();
+    if(!heroCtx)return;
+    if(heroFrameId)window.cancelAnimationFrame(heroFrameId);
+    heroFrameId=window.requestAnimationFrame(heroDraw);
+  }
+  function stopHeroPreview(){
+    if(heroFrameId)window.cancelAnimationFrame(heroFrameId);
+    heroFrameId=0;
+  }
+  function initHeroPreview(){
+    heroCanvas=$('soHeroPreviewCanvas');
+    if(!heroCanvas)return;
+    heroResize();
+    if('IntersectionObserver' in window){
+      heroObserver=new IntersectionObserver(function(entries){
+        heroVisible=entries.some(function(entry){return entry.isIntersecting;});
+        if(heroVisible&&!document.hidden)startHeroPreview();else stopHeroPreview();
+      },{threshold:.05});
+      heroObserver.observe(heroCanvas);
+    }else startHeroPreview();
+    window.addEventListener('resize',function(){heroResize();if(heroVisible&&!document.hidden)startHeroPreview();});
+    document.addEventListener('visibilitychange',function(){if(document.hidden)stopHeroPreview();else if(heroVisible)startHeroPreview();});
+    if(heroReducedMotion){heroDraw(performance.now());}
   }
   function cinemaResize(){
     if(!cinemaCanvas)return;
@@ -362,11 +477,14 @@
       c.globalAlpha=1;
     }
   }
-  function cinemaCar(t,scene){
+  function cinemaCar(t,scene,elapsed){
     var c=cinemaCtx,w=cinemaWidth,h=cinemaHeight;
+    var e=Math.max(0,elapsed||0),p=Math.min(1,e/1550),ease=1-Math.pow(1-p,3);
     var scale=Math.min(1.12,w/590,h/430),cx=w*.5,cy=h*.555;
-    if(scene==='acceleration'){cx=w*.66+Math.sin(t*.002)*w*.035;cy=h*.59;scale*=.96;}
-    if(scene==='tunnel'){scale*=Math.max(.22,1-((t*.0001)%1)*.7);cy=h*.59;}
+    // The car begins deep in the street, approaches the virtual camera, settles, then accelerates.
+    if(scene==='car'){scale*=.12+.91*ease;cy=h*(.77-.205*ease);cx=w*(.5-.035*(1-ease));}
+    if(scene==='acceleration'){var speed=Math.min(1,e/1200),speedEase=1-Math.pow(1-speed,2.4);cx=w*(.5+.19*speedEase)+Math.sin(t*.002)*w*.014;cy=h*(.59-.016*speedEase);scale*=.98+speedEase*.18;}
+    if(scene==='tunnel'){var dive=Math.min(1,e/1750);scale*=1.1-.84*(dive*dive);cy=h*(.60-.145*dive);cx=w*.5+Math.sin(t*.0012)*w*.012;}
     if(scene==='globe'||scene==='reveal')return;
     c.save();c.translate(cx,cy);c.scale(scale,scale);
     var bob=Math.sin(t*.0038)*2.3;c.translate(0,bob);
@@ -519,13 +637,13 @@
     c.strokeStyle='rgba(191,219,254,.7)';c.lineWidth=1.3;c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.stroke();
     cinemaGlow(cx-r*.38,cy-r*.4,r*.46,'rgba(224,242,254,ALPHA)',.12);
   }
-  function paintCinemaScene(t,scene){
+  function paintCinemaScene(t,scene,elapsed){
     var c=cinemaCtx,w=cinemaWidth,h=cinemaHeight;
     cinemaBackground(t,scene);
-    if(scene==='tunnel'){cinemaTunnel(t);cinemaCar(t,scene);}
-    else if(scene==='globe'){cinemaGlobe(t,false);cinemaCar(t,scene);}
+    if(scene==='tunnel'){cinemaTunnel(t);cinemaCar(t,scene,elapsed);}
+    else if(scene==='globe'){cinemaGlobe(t,false);cinemaCar(t,scene,elapsed);}
     else if(scene==='reveal'){cinemaGlobe(t,true);cinemaGlow(w*.5,h*.43,Math.min(w,h)*.28,'rgba(139,92,246,ALPHA)',.16);}
-    else cinemaCar(t,scene);
+    else cinemaCar(t,scene,elapsed);
     if(scene==='car'||scene==='reveal'){
       for(var i=0;i<16;i++){
         var a=t*.00021+i*Math.PI/8,rad=Math.min(w,h)*(.19+(i%5)*.035),x=w*.5+Math.cos(a)*rad*1.22,y=h*.48+Math.sin(a)*rad*.62;
@@ -540,7 +658,7 @@
     if(!cinemaCtx||!cinemaCanvas||!cinemaCanvas.width)cinemaResize();
     if(!cinemaCtx){cinemaFrameId=window.requestAnimationFrame(cinemaFrame);return;}
     var now=time||performance.now(),t=now-cinemaStart,scene=overlay.dataset.scene||'car';
-    paintCinemaScene(t,scene);
+    var elapsed=Math.max(0,now-cinemaSceneStartedAt);paintCinemaScene(t,scene,elapsed);
     // Blend from the actual outgoing rendered frame. This avoids the hard scene cuts of a slide-show.
     if(cinemaSnapshotCanvas&&cinemaSnapshotCtx&&cinemaSceneTransitionAt){
       var progress=Math.max(0,Math.min(1,(now-cinemaSceneTransitionAt)/cinemaSceneTransitionDuration));
@@ -608,6 +726,7 @@
       document.body.appendChild(banner.querySelector('#soIntroOverlay'));
     }
     updateDock();
+    initHeroPreview();
     if(typeof window.toast==='function'&&!window.toast.__studentOSSoundsWrapped){
       var originalToast=window.toast;
       var wrappedToast=function(){var result=originalToast.apply(this,arguments);play('notification');return result;};
