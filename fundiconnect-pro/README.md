@@ -1,10 +1,10 @@
-# FundiConnect Pro
+# CampusHub — One App. Unlimited Opportunities.
 
 **Kenya's Trusted Skilled Workers Marketplace**
 
-FundiConnect Pro is a Kenya-first marketplace MVP connecting customers with electricians, CCTV installers, and WiFi/network technicians. This repository contains the working browser UI, same-origin HTTP API, PostgreSQL migrations, operational scripts, and CI checks for both the Fundi services marketplace and CampusConnect student/opportunity hubs.
+CampusHub is a connected campus and local-services super app evolved from the CampusHub + FundiConnect project. It brings student opportunities, housing listings, campus community, career and alumni hubs, local businesses, and a skilled-services marketplace into one responsive web platform. This repository contains the working browser UI, same-origin HTTP API, PostgreSQL migrations, operational scripts, and CI checks.
 
-> **Release status:** functional marketplace MVP, not yet a fully production-hardened marketplace. The launch payment model is direct-to-provider: customers pay providers using provider-controlled instructions, and FundiConnect records each party's confirmation without moving or independently verifying funds. Platform M-Pesa checkout is disabled. Real identity/phone verification, SMS OTP, email verification and live dispatch remain unconnected.
+> **Release status:** functional marketplace MVP, not yet a fully production-hardened marketplace. The launch payment model is direct-to-provider: customers pay providers using provider-controlled instructions, and CampusHub records each party's confirmation without moving or independently verifying funds. Platform M-Pesa checkout is disabled. Real identity/phone verification, SMS OTP, email verification and live dispatch remain unconnected.
 
 ## Live preview
 
@@ -17,6 +17,7 @@ FundiConnect Pro is a Kenya-first marketplace MVP connecting customers with elec
 - Server-side role checks for customers, fundis, and administrator endpoints.
 - Fundi profiles with category, professional title, bio, location, skills, experience, and an availability toggle.
 - Search/filter by service category and county/town plus text search and sorting.
+- Expanded service directory covering 20 categories, including tutors, freelance services, solar/backup power, computer repair, moving, handyperson maintenance, and locksmiths.
 - Persistent single-provider quote requests and booking status transitions: pending, accepted, assigned, traveling, in progress, completed, and cancelled, with validated transitions.
 - Smart multi-provider job requests: one request is shared with up to 30 available fundis matching the selected service category and county (when supplied); providers send comparable quotes with scope notes and proposed start times; customers compare quotes and select one. Selecting a quote transactionally creates a regular booking and closes competing quotes.
 - Fundi Job Desk with lead and booking counts, upcoming appointments, and quote response tracking.
@@ -32,11 +33,19 @@ FundiConnect Pro is a Kenya-first marketplace MVP connecting customers with elec
 - Numbered SQL migrations, code syntax checks, a browser-script check, guarded integration tests, and a GitHub Actions CI workflow.
 - An opt-in campus/alumni profile directory with search by name, course, skills, campus and persona. Contact information is excluded from public directory responses.
 
-## CampusConnect super-app modules
+## CampusHub interface and progressive web app
+
+- Rebranded, responsive landing page with an animated CSS-built 3D-style visual, a module showcase, accessible contrast and focus treatments, reduced-motion support, pricing status, FAQ and a clear contact/safety entry point.
+- Persistent dark/light theme preference using the browser's local storage.
+- Live public aggregate counters for member, provider, and published opportunity totals; counts are sourced from PostgreSQL and do not disclose member identities.
+- PWA manifest, original SVG app mark, and a network-first offline shell. The shell can cache the landing page and static assets, while API calls remain network-only. This is not a full offline transactional mode and does not queue bookings while offline.
+- Google Fonts typography uses Inter and Poppins when the fonts are reachable, with system-font fallbacks.
+
+## CampusHub opportunity and campus modules
 
 The app includes 13 database-backed opportunity hubs: student gigs, jobs, internships/graduate roles, housing, products, events, courses/skills academy listings, business directory, community posts, transport/delivery listings, student services, alumni/mentorship and professional service offers. Members can publish listings, search by hub and location, apply or inquire, RSVP, save items, comment on campus posts, exchange persistent listing messages, report abusive listings, and review incoming applications through owner dashboards. User profiles can include campus, course, study level, graduation year, organisation, portfolio and skills; a printable CV preview uses that profile data. The Campus & Alumni Directory is opt-in and private by default; users can make their profile discoverable or opt out at any time, and the directory does not expose account phone/email. Emergency request records are persistent but do not dispatch responders. A local rules-based study/career guide and user-input cost worksheet are included; neither is a connected generative AI service or external market-price engine.
 
-The release implements a direct-to-provider marketplace. Providers list their own payment instructions (such as M-Pesa Till/Paybill, cash or bank transfer); participants on an accepted booking can view the instructions and record timestamped confirmations. A customer report and provider receipt confirmation create a two-sided record, not independent bank verification. Booking disputes preserve a case timeline for admin review. Platform checkout, wallet transfers, escrow, provider payouts, rent collection, paid ticketing, real OTP/email delivery, automated identity validation/background checks, live GPS, push notifications, real-time WebSocket chat, course content delivery, company team invitations, employer-system integrations, referral bonuses and AI-provider calls are **not enabled**. Company dashboards and point-based listing spotlights are implemented, but do not imply an organisation is verified or guarantee a listing's outcome.
+The release implements a direct-to-provider marketplace. The CampusHub landing page, theme toggle and PWA app shell do not imply that separately listed roadmap integrations are already operational.  Providers list their own payment instructions (such as M-Pesa Till/Paybill, cash or bank transfer); participants on an accepted booking can view the instructions and record timestamped confirmations. A customer report and provider receipt confirmation create a two-sided record, not independent bank verification. Booking disputes preserve a case timeline for admin review. Platform checkout, wallet transfers, escrow, provider payouts, rent collection, paid ticketing, real OTP/email delivery, automated identity validation/background checks, live GPS, push notifications, real-time WebSocket chat, course content delivery, company team invitations, employer-system integrations, referral bonuses and AI-provider calls are **not enabled**. Company dashboards and point-based listing spotlights are implemented, but do not imply an organisation is verified or guarantee a listing's outcome.
 
 ## Stack
 
@@ -145,7 +154,7 @@ All endpoints are same-origin under **/api**. Authenticated sessions use an opaq
 
 ### Direct-payment launch model
 
-FundiConnect does not collect or hold customer service payments. A provider controls their default payment instructions and must save them before quoting. The quote stores a snapshot of those instructions so later edits to the provider's default Till/Paybill do not silently redirect an accepted booking. Both booking parties may record their confirmations; admins may review disputes and the booking event timeline. The platform does not independently confirm transfers or guarantee refunds. Legacy platform M-Pesa endpoints, including historical platform payment records, are disabled in this release and return a direct-payment-model response.
+CampusHub does not collect or hold customer service payments. A provider controls their default payment instructions and must save them before quoting. The quote stores a snapshot of those instructions so later edits to the provider's default Till/Paybill do not silently redirect an accepted booking. Both booking parties may record their confirmations; admins may review disputes and the booking event timeline. The platform does not independently confirm transfers or guarantee refunds. Legacy platform M-Pesa endpoints, including historical platform payment records, are disabled in this release and return a direct-payment-model response.
 
 ### Core data model
 
