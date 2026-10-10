@@ -32,6 +32,23 @@
     US:'USD',CA:'CAD',GB:'GBP',IE:'EUR',DE:'EUR',FR:'EUR',ES:'EUR',PT:'EUR',IT:'EUR',NL:'EUR',BE:'EUR',AT:'EUR',FI:'EUR',GR:'EUR',
     KE:'KES',UG:'UGX',TZ:'TZS',NG:'NGN',ZA:'ZAR',IN:'INR',CN:'CNY',BR:'BRL',AU:'AUD',NZ:'AUD'
   };
+  const UNIVERSITIES_BY_COUNTRY = {
+    US:['Harvard University','Stanford University','Massachusetts Institute of Technology','University of California, Berkeley','Columbia University'],
+    CA:['University of Toronto','University of British Columbia','McGill University','University of Waterloo'],
+    GB:['University of Oxford','University of Cambridge','Imperial College London','University College London'],
+    DE:['Technical University of Munich','Ludwig Maximilian University of Munich','Heidelberg University'],
+    FR:['Sorbonne University','PSL University','Université Paris-Saclay'],
+    KE:['University of Nairobi','Kenyatta University','Jomo Kenyatta University of Agriculture and Technology','Strathmore University','Moi University'],
+    UG:['Makerere University','Kyambogo University'],TZ:['University of Dar es Salaam','University of Dodoma'],
+    ZA:['University of Cape Town','University of the Witwatersrand','Stellenbosch University','University of Pretoria'],
+    NG:['University of Lagos','University of Ibadan','Ahmadu Bello University'],
+    IN:['University of Delhi','Indian Institute of Technology Delhi','Indian Institute of Technology Bombay'],
+    AU:['University of Melbourne','Australian National University','University of Sydney','Monash University'],
+    BR:['University of São Paulo','University of Campinas'],CN:['Peking University','Tsinghua University','Fudan University'],
+    NZ:['University of Auckland','University of Otago'],IE:['Trinity College Dublin','University College Dublin'],
+    NL:['University of Amsterdam','Delft University of Technology'],SG:['National University of Singapore','Nanyang Technological University'],
+    RW:['University of Rwanda','Kigali Independent University']
+  };
   const REGION_LANGUAGE = { KE:'sw',TZ:'sw',UG:'en',FR:'fr',ES:'es',PT:'pt',BR:'pt',CN:'zh',DE:'de',AT:'de',CH:'de',SA:'ar',AE:'ar',EG:'ar',MA:'ar',TN:'ar',US:'en',GB:'en',CA:'en',AU:'en',IN:'en' };
   const fallback = { country:'Kenya',countryCode:'KE',region:'',city:'',university:'',language:'en',currency:'KES',mode:'country',savedByUser:false };
   let location = readLocation();
@@ -166,6 +183,10 @@
     const current = selected || location.language;
     return LANGUAGES.map(([code,label]) => `<option value="${code}" ${code === current ? 'selected' : ''}>${label}</option>`).join('');
   }
+  function updateUniversitySuggestions(code = location.countryCode) {
+    const list = $('so-university-suggestions');
+    if (list) list.innerHTML = (UNIVERSITIES_BY_COUNTRY[code] || []).map(name => '<option value="' + esc(name) + '"></option>').join('');
+  }
   function codeForCountry(name) { return countryByName(name)?.code || 'ZZ'; }
   function setCountryDefaults(select, currency, language, hiddenCode) {
     const code = codeForCountry(select.value);
@@ -183,9 +204,9 @@
         <div class="so-field"><label for="so-${idSuffix}-language">Preferred language</label><select id="so-${idSuffix}-language" name="language" data-so-language>${languageOptions()}</select></div>
         <div class="so-field"><label for="so-${idSuffix}-region">Region / state / county</label><input id="so-${idSuffix}-region" name="region" maxlength="100" value="${esc(location.region)}" placeholder="e.g. Nairobi County, California"></div>
         <div class="so-field"><label for="so-${idSuffix}-city">City</label><input id="so-${idSuffix}-city" name="city" maxlength="100" value="${esc(location.city)}" placeholder="e.g. Nairobi, London"></div>
-        <div class="so-field"><label for="so-${idSuffix}-university">University / institution</label><input id="so-${idSuffix}-university" name="university" maxlength="180" value="${esc(location.university)}" placeholder="Your campus or institution"></div>
+        <div class="so-field"><label for="so-${idSuffix}-university">University / institution</label><input id="so-${idSuffix}-university" name="university" list="so-university-suggestions" maxlength="180" value="${esc(location.university)}" placeholder="Your campus or institution"></div>
         <div class="so-field"><label for="so-${idSuffix}-currency">Preferred supported currency</label><select id="so-${idSuffix}-currency" name="currency" data-so-currency>${currencyOptions()}</select></div>
-      </div><p class="studentos-field-note">Choose your own location. Automatic place lookup and verified international university directories are not connected yet.</p>
+      </div><p class="studentos-field-note">Choose your own location. University suggestions cover selected institutions only; type any other institution. Automatic location lookup still needs a reverse-geocoding provider.</p>
     </fieldset>`;
   }
   function locationParams(modeOverride) {
@@ -243,6 +264,7 @@
     if (currencyControl) currencyControl.value = location.currency;
     document.querySelectorAll('[data-so-mode]').forEach(btn => btn.setAttribute('aria-pressed',String(btn.dataset.soMode === location.mode)));
     syncHomeLocationFilter();
+    updateUniversitySuggestions(location.countryCode);
     document.querySelectorAll('[data-so-country]').forEach(select => {
       if (select.value !== location.country && countryByName(location.country)) select.value = location.country;
       const hidden = select.form?.querySelector('[data-so-code]');
@@ -319,7 +341,7 @@
             <div class="so-field"><label for="so-global-country">Country / territory</label><select id="so-global-country" data-so-main-country>${countryOptions()}</select></div>
             <div class="so-field"><label for="so-global-region">Region / state / county</label><input id="so-global-region" maxlength="100" value="${esc(location.region)}" placeholder="Nairobi County, Texas…"></div>
             <div class="so-field"><label for="so-global-city">City</label><input id="so-global-city" maxlength="100" value="${esc(location.city)}" placeholder="Nairobi, London, Toronto…"></div>
-            <div class="so-field"><label for="so-global-university">University / institution</label><input id="so-global-university" maxlength="180" value="${esc(location.university)}" placeholder="Search by name"></div>
+            <div class="so-field"><label for="so-global-university">University / institution</label><input id="so-global-university" list="so-university-suggestions" maxlength="180" value="${esc(location.university)}" placeholder="Start typing your institution"><datalist id="so-university-suggestions"></datalist></div>
             <div class="so-field"><label for="so-global-language">Preferred language</label><select id="so-global-language">${languageOptions()}</select></div>
             <div class="so-field"><label for="so-global-currency">Currency for new listings</label><select id="so-global-currency">${currencyOptions()}</select></div>
           </div>
@@ -560,6 +582,7 @@
       const hidden=form.querySelector('[data-so-code]');
       select.addEventListener('change',()=>{
         setCountryDefaults(select,currency,language,hidden);
+        updateUniversitySuggestions(codeForCountry(select.value));
         // Preserve current region/city fields. The location chooser updates its own settings separately.
       });
       if (hidden) hidden.value=codeForCountry(select.value);
