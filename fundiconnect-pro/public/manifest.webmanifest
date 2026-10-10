@@ -1,0 +1,21 @@
+{
+  "id": "/",
+  "name": "CampusHub — One App. Unlimited Opportunities.",
+  "short_name": "CampusHub",
+  "description": "A connected ecosystem for student life, local services and opportunities.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/campushub-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "social", "lifestyle", "business"]
+}
