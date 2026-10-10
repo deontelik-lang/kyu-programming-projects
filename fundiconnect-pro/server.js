@@ -654,7 +654,7 @@ const server = http.createServer(async (req, res) => {
       return req.method === 'HEAD' ? res.end() : res.end(data);
     });
   } catch (e) {
-    console.error('Request failed:', e.code || e.name, e.message);
+    console.error('Request failed:', req.method, req.url, e.code || e.name, e.message);
     if (!res.headersSent) {
       const status = Number(e.status) || (e.code === '23505' ? 409 : 500);
       return fail(res, status, status === 500 ? 'SERVER_ERROR' : 'REQUEST_ERROR', status === 500 ? 'The request could not be completed. Please try again.' : e.message);
