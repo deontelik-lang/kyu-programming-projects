@@ -723,7 +723,7 @@ const server = http.createServer(async (req, res) => {
         let withCss = source;
         if (!withCss.includes('/engagement.css')) withCss = withCss.replace('</head>', '<link rel="stylesheet" href="/engagement.css?v=1"></head>');
         if (!withCss.includes('/studentos.css')) withCss = withCss.replace('</head>', '<link rel="stylesheet" href="/studentos.css?v=4"></head>');
-        if (!withCss.includes('/soundscape.css')) withCss = withCss.replace('</head>', '<link rel="stylesheet" href="/soundscape.css?v=5"></head>');
+        if (!withCss.includes('/soundscape.css')) withCss = withCss.replace('</head>', '<link rel="stylesheet" href="/soundscape.css?v=6"></head>');
         let withJs = withCss;
         if (!withJs.includes('/engagement.js')) withJs = withJs.replace('</body>', '<script src="/engagement.js?v=2" defer></script></body>');
         if (!withJs.includes('/studentos.js')) withJs = withJs.replace('</body>', '<script src="/studentos.js?v=7" defer></script></body>');
