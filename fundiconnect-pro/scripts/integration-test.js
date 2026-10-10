@@ -344,10 +344,16 @@ async function cleanup() {
     check('student profile can be edited', response.status === 200 && response.data.profile.campus === 'Integration Campus');
     response = await request('/api/members?q=StudentOS%20Test%20Customer');
     check('campus directory keeps profiles private by default', response.status === 200 && !(response.data.members || []).some(m => m.user_id === customerId));
-    response = await request('/api/platform-profile', { method: 'PATCH', cookie: customerCookie, body: { persona: 'student', headline: 'IT student looking for internships', campus: 'Integration Campus', course: 'Information Technology', studyLevel: 'Year 1', graduationYear: 2029, bio: 'Testing CampusConnect profile', skills: ['C', 'Networking'], organisation: '', portfolioUrl: '', publicDirectory: true } });
-    check('member can opt into the public directory', response.status === 200 && response.data.profile.public_directory === true);
+    response = await request('/api/platform-profile', { method: 'PATCH', cookie: customerCookie, body: { persona: 'student', headline: 'IT student looking for internships', campus: 'Integration Campus', course: 'Information Technology', studyLevel: 'Year 1', graduationYear: 2029, bio: 'Testing StudentOS profile', skills: ['C', 'Networking'], organisation: '', portfolioUrl: '', publicDirectory: true, country: 'Canada', countryCode: 'CA', region: 'Ontario', city: 'Toronto', university: 'Integration University', language: 'en', currency: 'CAD' } });
+    check('member can opt into the public directory', response.status === 200 && response.data.profile.public_directory === true && response.data.profile.country === 'Canada' && response.data.profile.city === 'Toronto' && response.data.profile.region === 'Ontario' && response.data.profile.university === 'Integration University');
     response = await request('/api/members?q=StudentOS%20Test%20Customer');
     check('public campus search returns opted-in members only', response.status === 200 && (response.data.members || []).some(m => m.user_id === customerId) && !('email' in ((response.data.members || []).find(m => m.user_id === customerId) || {})));
+    for (const [filter,query,label] of [['country','Canada','country'],['city','Toronto','city'],['region','Ontario','region'],['university','Integration%20University','university']]) {
+      response = await request('/api/members?' + filter + '=' + query + '&q=StudentOS%20Test%20Customer');
+      check('public member directory filters by ' + label, response.status === 200 && (response.data.members || []).some(m => m.user_id === customerId));
+    }
+    response = await request('/api/members?country=Kenya&q=StudentOS%20Test%20Customer');
+    check('public member directory excludes profiles outside selected country', response.status === 200 && !(response.data.members || []).some(m => m.user_id === customerId));
     response = await request('/api/platform-profile', { method: 'PATCH', cookie: customerCookie, body: { persona: 'student', headline: 'IT student looking for internships', campus: 'Integration Campus', course: 'Information Technology', studyLevel: 'Year 1', graduationYear: 2029, bio: 'Testing CampusConnect profile', skills: ['C', 'Networking'], organisation: '', portfolioUrl: '', publicDirectory: false } });
     check('member can opt out of the public directory', response.status === 200 && response.data.profile.public_directory === false);
     response = await request('/api/members?q=StudentOS%20Test%20Customer');
