@@ -1,8 +1,8 @@
 # CampusHub — One App. Unlimited Opportunities.
 
-**Kenya's Trusted Skilled Workers Marketplace**
+**A connected campus and local-services opportunity ecosystem**
 
-CampusHub is a connected campus and local-services super app evolved from the CampusHub + FundiConnect project. It brings student opportunities, housing listings, campus community, career and alumni hubs, local businesses, and a skilled-services marketplace into one responsive web platform. This repository contains the working browser UI, same-origin HTTP API, PostgreSQL migrations, operational scripts, and CI checks.
+CampusHub is a connected campus and local-services super app evolved from the earlier CampusConnect + FundiConnect project. It brings student opportunities, housing listings, campus community, career and alumni hubs, local businesses, and a skilled-services marketplace into one responsive web platform. This repository contains the working browser UI, same-origin HTTP API, PostgreSQL migrations, operational scripts, and CI checks.
 
 > **Release status:** functional marketplace MVP, not yet a fully production-hardened marketplace. The launch payment model is direct-to-provider: customers pay providers using provider-controlled instructions, and CampusHub records each party's confirmation without moving or independently verifying funds. Platform M-Pesa checkout is disabled. Real identity/phone verification, SMS OTP, email verification and live dispatch remain unconnected.
 
