@@ -200,6 +200,29 @@
   }
   function getLocationParams(modeOverride) { return locationParams(modeOverride); }
   function getLocation() { return { ...location }; }
+  function syncHomeLocationFilter() {
+    const homeSelect = $('heroCounty');
+    if (!homeSelect) return;
+    const current = location.country || 'Kenya';
+    const isKenya = current.toLowerCase() === 'kenya' && location.mode !== 'worldwide';
+    if (isKenya) {
+      const countySource = $('countyFilter');
+      const countyOptions = countySource ? Array.from(countySource.options).slice(1).map(option =>
+        '<option value="' + esc(option.value) + '">' + esc(option.textContent) + '</option>'
+      ).join('') : '';
+      const selected = homeSelect.value;
+      homeSelect.innerHTML = '<option value="">All counties in Kenya</option>' + countyOptions;
+      homeSelect.value = Array.from(homeSelect.options).some(option => option.value === selected) ? selected : '';
+      homeSelect.setAttribute('aria-label', 'Optional county filter for Kenya');
+      homeSelect.title = 'Optional Kenyan county filter';
+    } else {
+      const label = location.mode === 'worldwide' ? 'All locations worldwide' : 'Use selected location';
+      homeSelect.innerHTML = '<option value="">' + esc(label) + '</option>';
+      homeSelect.value = '';
+      homeSelect.setAttribute('aria-label', location.mode === 'worldwide' ? 'Worldwide search location' : 'Use selected global location');
+      homeSelect.title = location.mode === 'worldwide' ? 'Search worldwide' : 'Location is set in StudentOS Global';
+    }
+  }
   function updateLocationInputs() {
     const chip = $('studentosCurrentLocation');
     if (chip) {
@@ -219,6 +242,7 @@
     if (languageControl) languageControl.value = location.language;
     if (currencyControl) currencyControl.value = location.currency;
     document.querySelectorAll('[data-so-mode]').forEach(btn => btn.setAttribute('aria-pressed',String(btn.dataset.soMode === location.mode)));
+    syncHomeLocationFilter();
     document.querySelectorAll('[data-so-country]').forEach(select => {
       if (select.value !== location.country && countryByName(location.country)) select.value = location.country;
       const hidden = select.form?.querySelector('[data-so-code]');
@@ -444,6 +468,9 @@
   }
   function openPage(page) {
     if (page === 'account') {
+      document.body.dataset.studentosView = 'account';
+      document.querySelectorAll('[data-so-page]').forEach(button => button.setAttribute('aria-current',String(button.dataset.soPage === 'account' ? 'page' : 'false')));
+      document.querySelectorAll('.studentos-nav-btn').forEach(button => button.setAttribute('aria-current',String(button.dataset.soPage === 'account' ? 'page' : 'false')));
       if (typeof window.showDashboard === 'function') window.showDashboard();
       return;
     }
@@ -467,6 +494,8 @@
     $('campusDiscovery')?.classList.toggle('studentos-page-hidden',page!=='explore');
     $('dashboard')?.classList.remove('show');
     $('publicMain')?.classList.remove('hidden');
+    document.querySelector('.hero')?.classList.remove('hidden');
+    document.querySelector('.stats')?.classList.remove('hidden');
     document.querySelectorAll('[data-so-page]').forEach(button => {
       const active=button.dataset.soPage===page || (button.dataset.soPage==='account' && page==='account');
       button.setAttribute('aria-current',active?'page':'false');
@@ -515,6 +544,16 @@
   function bindLocationFields(form) {
     if (!form || form.dataset.studentosBound === 'true') return;
     form.dataset.studentosBound='true';
+    const applyProviderLocationRequirements = () => {
+      const shouldRequire = form.id === 'profileForm' ||
+        (form.id === 'registerForm' && form.querySelector('[name="persona"]')?.value === 'worker');
+      const group = form.querySelector('[data-studentos-fields]');
+      for (const name of ['region','city']) {
+        const input = group?.querySelector('[name="' + name + '"]');
+        if (input) input.required = Boolean(shouldRequire);
+      }
+    };
+    form.querySelector('[name="persona"]')?.addEventListener('change',applyProviderLocationRequirements);
     form.querySelectorAll('[data-so-country]').forEach(select=>{
       const currency=form.querySelector('[data-so-currency]');
       const language=form.querySelector('[data-so-language]');
@@ -533,10 +572,24 @@
       county.replaceWith(input);
     }
     const town = form.querySelector('input[name="town"]');
-    if (town && form.id==='hubCreateForm') {
+    if (town && ['hubCreateForm','profileForm','registerForm'].includes(form.id)) {
       const row=town.closest('.formgrid');
       if (row) row.classList.add('studentos-hide-legacy-location');
+      // Hidden legacy fields remain in FormData for backward compatibility, but should not block native form validation.
+      town.required=false;
+      const legacyCounty=form.querySelector('[name="county"]');
+      if (legacyCounty) legacyCounty.required=false;
+      const group=form.querySelector('[data-studentos-fields]');
+      const regionInput=group?.querySelector('[name="region"]');
+      const cityInput=group?.querySelector('[name="city"]');
+      if (regionInput && !regionInput.value && legacyCounty?.value) regionInput.value=legacyCounty.value;
+      if (cityInput && !cityInput.value && town.value) cityInput.value=town.value;
     }
+    if (['registerForm','platformProfileForm'].includes(form.id)) {
+      const legacyCampus=form.querySelector('input[name="campus"]')?.closest('.field');
+      if (legacyCampus) legacyCampus.classList.add('studentos-hide-legacy-location');
+    }
+    applyProviderLocationRequirements();
     const countryBox = form.querySelector('[data-studentos-fields]');
     if (countryBox) {
       const mainCountry=form.querySelector('[data-so-country]');
@@ -674,6 +727,7 @@
   window.StudentOS = {
     getLocation,
     getLocationParams,
+    syncHomeLocationFilter,
     countryOptions,
     languageOptions,
     currencyOptions,
