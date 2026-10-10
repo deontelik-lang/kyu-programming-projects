@@ -88,16 +88,16 @@ async function cleanup() {
   try {
     const homepageResponse = await fetch(base + '/', { headers: { 'x-forwarded-for': testIp } });
     const homepageHtml = await homepageResponse.text();
-    check('homepage injects the CampusHub discovery experience', homepageResponse.status === 200 && homepageHtml.includes('/engagement.css?v=1') && homepageHtml.includes('/engagement.js?v=1') && homepageHtml.includes('/studentos.css?v=2') && homepageHtml.includes('/studentos.js?v=2'));
+    check('homepage injects the CampusHub discovery experience', homepageResponse.status === 200 && homepageHtml.includes('/engagement.css?v=1') && homepageHtml.includes('/engagement.js?v=2') && homepageHtml.includes('/studentos.css?v=2') && homepageHtml.includes('/studentos.js?v=3'));
     const discoveryCss = await fetch(base + '/engagement.css?v=1');
-    const discoveryJs = await fetch(base + '/engagement.js?v=1');
+    const discoveryJs = await fetch(base + '/engagement.js?v=2');
     const studentosCss = await fetch(base + '/studentos.css?v=2');
-    const studentosJs = await fetch(base + '/studentos.js?v=2');
+    const studentosJs = await fetch(base + '/studentos.js?v=3');
     const [cssText, jsText, soCssText, soJsText] = await Promise.all([discoveryCss.text(), discoveryJs.text(), studentosCss.text(), studentosJs.text()]);
     check('discovery styles are served', discoveryCss.status === 200 && cssText.includes('.dh-glass') && cssText.includes('prefers-reduced-motion'));
     check('discovery interaction layer is served', discoveryJs.status === 200 && jsText.includes('Your momentum') && jsText.includes('/api/hubs/listings?'));
     check('StudentOS responsive app shell styles are served', studentosCss.status === 200 && soCssText.includes('.so-launch-grid') && soCssText.includes('.so-mobile-nav'));
-    check('StudentOS global country engine, interactive map and media view are served', studentosJs.status === 200 && soJsText.includes('COUNTRY_DATA') && soJsText.includes('studentosEntertainment') && soJsText.includes('My university') && soJsText.includes('so-world-map') && soJsText.includes('UI_TEXT'));
+    check('StudentOS global country engine, interactive map and media view are served', studentosJs.status === 200 && soJsText.includes('COUNTRY_DATA') && soJsText.includes('studentosEntertainment') && soJsText.includes('My university') && soJsText.includes('so-world-map') && soJsText.includes('UI_TEXT') && soJsText.includes('syncHomeLocationFilter'));
 
     let response = await request('/api/health');
     check('API and PostgreSQL health', response.status === 200 && response.data.database === true);
