@@ -725,7 +725,7 @@ const server = http.createServer(async (req, res) => {
         if (!withCss.includes('/studentos.css')) withCss = withCss.replace('</head>', '<link rel="stylesheet" href="/studentos.css?v=2"></head>');
         let withJs = withCss;
         if (!withJs.includes('/engagement.js')) withJs = withJs.replace('</body>', '<script src="/engagement.js?v=2" defer></script></body>');
-        if (!withJs.includes('/studentos.js')) withJs = withJs.replace('</body>', '<script src="/studentos.js?v=3" defer></script></body>');
+        if (!withJs.includes('/studentos.js')) withJs = withJs.replace('</body>', '<script src="/studentos.js?v=4" defer></script></body>');
         data = Buffer.from(withJs, 'utf8');
       }
       const type = ext === '.html' ? 'text/html; charset=utf-8' : ext === '.css' ? 'text/css; charset=utf-8' : ext === '.js' ? 'text/javascript; charset=utf-8' : ext === '.svg' ? 'image/svg+xml' : ext === '.webmanifest' || ext === '.json' ? 'application/manifest+json; charset=utf-8' : 'application/octet-stream';
