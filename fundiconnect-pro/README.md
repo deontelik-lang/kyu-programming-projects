@@ -228,12 +228,6 @@ The public homepage also includes a responsive Discovery layer that loads curren
 
 The optional XP / level / streak panel is currently browser-local. Check-ins are user-triggered, have no countdown or penalty, and do not create server-side rewards. Private preference hearts are not public reactions. Live chat, video/music hosting, stories, creator earnings/leaderboards, and real-time streaming are not enabled by this layer. The discovery CSS/JS are injected into the public HTML response by server.js, and both assets are included in the service-worker app shell.
 
-## CampusHub Discovery & engagement layer
-
-The public homepage also includes a responsive Discovery layer that loads current published records from /api/hubs/listings and /api/fundis. It provides category lanes, newest/activity sorting, featured labels based on listing data, account-backed listing saves, and local interest-based ordering. This is rule-based personalization on the current device, not a connected AI recommender.
-
-The optional XP / level / streak panel is currently browser-local. Check-ins are user-triggered, have no countdown or penalty, and do not create server-side rewards. Private preference hearts are not public reactions. Live chat, video/music hosting, stories, creator earnings/leaderboards, and real-time streaming are not enabled by this layer. The discovery CSS/JS are injected into the public HTML response by server.js, and both assets are included in the service-worker app shell.
-
 ## StudentOS organization and global discovery
 
 StudentOS now opens to six focused destinations (Explore, Global, Campus & Community, Services, Media, and My Space) rather than a long list of every feature. The full directory is arranged into five collapsible groups for campus life, work/learning/global opportunities, housing/marketplace, services/businesses, and media/creators. The Global page includes an interactive country-selector illustration and privacy-safe aggregates from published listings, eligible service providers and opt-in public profiles.
