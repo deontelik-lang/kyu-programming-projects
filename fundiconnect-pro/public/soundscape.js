@@ -199,7 +199,7 @@
       '<div class="so-intro-progress" aria-hidden="true">'+points+'</div><div class="so-intro-actions"><button id="soIntroEnter" class="primary" type="button" data-sound-action="enter-intro" hidden>Explore StudentOS ↗</button></div></div></div>';
   }
   function uiMarkup(){
-    return '<div class="so-intro-banner"><div class="so-intro-banner-copy"><div class="so-intro-banner-kicker">STUDENTOS · GLOBAL EXPERIENCE</div><strong>Your future. One connected universe.</strong><small>A live animated preview, then a cinematic journey through a futuristic city, light tunnel and connected world. Sound stays off until you choose to start.</small><div class="so-preview-meta"><span><i></i> LIVE VISUAL</span><span>2.5D CINEMATIC</span><span>PERSONALISE YOUR SOUND</span></div></div><div class="so-intro-preview" aria-hidden="true"><canvas id="soHeroPreviewCanvas"></canvas><span class="so-preview-coordinate">GLOBAL NETWORK <b>01 — 08</b></span></div><button class="so-intro-launch" type="button" data-sound-action="intro"><span aria-hidden="true">▶</span><span>Launch experience</span><small>ENTER STUDENTOS</small></button></div>'+
+    return '<div class="so-intro-banner"><div class="so-intro-banner-copy"><div class="so-intro-banner-kicker">STUDENTOS · GLOBAL EXPERIENCE</div><strong>Experience the next era of student life.</strong><small>Live canvas animation · One connected student universe.</small><div class="so-preview-meta"><span><i></i> LIVE RENDER</span><span>ANIMATED SCENES</span><span>OPTIONAL SOUND</span></div></div><div class="so-intro-preview" aria-hidden="true"><canvas id="soHeroPreviewCanvas"></canvas><span class="so-preview-coordinate">GLOBAL NETWORK <b>01 — 08</b></span></div><button class="so-intro-launch" type="button" data-sound-action="intro"><span aria-hidden="true">▶</span><span>Launch experience</span><small>ENTER STUDENTOS</small></button></div>'+
       '<div id="soSoundDock" class="so-sound-dock" data-enabled="false"><button id="soSoundToggle" type="button" data-sound-action="toggle-sound" aria-pressed="false" aria-label="Turn StudentOS sounds on"><span class="so-sound-indicator" aria-hidden="true"></span><span class="so-sound-label">Sound off</span></button><button id="soSoundSettings" class="so-sound-gear" type="button" data-sound-action="toggle-panel" aria-expanded="false" aria-controls="soSoundPanel" aria-label="Sound settings">⚙</button></div>'+
       '<section id="soSoundPanel" class="so-sound-panel" aria-label="StudentOS sound settings" hidden><div class="so-sound-panel-head"><div><strong>Soundscape</strong><small>Shape the atmosphere. Your settings stay on this device.</small></div><button type="button" class="so-sound-close" data-sound-action="toggle-panel" aria-label="Close sound settings">×</button></div>'+
       '<div class="so-sound-row"><label for="soSoundTheme">Ambient theme</label><select id="soSoundTheme"><option value="off">No background music</option><option value="future">Future City</option><option value="global">Global Explorer</option><option value="study">Study Mode</option><option value="premium">Premium Experience</option></select></div>'+
@@ -787,11 +787,28 @@
     document.addEventListener('keydown',function(event){
       if(event.key==='Escape'&&$('soIntroOverlay')&&!$('soIntroOverlay').hidden)closeIntro();
       if(event.key==='Escape'&&$('soSoundPanel')&&!$('soSoundPanel').hidden){$('soSoundPanel').hidden=true;updateDock();}
+      var overlay=$('soIntroOverlay');
+      if(event.key==='Tab'&&overlay&&!overlay.hidden){
+        var focusable=Array.from(overlay.querySelectorAll('button:not([hidden]):not([disabled]),a[href],input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])')).filter(function(node){return node.getClientRects().length>0;});
+        if(!focusable.length){event.preventDefault();return;}
+        var first=focusable[0],last=focusable[focusable.length-1];
+        if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+      }
     });
     ['studentos:notification','studentos:message','studentos:achievement','studentos:match-success','studentos:wallet-success','studentos:media-transition','studentos:discovery'].forEach(function(eventName){
       document.addEventListener(eventName,function(){var map={'studentos:notification':'notification','studentos:message':'message','studentos:achievement':'achievement','studentos:match-success':'match','studentos:wallet-success':'wallet','studentos:media-transition':'media','studentos:discovery':'discovery'};play(map[eventName]);});
     });
-    document.addEventListener('visibilitychange',function(){if(document.hidden&&ctx&&ctx.state==='running'){/* Keep the pad alive quietly; the browser may suspend it itself. */}});
+    document.addEventListener('visibilitychange',function(){
+      var overlay=$('soIntroOverlay');
+      if(document.hidden){
+        if(cinemaFrameId){window.cancelAnimationFrame(cinemaFrameId);cinemaFrameId=0;}
+        if(ctx&&ctx.state==='running'&&master)master.gain.setTargetAtTime(0,ctx.currentTime,.08);
+      }else{
+        if(settings.enabled&&ctx&&master)master.gain.setTargetAtTime(settings.volume,ctx.currentTime,.12);
+        if(overlay&&!overlay.hidden&&!cinemaFrameId&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches)cinemaFrameId=window.requestAnimationFrame(cinemaFrame);
+      }
+    });
   }
   window.StudentOSSounds={
     play:play,
