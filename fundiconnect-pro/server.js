@@ -23,7 +23,7 @@ const pool = new Pool({
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,
   statement_timeout: 15000,
-  application_name: 'fundiconnect-pro'
+  application_name: 'campushub'
 });
 pool.on('error', (err) => console.error('Unexpected idle PostgreSQL client error:', err.message));
 
@@ -45,7 +45,9 @@ const categories = [
   { name: 'Computer Repair & IT Support', slug: 'computer-repair', description: 'Computer troubleshooting, software setup and small-office IT support' },
   { name: 'Moving & Delivery Services', slug: 'moving', description: 'Local moves, furniture transport and delivery help' },
   { name: 'Handyperson & General Maintenance', slug: 'handyperson', description: 'Small repairs, fittings and general property maintenance' },
-  { name: 'Locksmiths & Access Control', slug: 'locksmith', description: 'Locks, keys and non-emergency access-control services' }
+  { name: 'Locksmiths & Access Control', slug: 'locksmith', description: 'Locks, keys and non-emergency access-control services' },
+  { name: 'Tutors & Academic Support', slug: 'tutor', description: 'Subject tutoring, study support and academic coaching' },
+  { name: 'Freelance & Creative Services', slug: 'freelancer', description: 'Writing, graphic design, photography and other independent services' }
 ];
 
 const hubTypes = {
@@ -77,7 +79,7 @@ function json(res, status, payload, extraHeaders = {}) {
     'X-Frame-Options': 'DENY',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=(self)',
-    'Content-Security-Policy': "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+    'Content-Security-Policy': "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
     ...extraHeaders
   });
   res.end(body);
@@ -88,7 +90,7 @@ function setSecurityHeaders(res) {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(self)');
-  res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'");
+  res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'");
 }
 
 function parseCookies(header) {
@@ -247,7 +249,23 @@ async function mainRouter(req, res, url) {
 
   if (method === 'GET' && pathname === '/api/health') {
     const db = await pool.query('SELECT 1 AS ok');
-    return json(res, 200, { ok: true, database: db.rows[0].ok === 1, service: 'FundiConnect Pro API', runtime: process.versions.node, time: new Date().toISOString() });
+    return json(res, 200, { ok: true, database: db.rows[0].ok === 1, service: 'CampusHub API', runtime: process.versions.node, time: new Date().toISOString() });
+  }
+
+  if (method === 'GET' && pathname === '/api/public/stats') {
+    const [members, providers, opportunities] = await Promise.all([
+      pool.query('SELECT COUNT(*)::int AS n FROM users WHERE is_active=true'),
+      pool.query('SELECT COUNT(*)::int AS n FROM fundi_profiles fp JOIN users u ON u.id=fp.user_id WHERE u.is_active=true'),
+      pool.query("SELECT COUNT(*)::int AS n FROM hub_listings WHERE status='published'")
+    ]);
+    return json(res, 200, {
+      members: members.rows[0].n,
+      providers: providers.rows[0].n,
+      opportunities: opportunities.rows[0].n,
+      connectedHubs: Object.keys(hubTypes).length,
+      serviceCategories: categories.length,
+      generatedAt: new Date().toISOString()
+    });
   }
 
   if (method === 'GET' && pathname === '/api/categories') {
@@ -594,7 +612,7 @@ async function initialize() {
     );
   }
   await pool.query('DELETE FROM user_sessions WHERE expires_at < now()');
-  console.log('Database schema is ready; launch categories seeded.');
+  console.log('CampusHub database schema is ready; service categories seeded.');
 }
 
 const server = http.createServer(async (req, res) => {
@@ -631,7 +649,7 @@ const server = http.createServer(async (req, res) => {
         return json(res, 500, { error: 'SERVER_ERROR', message: 'Unable to read page.' });
       }
       const ext = path.extname(fullPath);
-      const type = ext === '.html' ? 'text/html; charset=utf-8' : ext === '.css' ? 'text/css; charset=utf-8' : ext === '.js' ? 'text/javascript; charset=utf-8' : 'application/octet-stream';
+      const type = ext === '.html' ? 'text/html; charset=utf-8' : ext === '.css' ? 'text/css; charset=utf-8' : ext === '.js' ? 'text/javascript; charset=utf-8' : ext === '.svg' ? 'image/svg+xml' : ext === '.webmanifest' || ext === '.json' ? 'application/manifest+json; charset=utf-8' : 'application/octet-stream';
       res.writeHead(200, { 'Content-Type': type, 'Cache-Control': ext === '.html' ? 'no-store' : 'public, max-age=3600' });
       return req.method === 'HEAD' ? res.end() : res.end(data);
     });
@@ -646,7 +664,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 initialize().then(() => {
-  server.listen(PORT, HOST, () => console.log('FundiConnect Pro listening on ' + HOST + ':' + PORT));
+  server.listen(PORT, HOST, () => console.log('CampusHub listening on ' + HOST + ':' + PORT));
 }).catch((err) => {
   console.error('Startup failed:', err.stack || err.message);
   process.exit(1);
