@@ -25,6 +25,7 @@
   let providers = [];
   let loaded = false;
   let busy = false;
+  let reloadPending = false;
   let model = readModel();
 
   function dayKey(date) {
@@ -194,7 +195,7 @@
   function listingCard(item, index) {
     const type = item.hub_type || '';
     const [label, icon] = hub(type);
-    const location = [item.town, item.county].filter(Boolean).join(', ');
+    const location = [item.city || item.town, item.region || item.county, item.country].filter(Boolean).filter((value,index,array)=>value && array.indexOf(value)===index).join(', ');
     const price = money(item.price, item.currency);
     const saved = item.is_saved === true || model.saved.includes(item.id);
     const liked = model.liked.includes(item.id);
@@ -308,13 +309,19 @@
   }
 
   async function loadData() {
-    if (busy) return;
+    if (busy) { reloadPending = true; return; }
     busy = true;
     const feed = document.getElementById('dhFeed');
     if (feed) feed.innerHTML = '<div class="dh-skeleton"></div><div class="dh-skeleton"></div>';
+    const loc = window.StudentOS && typeof window.StudentOS.getLocationParams === 'function' ? window.StudentOS.getLocationParams() : {};
+    const listingParams = new URLSearchParams({ ...loc, limit: '80' });
+    const fundiParams = new URLSearchParams();
+    if (loc.country) fundiParams.set('country', loc.country);
+    if (loc.city) fundiParams.set('city', loc.city);
+    if (loc.region) fundiParams.set('county', loc.region);
     const requests = await Promise.allSettled([
-      fetch('/api/hubs/listings?limit=80', { credentials: 'same-origin' }).then(res => { if (!res.ok) throw new Error('Listings unavailable'); return res.json(); }),
-      fetch('/api/fundis', { credentials: 'same-origin' }).then(res => { if (!res.ok) throw new Error('Professionals unavailable'); return res.json(); })
+      fetch('/api/hubs/listings?' + listingParams.toString(), { credentials: 'same-origin' }).then(res => { if (!res.ok) throw new Error('Listings unavailable'); return res.json(); }),
+      fetch('/api/fundis?' + fundiParams.toString(), { credentials: 'same-origin' }).then(res => { if (!res.ok) throw new Error('Professionals unavailable'); return res.json(); })
     ]);
     if (requests[0].status === 'fulfilled') items = Array.isArray(requests[0].value.listings) ? requests[0].value.listings : [];
     if (requests[1].status === 'fulfilled') providers = Array.isArray(requests[1].value.fundis) ? requests[1].value.fundis : [];
@@ -322,7 +329,8 @@
     busy = false;
     renderFeed();
     renderProviders();
-    if (!loaded && feed) feed.innerHTML = '<div class="dh-empty"><div class="dh-empty-mark">↻</div><h3>Could not reach discovery</h3><p>CampusHub could not refresh the discovery records just now. Check your connection and try again.</p><button class="btn primary" type="button" data-dh="refresh">Try again</button></div>';
+    if (!loaded && feed) feed.innerHTML = '<div class="dh-empty"><div class="dh-empty-mark">↻</div><h3>Could not reach discovery</h3><p>StudentOS could not refresh discovery records just now. Check your connection and try again.</p><button class="btn primary" type="button" data-dh="refresh">Try again</button></div>';
+    if (reloadPending) { reloadPending = false; loadData(); }
   }
 
   function goToHub(type) {
@@ -423,6 +431,7 @@
     loadData();
   }
 
+  window.CampusHubDiscovery = { refresh: loadData, setFilter(filter) { activeFilter = FILTERS.some(item => item[1] === filter) ? filter : 'all'; renderFeed(); } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })();
