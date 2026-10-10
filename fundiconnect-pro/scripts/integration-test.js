@@ -93,8 +93,8 @@ async function cleanup() {
     const discoveryJs = await fetch(base + '/engagement.js?v=2');
     const studentosCss = await fetch(base + '/studentos.css?v=4');
     const studentosJs = await fetch(base + '/studentos.js?v=7');
-    const soundscapeCss = await fetch(base + '/soundscape.css?v=4');
-    const soundscapeJs = await fetch(base + '/soundscape.js?v=5');
+    const soundscapeCss = await fetch(base + '/soundscape.css?v=5');
+    const soundscapeJs = await fetch(base + '/soundscape.js?v=6');
     const [cssText, jsText, soCssText, soJsText, cinemaCssText, cinemaJsText] = await Promise.all([discoveryCss.text(), discoveryJs.text(), studentosCss.text(), studentosJs.text(), soundscapeCss.text(), soundscapeJs.text()]);
     check('discovery styles are served', discoveryCss.status === 200 && cssText.includes('.dh-glass') && cssText.includes('prefers-reduced-motion'));
     check('discovery interaction layer is served', discoveryJs.status === 200 && jsText.includes('Your momentum') && jsText.includes('/api/hubs/listings?'));
