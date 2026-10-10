@@ -4,14 +4,19 @@ const crypto = require('node:crypto');
 
 const listingTypes = new Set([
   'student_gig','job','internship','housing','product','event','course',
-  'business','community','transport','student_service','alumni','service_offer'
+  'business','community','transport','student_service','alumni','service_offer',
+  'scholarship','study_abroad','language_exchange','lost_found','student_discount','club',
+  'media_video','music','podcast','student_original','creator'
 ]);
 const actionsByType = {
   student_gig: ['apply'], job: ['apply'], internship: ['apply'],
   housing: ['inquire'], product: ['inquire'], event: ['attend'],
   course: ['enroll'], business: ['inquire'], community: [],
   transport: ['book'], student_service: ['inquire'], alumni: ['mentor'],
-  service_offer: ['inquire']
+  service_offer: ['inquire'], scholarship: ['apply'], study_abroad: ['apply'],
+  language_exchange: ['mentor'], lost_found: ['inquire'], student_discount: ['inquire'],
+  club: ['attend'], media_video: ['inquire'], music: ['inquire'],
+  podcast: ['inquire'], student_original: ['inquire'], creator: ['mentor']
 };
 const personaChoices = new Set(['student','worker','customer','business','employer','alumni']);
 const actionChoices = new Set(['save','apply','inquire','attend','enroll','book','mentor']);
@@ -60,10 +65,13 @@ async function handleHubRoutes(ctx) {
     const q = bounded(url.searchParams.get('q'), 120).toLowerCase();
     const campus = bounded(url.searchParams.get('campus'), 160);
     const persona = bounded(url.searchParams.get('persona'), 30).toLowerCase();
+    const country = bounded(url.searchParams.get('country'), 80);
+    const city = bounded(url.searchParams.get('city'), 100);
+    const university = bounded(url.searchParams.get('university'), 180);
     if (persona && !personaChoices.has(persona)) return fail(res, 400, 'INVALID_PERSONA', 'Choose a supported profile type.');
     const limit = Math.min(Math.max(Number(url.searchParams.get('limit')) || 36, 1), 80);
-    const r = await pool.query("SELECT pp.id AS profile_id,u.id AS user_id,u.full_name,pp.persona,pp.headline,pp.campus,pp.course,pp.study_level,pp.graduation_year,pp.bio,pp.skills,pp.organisation,pp.portfolio_url,pp.updated_at FROM platform_profiles pp JOIN users u ON u.id=pp.user_id WHERE pp.public_directory=true AND u.is_active=true AND ($1='' OR pp.persona=$1) AND ($2='' OR lower(pp.campus)=lower($2)) AND ($3='' OR lower(u.full_name || ' ' || pp.headline || ' ' || pp.campus || ' ' || pp.course || ' ' || pp.bio || ' ' || array_to_string(pp.skills,' ')) LIKE '%' || $3 || '%') ORDER BY pp.updated_at DESC LIMIT $4",
-      [persona,campus,q,limit]
+    const r = await pool.query("SELECT pp.id AS profile_id,u.id AS user_id,u.full_name,pp.persona,pp.headline,pp.campus,pp.course,pp.study_level,pp.graduation_year,pp.bio,pp.skills,pp.organisation,pp.portfolio_url,pp.country,pp.country_code,pp.region,pp.city,pp.university,pp.language,pp.currency,pp.updated_at FROM platform_profiles pp JOIN users u ON u.id=pp.user_id WHERE pp.public_directory=true AND u.is_active=true AND ($1='' OR pp.persona=$1) AND ($2='' OR lower(pp.campus)=lower($2)) AND ($3='' OR lower(u.full_name || ' ' || pp.headline || ' ' || pp.campus || ' ' || pp.course || ' ' || pp.bio || ' ' || array_to_string(pp.skills,' ')) LIKE '%' || $3 || '%') AND ($4='' OR lower(pp.country)=lower($4)) AND ($5='' OR lower(pp.city)=lower($5)) AND ($6='' OR lower(pp.university)=lower($6)) ORDER BY pp.updated_at DESC LIMIT $7",
+      [persona,campus,q,country,city,university,limit]
     );
     return json(res, 200, { members: r.rows, count: r.rowCount, privacyNote: 'Only members who opt into the public directory appear here. Contact details are not exposed.' });
   }
@@ -92,10 +100,17 @@ async function handleHubRoutes(ctx) {
     if (graduation !== null && (!Number.isInteger(graduation) || graduation < 1990 || graduation > 2100)) return fail(res, 400, 'INVALID_GRADUATION_YEAR', 'Enter a valid graduation year.');
     const portfolio = bounded(body.portfolioUrl, 500);
     if (portfolio && !/^https?:\/\/\S+$/i.test(portfolio)) return fail(res, 400, 'INVALID_PORTFOLIO_URL', 'Portfolio URL must begin with http:// or https://.');
+    const country = bounded(body.country,80) || 'Kenya';
+    const countryCodeInput = bounded(body.countryCode,2).toUpperCase();
+    const countryCode = /^[A-Z]{2}$/.test(countryCodeInput) ? countryCodeInput : (country.toLowerCase()==='kenya'?'KE':'ZZ');
+    const language = bounded(body.language,10) || 'en';
+    const supportedCurrencies = new Set(['USD','EUR','GBP','CAD','AUD','KES','UGX','TZS','NGN','ZAR','INR','CNY','BRL']);
+    const currencyInput = bounded(body.currency,3).toUpperCase();
+    const currency = supportedCurrencies.has(currencyInput) ? currencyInput : (country.toLowerCase()==='kenya'?'KES':'USD');
     const skills = [...new Set((Array.isArray(body.skills) ? body.skills : bounded(body.skills, 1000).split(',')).map(v => bounded(String(v), 60)).filter(Boolean))].slice(0, 20);
     await pool.query(
-      'INSERT INTO platform_profiles(id,user_id,persona,headline,campus,course,study_level,graduation_year,bio,skills,organisation,portfolio_url,public_directory,updated_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,now()) ON CONFLICT(user_id) DO UPDATE SET persona=EXCLUDED.persona,headline=EXCLUDED.headline,campus=EXCLUDED.campus,course=EXCLUDED.course,study_level=EXCLUDED.study_level,graduation_year=EXCLUDED.graduation_year,bio=EXCLUDED.bio,skills=EXCLUDED.skills,organisation=EXCLUDED.organisation,portfolio_url=EXCLUDED.portfolio_url,public_directory=EXCLUDED.public_directory,updated_at=now()',
-      [crypto.randomUUID(),user.id,persona,bounded(body.headline,140),bounded(body.campus,160),bounded(body.course,160),bounded(body.studyLevel,80),graduation,bounded(body.bio,1800),skills,bounded(body.organisation,180),portfolio,body.publicDirectory===true]
+      'INSERT INTO platform_profiles(id,user_id,persona,headline,campus,course,study_level,graduation_year,bio,skills,organisation,portfolio_url,public_directory,country,country_code,region,city,university,language,currency,updated_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,now()) ON CONFLICT(user_id) DO UPDATE SET persona=EXCLUDED.persona,headline=EXCLUDED.headline,campus=EXCLUDED.campus,course=EXCLUDED.course,study_level=EXCLUDED.study_level,graduation_year=EXCLUDED.graduation_year,bio=EXCLUDED.bio,skills=EXCLUDED.skills,organisation=EXCLUDED.organisation,portfolio_url=EXCLUDED.portfolio_url,public_directory=EXCLUDED.public_directory,country=EXCLUDED.country,country_code=EXCLUDED.country_code,region=EXCLUDED.region,city=EXCLUDED.city,university=EXCLUDED.university,language=EXCLUDED.language,currency=EXCLUDED.currency,updated_at=now()',
+      [crypto.randomUUID(),user.id,persona,bounded(body.headline,140),bounded(body.campus,160),bounded(body.course,160),bounded(body.studyLevel,80),graduation,bounded(body.bio,1800),skills,bounded(body.organisation,180),portfolio,body.publicDirectory===true,country,countryCode,bounded(body.region,100),bounded(body.city,100),bounded(body.university,180)||bounded(body.campus,160),language,currency]
     );
     await logAudit(user.id, 'platform.profile_updated', 'platform_profile', user.id, { persona });
     const r = await pool.query('SELECT * FROM platform_profiles WHERE user_id=$1', [user.id]);
@@ -115,12 +130,16 @@ async function handleHubRoutes(ctx) {
     const q = bounded(url.searchParams.get('q'), 120).toLowerCase();
     const county = bounded(url.searchParams.get('county'), 100);
     const town = bounded(url.searchParams.get('town'), 100);
+    const country = bounded(url.searchParams.get('country'), 80);
+    const city = bounded(url.searchParams.get('city'), 100);
+    const region = bounded(url.searchParams.get('region'), 100);
+    const university = bounded(url.searchParams.get('university'), 180);
     const limit = Math.min(Math.max(Number(url.searchParams.get('limit')) || 40, 1), 100);
     const viewerId = user?.id || null;
     const isAdmin = user?.role === 'admin';
     const r = await pool.query(
-      "SELECT l.id,l.owner_user_id,l.hub_type,l.title,l.description,l.category,l.county,l.town,l.price,l.currency,l.status,l.starts_at,l.ends_at,l.metadata,l.featured_until,(l.featured_until IS NOT NULL AND l.featured_until>now()) AS is_featured,l.created_at,l.updated_at,u.full_name AS owner_name,COALESCE(pp.persona,CASE WHEN u.role='fundi' THEN 'worker' ELSE 'customer' END) AS owner_persona,COALESCE(ac.action_count,0)::int AS action_count,COALESCE(cc.comment_count,0)::int AS comment_count,EXISTS(SELECT 1 FROM hub_listing_actions a WHERE a.listing_id=l.id AND a.user_id=$5 AND a.action='save') AS is_saved FROM hub_listings l JOIN users u ON u.id=l.owner_user_id LEFT JOIN platform_profiles pp ON pp.user_id=u.id LEFT JOIN LATERAL (SELECT COUNT(*) AS action_count FROM hub_listing_actions a WHERE a.listing_id=l.id AND a.action<>'save') ac ON true LEFT JOIN LATERAL (SELECT COUNT(*) AS comment_count FROM hub_comments c WHERE c.listing_id=l.id) cc ON true WHERE ($1='' OR l.hub_type=$1) AND ($2='' OR lower(l.title || ' ' || l.description || ' ' || l.category || ' ' || l.metadata::text) LIKE '%' || $2 || '%') AND ($3='' OR lower(l.county)=lower($3)) AND ($4='' OR lower(l.town)=lower($4)) AND (l.status='published' OR (l.owner_user_id=$5 AND l.status<>'hidden') OR $6=true) AND (l.ends_at IS NULL OR l.ends_at>now()) ORDER BY (l.featured_until IS NOT NULL AND l.featured_until>now()) DESC,l.created_at DESC LIMIT $7",
-      [type,q,county,town,viewerId,isAdmin,limit]
+      "SELECT l.id,l.owner_user_id,l.hub_type,l.title,l.description,l.category,l.county,l.town,l.price,l.currency,l.status,l.starts_at,l.ends_at,l.metadata,l.featured_until,l.country,l.country_code,l.city,l.region,l.university,(l.featured_until IS NOT NULL AND l.featured_until>now()) AS is_featured,l.created_at,l.updated_at,u.full_name AS owner_name,COALESCE(pp.persona,CASE WHEN u.role='fundi' THEN 'worker' ELSE 'customer' END) AS owner_persona,COALESCE(ac.action_count,0)::int AS action_count,COALESCE(cc.comment_count,0)::int AS comment_count,EXISTS(SELECT 1 FROM hub_listing_actions a WHERE a.listing_id=l.id AND a.user_id=$9 AND a.action='save') AS is_saved FROM hub_listings l JOIN users u ON u.id=l.owner_user_id LEFT JOIN platform_profiles pp ON pp.user_id=u.id LEFT JOIN LATERAL (SELECT COUNT(*) AS action_count FROM hub_listing_actions a WHERE a.listing_id=l.id AND a.action<>'save') ac ON true LEFT JOIN LATERAL (SELECT COUNT(*) AS comment_count FROM hub_comments c WHERE c.listing_id=l.id) cc ON true WHERE ($1='' OR l.hub_type=$1) AND ($2='' OR lower(l.title || ' ' || l.description || ' ' || l.category || ' ' || l.metadata::text) LIKE '%' || $2 || '%') AND ($3='' OR lower(l.county)=lower($3)) AND ($4='' OR lower(l.town)=lower($4)) AND ($5='' OR lower(l.country)=lower($5)) AND ($6='' OR lower(COALESCE(NULLIF(l.city,''),l.town))=lower($6)) AND ($7='' OR lower(COALESCE(NULLIF(l.region,''),l.county))=lower($7)) AND ($8='' OR lower(l.university)=lower($8)) AND (l.status='published' OR (l.owner_user_id=$9 AND l.status<>'hidden') OR $10=true) AND (l.ends_at IS NULL OR l.ends_at>now()) ORDER BY (l.featured_until IS NOT NULL AND l.featured_until>now()) DESC,l.created_at DESC LIMIT $11",
+      [type,q,county,town,country,city,region,university,viewerId,isAdmin,limit]
     );
     return json(res, 200, { listings: r.rows, count: r.rowCount });
   }
@@ -134,9 +153,19 @@ async function handleHubRoutes(ctx) {
     const title = bounded(body.title, 140);
     const description = bounded(body.description, 5000);
     const category = bounded(body.category, 100);
-    const county = bounded(body.county, 100);
-    const town = bounded(body.town, 100);
+    const country = bounded(body.country, 80) || 'Kenya';
+    const countryCodeInput = bounded(body.countryCode,2).toUpperCase();
+    const countryCode = /^[A-Z]{2}$/.test(countryCodeInput) ? countryCodeInput : (country.toLowerCase()==='kenya'?'KE':'ZZ');
+    const county = bounded(body.region,100) || bounded(body.county,100);
+    const town = bounded(body.city,100) || bounded(body.town,100);
+    const city = town, region = county, university = bounded(body.university,180);
+    const allowedCurrencies = new Set(['USD','EUR','GBP','CAD','AUD','KES','UGX','TZS','NGN','ZAR','INR','CNY','BRL']);
+    const currencyInput = bounded(body.currency,3).toUpperCase();
+    const currency = allowedCurrencies.has(currencyInput) ? currencyInput : (country.toLowerCase()==='kenya'?'KES':'USD');
     const metadata = object(body.metadata);
+    const mediaUrl = bounded(metadata.mediaUrl, 800);
+    if (mediaUrl && !/^https?:\/\/\S+$/i.test(mediaUrl)) return fail(res, 400, 'INVALID_MEDIA_URL', 'Content links must begin with http:// or https://.');
+    if (mediaUrl) metadata.mediaUrl = mediaUrl;
     if (!listingTypes.has(type)) return fail(res, 400, 'INVALID_HUB_TYPE', 'Choose a supported hub category.');
     if (title.length < 4 || description.length < 10) return fail(res, 400, 'LISTING_DETAILS_REQUIRED', 'Add a title and a description of at least 10 characters.');
     if (JSON.stringify(metadata).length > 5000) return fail(res, 400, 'METADATA_TOO_LARGE', 'Extra listing details are too large.');
@@ -151,8 +180,8 @@ async function handleHubRoutes(ctx) {
     if (startsAt && endsAt && endsAt <= startsAt) return fail(res, 400, 'INVALID_DATE_RANGE', 'The end date must be after the start date.');
     const id = crypto.randomUUID();
     const r = await pool.query(
-      'INSERT INTO hub_listings(id,owner_user_id,hub_type,title,description,category,county,town,price,currency,status,starts_at,ends_at,metadata) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,\'KES\',\'published\',$10,$11,$12) RETURNING id,hub_type,title,status,created_at',
-      [id,user.id,type,title,description,category,county,town,price,startsAt,endsAt,JSON.stringify(metadata)]
+      `INSERT INTO hub_listings(id,owner_user_id,hub_type,title,description,category,county,town,price,currency,status,starts_at,ends_at,metadata,country,country_code,city,region,university) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'published',$11,$12,$13,$14,$15,$16,$17,$18) RETURNING id,hub_type,title,status,created_at,country,country_code,city,region,university,currency`,
+      [id,user.id,type,title,description,category,county,town,price,currency,startsAt,endsAt,JSON.stringify(metadata),country,countryCode,city,region,university]
     );
     await logAudit(user.id, 'hub.listing_created', 'hub_listing', id, { type });
     await awardPoints(pool, user.id, 10, 'listing_published', 'hub_listing', id);
