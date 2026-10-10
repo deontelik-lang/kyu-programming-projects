@@ -66,7 +66,7 @@
 .so-intro-actions{display:flex;align-items:center;justify-content:center;gap:10px;pointer-events:auto}
 .so-intro-actions button{min-height:39px;padding:0 17px;border:1px solid #93c5fd5c;border-radius:11px;color:white;background:#ffffff0d;backdrop-filter:blur(12px);font:inherit;font-size:10px;font-weight:850;cursor:pointer}
 .so-intro-actions .primary{background:linear-gradient(110deg,#2563eb,#7c3aed);box-shadow:0 5px 28px #2563eb45}
-.so-intro-skip{position:absolute;z-index:5;top:max(15px,env(safe-area-inset-top));right:17px}
+.so-intro-skip{position:absolute;z-index:5;top:max(15px,env(safe-area-inset-top));right:17px;min-height:38px;padding:0 14px;border:1px solid #93c5fd5c;border-radius:11px;color:#eff6ff;background:#071225b8;backdrop-filter:blur(12px);font:inherit;font-size:10px;font-weight:850;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}.so-intro-skip:hover{background:#142844ed;border-color:#67e8f9a0;transform:translateY(-1px)}
 .so-intro-overlay[data-scene="acceleration"] .so-intro-car{transform:translate(12%,-58%) scale(1.15);opacity:.88}
 .so-intro-overlay[data-scene="acceleration"] .so-intro-city{animation:soCityStreak .5s ease-in-out infinite alternate}
 .so-intro-overlay[data-scene="tunnel"] .so-intro-car{transform:translate(-50%,-50%) scale(.7);opacity:.15}
@@ -269,7 +269,7 @@ body.so-intro-open{overflow:hidden}
 .so-help-experience-card p{font-size:9px;line-height:1.8;color:var(--muted);margin:5px 0 0}
 .so-help-experience-note{margin-top:12px;padding:11px 13px;border-radius:11px;border:1px solid #67e8f92d;background:#22d3ee08;color:var(--muted);font-size:9px;line-height:1.75}
 @media(max-width:1050px){.so-intro-banner{grid-template-columns:minmax(0,1fr) minmax(140px,220px)}.so-intro-launch{grid-column:1/-1;min-width:0;min-height:42px;align-items:center;flex-direction:row;width:100%}.so-intro-launch small{margin-left:auto}.so-help-topic-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:650px){.so-intro-banner{grid-template-columns:minmax(0,1fr) 116px;gap:10px;padding:13px}.so-intro-banner-copy{grid-column:1/-1}.so-intro-banner-copy strong{font-size:17px}.so-intro-banner-copy small{font-size:9px}.so-preview-meta{gap:6px}.so-preview-meta>span{font-size:6px}.so-intro-preview{grid-column:1;min-height:100px}.#soHeroPreviewCanvas{min-height:100px}.so-preview-coordinate{font-size:5px;left:6px;right:6px}.so-preview-coordinate b{font-size:6px}.so-intro-launch{grid-column:2;grid-row:2;min-height:74px;align-items:flex-start;flex-direction:column;justify-content:center;padding:10px;font-size:9px;gap:5px}.so-intro-launch>span:nth-child(2){font-size:9px}.so-intro-launch small{font-size:6px;margin-left:0}.so-help-topic-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.so-help-experience-grid{grid-template-columns:1fr}}
+@media(max-width:650px){.so-intro-banner{grid-template-columns:minmax(0,1fr) 116px;gap:10px;padding:13px}.so-intro-banner-copy{grid-column:1/-1}.so-intro-banner-copy strong{font-size:17px}.so-intro-banner-copy small{font-size:9px}.so-preview-meta{gap:6px}.so-preview-meta>span{font-size:6px}.so-intro-preview{grid-column:1;min-height:100px}#soHeroPreviewCanvas{min-height:100px}.so-preview-coordinate{font-size:5px;left:6px;right:6px}.so-preview-coordinate b{font-size:6px}.so-intro-launch{grid-column:2;grid-row:2;min-height:74px;align-items:flex-start;flex-direction:column;justify-content:center;padding:10px;font-size:9px;gap:5px}.so-intro-launch>span:nth-child(2){font-size:9px}.so-intro-launch small{font-size:6px;margin-left:0}.so-help-topic-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.so-help-experience-grid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.so-preview-meta>span i{animation:none!important}.so-intro-banner:before{animation:none!important}}
 
 /* Aurora Circuit finish: keep the home intro terse and reserve detailed guidance for Help. */
@@ -284,3 +284,5 @@ body.so-intro-open{overflow:hidden}
 .so-help-experience-action:hover{border-color:#67e8f9a0;box-shadow:0 6px 16px #0891b215}
 @media(max-width:650px){.so-help-experience-grid{grid-template-columns:1fr}.so-help-experience-card:hover{transform:none}}
 @media(prefers-reduced-motion:reduce){.so-help-experience-card,.so-help-experience-card:hover{transition:none!important;transform:none!important}}
+
+@media(max-width:650px){.so-intro-skip{right:10px;top:max(10px,env(safe-area-inset-top));min-height:34px;padding:0 10px;font-size:9px}}
