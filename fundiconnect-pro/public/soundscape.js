@@ -285,7 +285,7 @@
     heroFrameId=0;
     if(!heroCanvas||!heroCtx||!heroVisible||document.hidden)return;
     var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if(!reduced&&now-heroLastFrame<30){heroFrameId=window.requestAnimationFrame(heroDraw);return;}
+    // Render every browser frame (rather than a slideshow/timed CSS swap) for a fluid live preview.
     heroLastFrame=now;
     var c=heroCtx,w=heroWidth,h=heroHeight,t=reduced?950:now;
     c.clearRect(0,0,w,h);
