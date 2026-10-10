@@ -44,13 +44,16 @@ CampusHub is a connected campus and local-services super app evolved from the ea
 
 ## StudentOS cinematic soundscape
 
-- Optional, user-triggered cinematic intro with five scenes: futuristic car reveal, acceleration, light tunnel, global globe reveal and StudentOS logo/voiceover.
+- Optional, user-triggered cinematic intro rendered live on a high-DPI HTML canvas with five animated scenes: futuristic car reveal, acceleration and speed streaks, perspective light tunnel, rotating graticule-and-continent globe, and StudentOS logo/voiceover. This is rendered animation, not a prerecorded video or a static SVG with a few transitions.
 - Browser-generated synth effects for glass-like taps, navigation, discovery, AI-assistant entry, notifications, messages, achievements, match success and payment-success integration points.
 - Four user-controlled ambient palettes: Future City, Global Explorer, Study Mode and Premium Experience, plus silence and a volume slider.
 - Sound starts off by default. No audio is autoplayed on page load; the intro, sound toggle or theme selection is a deliberate gesture. Settings are stored locally and do not require an account.
 - Effects and ambience are synthesized using the Web Audio API rather than studio-recorded or licensed soundtrack files. The spoken reveal uses the browser's text-to-speech voice when available; its timbre and availability depend on the device.
 - Integrations for future product flows can dispatch studentos:notification, studentos:message, studentos:achievement, studentos:match-success, studentos:wallet-success, studentos:media-transition or studentos:discovery events, or call the window.StudentOSSounds methods. This supplies audio feedback hooks but does not create a wallet, live chat, matches or notification delivery feature that is not otherwise implemented.
-- Reduced-motion preferences, keyboard dismissal, visible controls and a global sound-off switch are supported.
+- The interface has a coordinated aurora palette (deep midnight, electric cyan, indigo, violet, magenta and mint), layered depth, hover lift and ripple feedback, animated orbital details, and responsive Help Centre cards.
+- A single Help Centre destination consolidates how-it-works, user journeys, account/membership details, FAQs, payments guidance, safety, trust, contact instructions and policy entry points. Search filters four expandable topic groups.
+- Reduced-motion preferences, keyboard dismissal, visible controls and a global sound-off switch are supported. The Aurora Circuit design system uses consistent ice-cyan, iris-violet, orchid and midnight-ink accents across the app, with restrained sheen, focus, hover and entrance motion.
+- Getting started, membership, FAQs, payments, contact guidance, trust and safety copy are grouped under the single searchable Help & Support destination; the footer links there rather than duplicating policy/help copy.
 
 ## CampusHub opportunity and campus modules
 
