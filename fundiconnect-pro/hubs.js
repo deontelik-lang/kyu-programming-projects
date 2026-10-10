@@ -36,7 +36,8 @@ function roleProblem(user, roles, fail) {
   return null;
 }
 function failResult(res, fail, problem) {
-  return fail(res, problem.status, problem.code, problem.message);
+  fail(res, problem.status, problem.code, problem.message);
+  return true;
 }
 
 async function awardPoints(pool, userId, points, reason, referenceType, referenceId) {
