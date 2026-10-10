@@ -18,16 +18,20 @@ new vm.Script(fs.readFileSync('public/engagement.js', 'utf8'), { filename: 'publ
 new vm.Script(fs.readFileSync('public/studentos.js', 'utf8'), { filename: 'public/studentos.js' });
 new vm.Script(fs.readFileSync('public/soundscape.js', 'utf8'), { filename: 'public/soundscape.js' });
 const soundscape = fs.readFileSync('public/soundscape.js','utf8');
-for (const required of ['StudentOSSounds','soIntroOverlay','soSoundPanel','Future City','Global Explorer','Study Mode','Premium Experience','prefers-reduced-motion','studentos:wallet-success','studentos:match-success','speechSynthesis','Welcome to <span class="gradient">StudentOS.</span>']) {
+for (const required of ['StudentOSSounds','soIntroOverlay','soSoundPanel','Future City','Global Explorer','Study Mode','Premium Experience','prefers-reduced-motion','studentos:wallet-success','studentos:match-success','speechSynthesis','Welcome to <span class="gradient">StudentOS.</span>', 'soCinemaCanvas', 'requestAnimationFrame', 'cinemaGlobe', 'cinemaTunnel', 'cinemaCar', 'cinemaSnapshotCanvas', 'cinemaSceneTransitionDuration', 'so-scene-copy-enter']) {
   if (!soundscape.includes(required)) throw new Error('StudentOS soundscape requirement missing: ' + required);
 }
 const sw = fs.readFileSync('public/sw.js','utf8');
-if (!sw.includes('studentos-shell-v8') || !sw.includes('/soundscape.css?v=1') || !sw.includes('/soundscape.js?v=1')) throw new Error('Soundscape assets are missing from the refreshed PWA shell cache.');
+if (!sw.includes('studentos-shell-v10') || !sw.includes('/soundscape.css?v=3') || !sw.includes('/soundscape.js?v=3')) throw new Error('Soundscape assets are missing from the refreshed PWA shell cache.');
 const studentos = fs.readFileSync('public/studentos.js', 'utf8');
 for (const required of ['COUNTRY_DATA', 'studentosGlobal', 'studentosLaunchpad', 'studentosEntertainment', 'My country', 'Worldwide', 'languageOptions', 'save-location', 'use-location', 'so-world-map', 'soCountryMapLegend', 'UI_TEXT', 'navGlobal', 'tileCampus', 'One home. Your whole world.', 'A global window into opportunity', 'soWorldUniversities', 'soWorldEvents', 'soWorldMedia', 'Preferred supported currency', 'UNIVERSITIES_BY_COUNTRY', 'updateUniversitySuggestions', 'Start typing your institution', 'UNIVERSITIES_BY_COUNTRY', 'updateUniversitySuggestions', 'so-university-suggestions']) {
   if (!studentos.includes(required)) throw new Error('StudentOS global/app shell requirement missing: ' + required);
 }
 if (!studentos.includes('function syncHomeLocationFilter') || !studentos.includes("navCommunity:'الحرم والمجتمع'")) throw new Error('Global location selector or Arabic navigation label is incorrect.');
+for (const required of ['studentosHelpCentre','soHelpSearch','soHelpGroupStart','soHelpGroupAccount','soHelpGroupFaq','soHelpGroupSafety','data-so-help-policy','navHelp','Help without the hunt.','so-help-contact-note','does not yet offer a staffed live-chat or support-ticket inbox.']) {
+  if (!studentos.includes(required)) throw new Error('StudentOS central Help Centre requirement missing: ' + required);
+}
+if (!studentos.includes('organizeHelpCentre();') || !studentos.includes("help: ['studentosHelpCentre','how','journeys','membership','faq','contact','trust']")) throw new Error('Help content must be consolidated in the dedicated Help Centre destination.');
 const hubRouteSource = fs.readFileSync('hubs.js','utf8');
 if (!hubRouteSource.includes('lower(pp.region)=lower($6)') || !hubRouteSource.includes('lower(pp.university)=lower($7)')) throw new Error('Public student discovery must filter by region and university as well as country/city.');
 if (!html.includes('m.university||m.campus') || !html.includes('m.city,m.region,m.country')) throw new Error('Public student cards must display selected global location data.');
@@ -40,7 +44,7 @@ if (!countriesBlob) throw new Error('The StudentOS world country list is missing
 const countryPairs = countriesBlob[1].split('|').map(value => value.slice(0, value.indexOf(':')));
 if (countryPairs.length < 240 || new Set(countryPairs).size !== countryPairs.length) throw new Error('Global country list must contain at least 240 unique country/territory codes.');
 const serverContentForStudentOS = fs.readFileSync('server.js', 'utf8');
-if (!serverContentForStudentOS.includes('/studentos.css?v=2') || !serverContentForStudentOS.includes('/studentos.js?v=4') || !serverContentForStudentOS.includes('/soundscape.css?v=1') || !serverContentForStudentOS.includes('/soundscape.js?v=1') || !serverContentForStudentOS.includes('/api/public/global-stats')) throw new Error('StudentOS design or soundscape assets are not injected into the homepage.');
+if (!serverContentForStudentOS.includes('/studentos.css?v=3') || !serverContentForStudentOS.includes('/studentos.js?v=6') || !serverContentForStudentOS.includes('/soundscape.css?v=3') || !serverContentForStudentOS.includes('/soundscape.js?v=3') || !serverContentForStudentOS.includes('/api/public/global-stats')) throw new Error('StudentOS design or soundscape assets are not injected into the homepage.');
 
 const serverWithDiscovery = fs.readFileSync('server.js', 'utf8');
 if (!serverWithDiscovery.includes('/engagement.css?v=1') || !serverWithDiscovery.includes('/engagement.js?v=2')) throw new Error('Dynamic discovery assets are not injected into the homepage.');
