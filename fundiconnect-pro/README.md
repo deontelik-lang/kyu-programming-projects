@@ -41,6 +41,17 @@ CampusHub is a connected campus and local-services super app evolved from the ea
 - PWA manifest, original SVG app mark, and a network-first offline shell. The shell can cache the landing page and static assets, while API calls remain network-only. This is not a full offline transactional mode and does not queue bookings while offline.
 - Google Fonts typography uses Inter and Poppins when the fonts are reachable, with system-font fallbacks.
 
+
+## StudentOS cinematic soundscape
+
+- Optional, user-triggered cinematic intro with five scenes: futuristic car reveal, acceleration, light tunnel, global globe reveal and StudentOS logo/voiceover.
+- Browser-generated synth effects for glass-like taps, navigation, discovery, AI-assistant entry, notifications, messages, achievements, match success and payment-success integration points.
+- Four user-controlled ambient palettes: Future City, Global Explorer, Study Mode and Premium Experience, plus silence and a volume slider.
+- Sound starts off by default. No audio is autoplayed on page load; the intro, sound toggle or theme selection is a deliberate gesture. Settings are stored locally and do not require an account.
+- Effects and ambience are synthesized using the Web Audio API rather than studio-recorded or licensed soundtrack files. The spoken reveal uses the browser's text-to-speech voice when available; its timbre and availability depend on the device.
+- Integrations for future product flows can dispatch studentos:notification, studentos:message, studentos:achievement, studentos:match-success, studentos:wallet-success, studentos:media-transition or studentos:discovery events, or call the window.StudentOSSounds methods. This supplies audio feedback hooks but does not create a wallet, live chat, matches or notification delivery feature that is not otherwise implemented.
+- Reduced-motion preferences, keyboard dismissal, visible controls and a global sound-off switch are supported.
+
 ## CampusHub opportunity and campus modules
 
 The app includes 13 database-backed opportunity hubs: student gigs, jobs, internships/graduate roles, housing, products, events, courses/skills academy listings, business directory, community posts, transport/delivery listings, student services, alumni/mentorship and professional service offers. Members can publish listings, search by hub and location, apply or inquire, RSVP, save items, comment on campus posts, exchange persistent listing messages, report abusive listings, and review incoming applications through owner dashboards. User profiles can include campus, course, study level, graduation year, organisation, portfolio and skills; a printable CV preview uses that profile data. The Campus & Alumni Directory is opt-in and private by default; users can make their profile discoverable or opt out at any time, and the directory does not expose account phone/email. Emergency request records are persistent but do not dispatch responders. A local rules-based study/career guide and user-input cost worksheet are included; neither is a connected generative AI service or external market-price engine.
