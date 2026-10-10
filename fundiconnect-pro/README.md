@@ -221,3 +221,15 @@ These remaining integrations need chosen providers, credentials, webhook URLs, o
 ## Licence
 
 No open-source licence has been chosen yet. Add one before inviting external contributors.
+
+## CampusHub Discovery & engagement layer
+
+The public homepage also includes a responsive Discovery layer that loads current published records from /api/hubs/listings and /api/fundis. It provides category lanes, newest/activity sorting, featured labels based on listing data, account-backed listing saves, and local interest-based ordering. This is rule-based personalization on the current device, not a connected AI recommender.
+
+The optional XP / level / streak panel is currently browser-local. Check-ins are user-triggered, have no countdown or penalty, and do not create server-side rewards. Private preference hearts are not public reactions. Live chat, video/music hosting, stories, creator earnings/leaderboards, and real-time streaming are not enabled by this layer. The discovery CSS/JS are injected into the public HTML response by server.js, and both assets are included in the service-worker app shell.
+
+## CampusHub Discovery & engagement layer
+
+The public homepage also includes a responsive Discovery layer that loads current published records from /api/hubs/listings and /api/fundis. It provides category lanes, newest/activity sorting, featured labels based on listing data, account-backed listing saves, and local interest-based ordering. This is rule-based personalization on the current device, not a connected AI recommender.
+
+The optional XP / level / streak panel is currently browser-local. Check-ins are user-triggered, have no countdown or penalty, and do not create server-side rewards. Private preference hearts are not public reactions. Live chat, video/music hosting, stories, creator earnings/leaderboards, and real-time streaming are not enabled by this layer. The discovery CSS/JS are injected into the public HTML response by server.js, and both assets are included in the service-worker app shell.
