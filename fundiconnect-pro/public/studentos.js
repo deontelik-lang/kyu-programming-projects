@@ -13,14 +13,14 @@
     ['en','English'],['fr','Français'],['es','Español'],['pt','Português'],['ar','العربية'],['sw','Kiswahili'],['zh','中文'],['de','Deutsch']
   ];
   const UI_TEXT = {
-    en:{navHome:'Home',navExplore:'Explore',navGlobal:'Global',navServices:'Services',navCommunity:'Community',navMedia:'Media',navAccount:'My space',launchKicker:'YOUR EVERYDAY ECOSYSTEM',launchTitle:'One home. Your whole world.',launchLede:'Choose a destination and focus on one task at a time. The rest of StudentOS stays out of your way.',tileCampus:'Campus & community',tileMySpace:'My space',assistantTitle:'Need a helpful next step?',assistantBody:'Ask StudentOS for a practical plan for study, work, housing or career goals.',assistantButton:'Ask StudentOS ↗',locationTitle:'Your discovery region',locationEdit:'Edit location ↗',hero1:'Study. Live.',hero2:'Work. Connect.',hero3:'Create. Explore.'},
-    fr:{navHome:'Accueil',navExplore:'Explorer',navGlobal:'Monde',navServices:'Services',navCommunity:'Vie étudiante',navMedia:'Médias',navAccount:'Mon espace',launchKicker:'VOTRE ÉCOSYSTÈME AU QUOTIDIEN',launchTitle:'Un espace. Votre monde entier.',launchLede:'Choisissez une destination et concentrez-vous sur une tâche à la fois.',tileCampus:'Campus et communauté',tileMySpace:'Mon espace',assistantTitle:'Besoin d’une prochaine étape ?',assistantBody:'Demandez à StudentOS un plan pratique pour les études, le travail ou le logement.',assistantButton:'Demander à StudentOS ↗',locationTitle:'Votre région de découverte',locationEdit:'Modifier ↗',hero1:'Étudier. Vivre.',hero2:'Travailler. Connecter.',hero3:'Créer. Explorer.'},
-    es:{navHome:'Inicio',navExplore:'Explorar',navGlobal:'Global',navServices:'Servicios',navCommunity:'Campus',navMedia:'Medios',navAccount:'Mi espacio',launchKicker:'TU ECOSISTEMA DIARIO',launchTitle:'Un espacio. Todo tu mundo.',launchLede:'Elige un destino y céntrate en una tarea cada vez.',tileCampus:'Campus y comunidad',tileMySpace:'Mi espacio',assistantTitle:'¿Necesitas un siguiente paso?',assistantBody:'Pide a StudentOS un plan práctico para estudiar, trabajar, encontrar vivienda o avanzar profesionalmente.',assistantButton:'Preguntar a StudentOS ↗',locationTitle:'Tu región de descubrimiento',locationEdit:'Cambiar ubicación ↗',hero1:'Estudia. Vive.',hero2:'Trabaja. Conecta.',hero3:'Crea. Explora.'},
-    pt:{navHome:'Início',navExplore:'Explorar',navGlobal:'Global',navServices:'Serviços',navCommunity:'Campus',navMedia:'Mídia',navAccount:'Meu espaço',launchKicker:'SEU ECOSSISTEMA DIÁRIO',launchTitle:'Um lugar. Seu mundo inteiro.',launchLede:'Escolha um destino e concentre-se em uma tarefa de cada vez.',tileCampus:'Campus e comunidade',tileMySpace:'Meu espaço',assistantTitle:'Precisa do próximo passo?',assistantBody:'Peça ao StudentOS um plano prático para estudo, trabalho, moradia ou carreira.',assistantButton:'Perguntar ao StudentOS ↗',locationTitle:'Sua região de descoberta',locationEdit:'Editar localização ↗',hero1:'Estude. Viva.',hero2:'Trabalhe. Conecte.',hero3:'Crie. Explore.'},
+    en:{navHome:'Home',navExplore:'Explore',navGlobal:'Global',navServices:'Services',navCommunity:'Community',navMedia:'Media',navHelp:'Help',navAccount:'My space',launchKicker:'YOUR EVERYDAY ECOSYSTEM',launchTitle:'One home. Your whole world.',launchLede:'Choose a destination and focus on one task at a time. The rest of StudentOS stays out of your way.',tileCampus:'Campus & community',tileMySpace:'My space',assistantTitle:'Need a helpful next step?',assistantBody:'Ask StudentOS for a practical plan for study, work, housing or career goals.',assistantButton:'Ask StudentOS ↗',locationTitle:'Your discovery region',locationEdit:'Edit location ↗',hero1:'Study. Live.',hero2:'Work. Connect.',hero3:'Create. Explore.'},
+    fr:{navHome:'Accueil',navExplore:'Explorer',navGlobal:'Monde',navServices:'Services',navCommunity:'Vie étudiante',navMedia:'Médias',navHelp:'Aide',navAccount:'Mon espace',launchKicker:'VOTRE ÉCOSYSTÈME AU QUOTIDIEN',launchTitle:'Un espace. Votre monde entier.',launchLede:'Choisissez une destination et concentrez-vous sur une tâche à la fois.',tileCampus:'Campus et communauté',tileMySpace:'Mon espace',assistantTitle:'Besoin d’une prochaine étape ?',assistantBody:'Demandez à StudentOS un plan pratique pour les études, le travail ou le logement.',assistantButton:'Demander à StudentOS ↗',locationTitle:'Votre région de découverte',locationEdit:'Modifier ↗',hero1:'Étudier. Vivre.',hero2:'Travailler. Connecter.',hero3:'Créer. Explorer.'},
+    es:{navHome:'Inicio',navExplore:'Explorar',navGlobal:'Global',navServices:'Servicios',navCommunity:'Campus',navMedia:'Medios',navHelp:'Ayuda',navAccount:'Mi espacio',launchKicker:'TU ECOSISTEMA DIARIO',launchTitle:'Un espacio. Todo tu mundo.',launchLede:'Elige un destino y céntrate en una tarea cada vez.',tileCampus:'Campus y comunidad',tileMySpace:'Mi espacio',assistantTitle:'¿Necesitas un siguiente paso?',assistantBody:'Pide a StudentOS un plan práctico para estudiar, trabajar, encontrar vivienda o avanzar profesionalmente.',assistantButton:'Preguntar a StudentOS ↗',locationTitle:'Tu región de descubrimiento',locationEdit:'Cambiar ubicación ↗',hero1:'Estudia. Vive.',hero2:'Trabaja. Conecta.',hero3:'Crea. Explora.'},
+    pt:{navHome:'Início',navExplore:'Explorar',navGlobal:'Global',navServices:'Serviços',navCommunity:'Campus',navMedia:'Mídia',navHelp:'Ajuda',navAccount:'Meu espaço',launchKicker:'SEU ECOSSISTEMA DIÁRIO',launchTitle:'Um lugar. Seu mundo inteiro.',launchLede:'Escolha um destino e concentre-se em uma tarefa de cada vez.',tileCampus:'Campus e comunidade',tileMySpace:'Meu espaço',assistantTitle:'Precisa do próximo passo?',assistantBody:'Peça ao StudentOS um plano prático para estudo, trabalho, moradia ou carreira.',assistantButton:'Perguntar ao StudentOS ↗',locationTitle:'Sua região de descoberta',locationEdit:'Editar localização ↗',hero1:'Estude. Viva.',hero2:'Trabalhe. Conecte.',hero3:'Crie. Explore.'},
     ar:{navHome:'الرئيسية',navExplore:'استكشف',navGlobal:'العالم',navServices:'الخدمات',navCommunity:'الحرم والمجتمع',navMedia:'الوسائط',navAccount:'مساحتي',launchKicker:'منظومتك اليومية',launchTitle:'مكان واحد. عالمك كله.',launchLede:'اختر وجهة وركّز على مهمة واحدة في كل مرة.',tileCampus:'الحرم والمجتمع',tileMySpace:'مساحتي',assistantTitle:'هل تحتاج إلى خطوة تالية؟',assistantBody:'اطلب من StudentOS خطة عملية للدراسة أو العمل أو السكن أو التطور المهني.',assistantButton:'اسأل StudentOS ↗',locationTitle:'منطقة الاستكشاف',locationEdit:'تعديل الموقع ↗',hero1:'ادرس. عش.',hero2:'اعمل. تواصل.',hero3:'ابتكر. استكشف.'},
-    sw:{navHome:'Nyumbani',navExplore:'Gundua',navGlobal:'Kimataifa',navServices:'Huduma',navCommunity:'Kampasi',navMedia:'Media',navAccount:'Nafasi yangu',launchKicker:'MFUMO WAKO WA KILA SIKU',launchTitle:'Nyumbani pamoja. Dunia yako yote.',launchLede:'Chagua unakoenda na ushughulikie jambo moja kwa wakati.',tileCampus:'Kampasi na jamii',tileMySpace:'Nafasi yangu',assistantTitle:'Unahitaji hatua inayofuata?',assistantBody:'Uliza StudentOS mpango wa vitendo kuhusu masomo, kazi, makazi au taaluma.',assistantButton:'Uliza StudentOS ↗',locationTitle:'Eneo lako la ugunduzi',locationEdit:'Badili eneo ↗',hero1:'Soma. Ishi.',hero2:'Fanya kazi. Ungana.',hero3:'Buni. Gundua.'},
-    zh:{navHome:'首页',navExplore:'探索',navGlobal:'全球',navServices:'服务',navCommunity:'校园与社区',navMedia:'媒体',navAccount:'我的空间',launchKicker:'你的日常生态系统',launchTitle:'一个家，连接整个世界。',launchLede:'选择一个目的地，一次专注完成一件事。',tileCampus:'校园与社区',tileMySpace:'我的空间',assistantTitle:'需要下一步建议吗？',assistantBody:'向 StudentOS 获取有关学习、工作、住宿或职业目标的实用计划。',assistantButton:'询问 StudentOS ↗',locationTitle:'你的探索地区',locationEdit:'编辑位置 ↗',hero1:'学习。生活。',hero2:'工作。连接。',hero3:'创造。探索。'},
-    de:{navHome:'Start',navExplore:'Entdecken',navGlobal:'Weltweit',navServices:'Dienste',navCommunity:'Campus & Community',navMedia:'Medien',navAccount:'Mein Bereich',launchKicker:'DEIN ALLTÄGLICHES ÖKOSYSTEM',launchTitle:'Ein Zuhause. Deine ganze Welt.',launchLede:'Wähle einen Bereich und konzentriere dich jeweils auf eine Aufgabe.',tileCampus:'Campus & Community',tileMySpace:'Mein Bereich',assistantTitle:'Brauchst du den nächsten Schritt?',assistantBody:'Bitte StudentOS um einen praktischen Plan für Studium, Arbeit, Wohnen oder Karriere.',assistantButton:'StudentOS fragen ↗',locationTitle:'Deine Entdeckungsregion',locationEdit:'Standort ändern ↗',hero1:'Lernen. Leben.',hero2:'Arbeiten. Verbinden.',hero3:'Gestalten. Entdecken.'}
+    sw:{navHome:'Nyumbani',navExplore:'Gundua',navGlobal:'Kimataifa',navServices:'Huduma',navCommunity:'Kampasi',navMedia:'Media',navHelp:'Msaada',navAccount:'Nafasi yangu',launchKicker:'MFUMO WAKO WA KILA SIKU',launchTitle:'Nyumbani pamoja. Dunia yako yote.',launchLede:'Chagua unakoenda na ushughulikie jambo moja kwa wakati.',tileCampus:'Kampasi na jamii',tileMySpace:'Nafasi yangu',assistantTitle:'Unahitaji hatua inayofuata?',assistantBody:'Uliza StudentOS mpango wa vitendo kuhusu masomo, kazi, makazi au taaluma.',assistantButton:'Uliza StudentOS ↗',locationTitle:'Eneo lako la ugunduzi',locationEdit:'Badili eneo ↗',hero1:'Soma. Ishi.',hero2:'Fanya kazi. Ungana.',hero3:'Buni. Gundua.'},
+    zh:{navHome:'首页',navExplore:'探索',navGlobal:'全球',navServices:'服务',navCommunity:'校园与社区',navMedia:'媒体',navHelp:'帮助',navAccount:'我的空间',launchKicker:'你的日常生态系统',launchTitle:'一个家，连接整个世界。',launchLede:'选择一个目的地，一次专注完成一件事。',tileCampus:'校园与社区',tileMySpace:'我的空间',assistantTitle:'需要下一步建议吗？',assistantBody:'向 StudentOS 获取有关学习、工作、住宿或职业目标的实用计划。',assistantButton:'询问 StudentOS ↗',locationTitle:'你的探索地区',locationEdit:'编辑位置 ↗',hero1:'学习。生活。',hero2:'工作。连接。',hero3:'创造。探索。'},
+    de:{navHome:'Start',navExplore:'Entdecken',navGlobal:'Weltweit',navServices:'Dienste',navCommunity:'Campus & Community',navMedia:'Medien',navHelp:'Hilfe',navAccount:'Mein Bereich',launchKicker:'DEIN ALLTÄGLICHES ÖKOSYSTEM',launchTitle:'Ein Zuhause. Deine ganze Welt.',launchLede:'Wähle einen Bereich und konzentriere dich jeweils auf eine Aufgabe.',tileCampus:'Campus & Community',tileMySpace:'Mein Bereich',assistantTitle:'Brauchst du den nächsten Schritt?',assistantBody:'Bitte StudentOS um einen praktischen Plan für Studium, Arbeit, Wohnen oder Karriere.',assistantButton:'StudentOS fragen ↗',locationTitle:'Deine Entdeckungsregion',locationEdit:'Standort ändern ↗',hero1:'Lernen. Leben.',hero2:'Arbeiten. Verbinden.',hero3:'Gestalten. Entdecken.'}
   };
   const CURRENCIES = [
     ['USD','US Dollar ($)'],['EUR','Euro (€)'],['GBP','British Pound (£)'],['CAD','Canadian Dollar (CA$)'],
@@ -54,7 +54,7 @@
   let location = readLocation();
   let profileHydrated = false;
   const $ = id => document.getElementById(id);
-  const sectionIds = ['ecosystem','hubs','people','services','fundis','how','journeys','membership','faq','contact','trust'];
+  const sectionIds = ['ecosystem','hubs','people','services','fundis','how','journeys','membership','faq','contact','trust','studentosHelpCentre'];
   const pageContent = {
     home: [],
     explore: ['hubs'],
@@ -63,7 +63,8 @@
     services: ['services','fundis'],
     studentlife: ['hubs','people'],
     media: ['hubs'],
-    about: ['how','journeys','membership','faq','contact','trust']
+    help: ['studentosHelpCentre','how','journeys','membership','faq','contact','trust'],
+    about: ['studentosHelpCentre','how','journeys','membership','faq','contact','trust']
   };
   function esc(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -497,6 +498,7 @@
       if (typeof window.showDashboard === 'function') window.showDashboard();
       return;
     }
+    if(page==='about')page='help';
     if (!Object.prototype.hasOwnProperty.call(pageContent,page)) page='home';
     document.body.dataset.studentosView = page;
     document.body.classList.toggle('studentos-content-view',page!=='home');
@@ -664,6 +666,16 @@
       const element=event.target.closest('button');
       if(!element)return;
       if(element.dataset.soPage){openPage(element.dataset.soPage);return;}
+      if(element.dataset.soHelpTarget){
+        openPage('help');
+        const target=$(element.dataset.soHelpTarget);
+        if(target){target.open=true;target.scrollIntoView({behavior:window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});}
+        return;
+      }
+      if(element.dataset.soHelpPolicy){
+        if(typeof window.showPolicy==='function')window.showPolicy(element.dataset.soHelpPolicy);
+        return;
+      }
       if(element.dataset.soMode){applyMode(element.dataset.soMode);return;}
       if(element.dataset.soAction==='save-location'){saveLocation();return;}
       if(element.dataset.soAction==='use-location'){useDeviceLocation();return;}
@@ -682,6 +694,18 @@
         if(typeof window.openCareerGuide==='function')window.openCareerGuide();
         return;
       }
+    });
+    document.addEventListener('input',event=>{
+      if(event.target.id!=='soHelpSearch')return;
+      const query=event.target.value.trim().toLocaleLowerCase();
+      const groupNodes=[...document.querySelectorAll('#soHelpGroups .so-help-group')];
+      let visible=0;
+      groupNodes.forEach(group=>{
+        const hit=!query||group.innerText.toLocaleLowerCase().includes(query);
+        group.hidden=!hit;
+        if(hit){visible++;if(query)group.open=true;}
+      });
+      const empty=$('soHelpNoResults');if(empty)empty.hidden=visible>0;
     });
     document.addEventListener('change',event=>{
       if(event.target.matches('[data-so-main-country]')) {
@@ -703,9 +727,51 @@
   }
   function registerFieldsMarkup() { return locationFieldsMarkup('register'); }
 
+  function helpCentreMarkup() {
+    return [
+      '<section id="studentosHelpCentre" class="so-help-centre studentos-page-hidden shell" aria-labelledby="soHelpTitle">',
+      '<div class="so-help-hero"><div class="so-help-kicker"><span class="so-help-spark"></span> STUDENTOS · HELP & SUPPORT</div>',
+      '<h2 id="soHelpTitle">Help without the hunt. <span>One place.</span></h2>',
+      '<p>Your single support hub for getting started, accounts, memberships, payments, app features, safety and policies. Search once, open a topic, and find the relevant guide without chasing information across the app.</p>',
+      '<label class="so-help-search"><span aria-hidden="true">⌕</span><input id="soHelpSearch" type="search" autocomplete="off" placeholder="Search help, payments, safety, account…" aria-label="Search the StudentOS Help Centre"><kbd>HELP</kbd></label>',
+      '<div class="so-help-topic-grid">',
+      '<button type="button" class="so-help-topic so-help-topic-cyan" data-so-help-target="soHelpGroupStart"><span>↗</span><b>Getting started</b><small>How StudentOS works</small></button>',
+      '<button type="button" class="so-help-topic so-help-topic-violet" data-so-help-target="soHelpGroupAccount"><span>◉</span><b>Account & plans</b><small>Profiles and pricing</small></button>',
+      '<button type="button" class="so-help-topic so-help-topic-mint" data-so-help-target="soHelpGroupFaq"><span>◇</span><b>Payments & features</b><small>Clear answers, no guesswork</small></button>',
+      '<button type="button" class="so-help-topic so-help-topic-rose" data-so-help-target="soHelpGroupSafety"><span>⌑</span><b>Safety & privacy</b><small>Report a problem</small></button>',
+      '</div><div class="so-help-policy-links"><span>Policies</span><button type="button" data-so-help-policy="terms">Terms of Service</button><button type="button" data-so-help-policy="privacy">Privacy</button><button type="button" data-so-help-policy="safety">Safety & disputes</button></div></div>',
+      '<div id="soHelpGroups" class="so-help-groups" aria-label="Help topics"></div>',
+      '<div class="so-help-contact-note"><span aria-hidden="true">✦</span><div><b>Still need help?</b><p>For a specific listing or booking, use the existing in-app report and dispute controls. Help content and policies live here together. StudentOS does not yet offer a staffed live-chat or support-ticket inbox.</p></div><button type="button" data-so-help-target="soHelpGroupSafety">Safety &amp; reporting ↗</button></div>',
+      '<div class="so-help-emergency"><span aria-hidden="true">✦</span><div><b>Need urgent real-world help?</b><p>StudentOS can record reports and requests, but it does not dispatch emergency responders. For immediate danger, contact the appropriate local emergency service.</p></div></div>',
+      '<p id="soHelpNoResults" class="so-help-no-results" hidden>No matching help topic was found. Try a shorter search term or clear the search to browse all topics.</p></section>'
+    ].join('');
+  }
+  function organizeHelpCentre() {
+    if ($('studentosHelpCentre')) return;
+    const first=$('how');
+    if(!first || !first.parentNode) return;
+    first.insertAdjacentHTML('beforebegin',helpCentreMarkup());
+    const root=$('studentosHelpCentre'),groups=$('soHelpGroups');
+    const data=[
+      {id:'soHelpGroupStart',title:'Getting started & how StudentOS works',subtitle:'Your guide to the main areas and how to get started',items:['how','journeys']},
+      {id:'soHelpGroupAccount',title:'Your account, memberships & pricing',subtitle:'Profile settings, membership expectations and available features',items:['membership']},
+      {id:'soHelpGroupFaq',title:'Common questions, payments & app features',subtitle:'Answers about services, listings, AI and mobile access',items:['faq']},
+      {id:'soHelpGroupSafety',title:'Safety, reporting & contact guidance',subtitle:'Reporting, booking disputes, precautions and trust information',items:['contact','trust']}
+    ];
+    data.forEach(function(group,index){
+      const details=document.createElement('details');
+      details.className='so-help-group';details.id=group.id;details.open=index===0;
+      details.innerHTML='<summary><span class="so-help-group-number">0'+(index+1)+'</span><span class="so-help-group-copy"><b>'+group.title+'</b><small>'+group.subtitle+'</small></span><span class="so-help-chevron" aria-hidden="true">⌄</span></summary><div class="so-help-group-content"></div>';
+      const content=details.querySelector('.so-help-group-content');
+      group.items.forEach(function(id){const node=$(id);if(node)content.appendChild(node);});
+      groups.appendChild(details);
+    });
+    root.dataset.studentosHelpReady='true';
+  }
   function init() {
     const ecosystem=$('ecosystem');
     if(!ecosystem)return;
+    organizeHelpCentre();
     if(!COUNTRIES.some(item=>item.code===location.countryCode))location.countryCode=codeForCountry(location.country);
     ecosystem.insertAdjacentHTML('beforebegin',globalMarkup());
     ecosystem.insertAdjacentHTML('beforebegin',entertainmentMarkup());
@@ -716,7 +782,7 @@
     // Consolidate top navigation around app areas rather than long scrolling sections.
     const nav=document.querySelector('.navlinks');
     if(nav)nav.innerHTML=[
-      ['home','Home'],['explore','Explore'],['global','Global'],['services','Services'],['community','Community'],['media','Media']
+      ['home','Home'],['explore','Explore'],['global','Global'],['services','Services'],['community','Community'],['media','Media'],['help','Help']
     ].map(([page,label])=>`<button type="button" class="studentos-nav-btn" data-so-page="${page}" data-so-i18n="nav${page.charAt(0).toUpperCase()+page.slice(1)}" aria-current="${page==='home'?'page':'false'}">${label}</button>`).join('');
     // Replace the legacy brand wording in the shell/footer while keeping CampusHub as the product alias.
     const brand=document.querySelector('.campus-brand');
@@ -744,8 +810,8 @@
     document.body.insertAdjacentHTML('beforeend',`<nav id="studentosMobileNav" class="so-mobile-nav" aria-label="StudentOS primary navigation">
       <button type="button" data-so-page="home" aria-current="page"><span aria-hidden="true">⌂</span><small data-so-i18n="navHome">Home</small></button>
       <button type="button" data-so-page="explore"><span aria-hidden="true">⌕</span><small data-so-i18n="navExplore">Explore</small></button>
-      <button type="button" data-so-page="global"><span aria-hidden="true">🌍</span><small data-so-i18n="navGlobal">Global</small></button>
       <button type="button" data-so-page="services"><span aria-hidden="true">⚒</span><small data-so-i18n="navServices">Services</small></button>
+      <button type="button" data-so-page="help"><span aria-hidden="true">✦</span><small data-so-i18n="navHelp">Help</small></button>
       <button type="button" data-so-page="account"><span aria-hidden="true">◉</span><small data-so-i18n="navAccount">My space</small></button>
     </nav>`);
   }
