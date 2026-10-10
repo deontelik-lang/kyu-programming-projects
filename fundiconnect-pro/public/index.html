@@ -260,9 +260,9 @@ a{transition:color .18s}
 </div></section>
 <div class="shell stats premium-stats" aria-label="Live CampusHub platform statistics">
   <div class="stat stat-intro"><span class="stat-kicker">THE ECOSYSTEM</span><b>Built to bring it all together.</b><span>One connected starting point for your next step.</span></div>
-  <div class="stat"><span class="stat-icon">◉</span><b id="statMembers">—</b><span>Community members</span></div>
-  <div class="stat"><span class="stat-icon">✳</span><b id="statProviders">—</b><span>Skilled professionals</span></div>
-  <div class="stat"><span class="stat-icon">↗</span><b id="statOpportunities">—</b><span>Published opportunities</span></div>
+  <div class="stat"><span class="stat-icon">◉</span><b id="statMembers">—</b><span id="statMembersLabel">Community members</span></div>
+  <div class="stat"><span class="stat-icon">✳</span><b id="statProviders">—</b><span id="statProvidersLabel">Skilled professionals</span></div>
+  <div class="stat"><span class="stat-icon">↗</span><b id="statOpportunities">—</b><span id="statOpportunitiesLabel">Published opportunities</span></div>
 </div>
 <main id="publicMain" class="shell">
 <section class="section ecosystem-section" id="ecosystem">
@@ -309,7 +309,7 @@ a{transition:color .18s}
 <button class="cat" data-category="carpenter" onclick="chooseCategory(this,'carpenter')"><span class="iconbox">🪚</span><strong>Carpenters</strong><small>Furniture and fittings</small></button>
 <button class="cat" data-category="welder" onclick="chooseCategory(this,'welder')"><span class="iconbox">🧑‍🏭</span><strong>Welders</strong><small>Metal fabrication</small></button>
 <button class="cat" data-category="mechanic" onclick="chooseCategory(this,'mechanic')"><span class="iconbox">🔧</span><strong>Mechanics</strong><small>Vehicle service and repairs</small></button>
-<button class="cat" data-category="painter" onclick="chooseCategory(this,'painter')"><span class="iconbox">🖌��</span><strong>Painters</strong><small>Home and commercial painting</small></button>
+<button class="cat" data-category="painter" onclick="chooseCategory(this,'painter')"><span class="iconbox">🖌️</span><strong>Painters</strong><small>Home and commercial painting</small></button>
 <button class="cat" data-category="cleaner" onclick="chooseCategory(this,'cleaner')"><span class="iconbox">🧹</span><strong>Cleaners</strong><small>Home, office and move-out cleaning</small></button>
 <button class="cat" data-category="gardener" onclick="chooseCategory(this,'gardener')"><span class="iconbox">🌿</span><strong>Gardeners</strong><small>Landscaping and grounds care</small></button>
 <button class="cat" data-category="appliance-repair" onclick="chooseCategory(this,'appliance-repair')"><span class="iconbox">🔌</span><strong>Appliance repair</strong><small>Home equipment maintenance</small></button>
@@ -402,9 +402,9 @@ function initTheme(){
 function toggleTheme(){applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark')}
 async function loadPublicStats(){
  try{const d=await api('/api/public/stats');const fmt=n=>Number(n||0).toLocaleString();
-  if($('statMembers'))$('statMembers').textContent=fmt(d.members);
-  if($('statProviders'))$('statProviders').textContent=fmt(d.providers);
-  if($('statOpportunities'))$('statOpportunities').textContent=fmt(d.opportunities);
+  if($('statMembers'))$('statMembers').textContent=fmt(d.members);if($('statMembersLabel'))$('statMembersLabel').textContent=Number(d.members)===1?'Community member':'Community members';
+  if($('statProviders'))$('statProviders').textContent=fmt(d.providers);if($('statProvidersLabel'))$('statProvidersLabel').textContent=Number(d.providers)===1?'Skilled professional':'Skilled professionals';
+  if($('statOpportunities'))$('statOpportunities').textContent=fmt(d.opportunities);if($('statOpportunitiesLabel'))$('statOpportunitiesLabel').textContent=Number(d.opportunities)===1?'Published opportunity':'Published opportunities';
  }catch(e){for(const id of ['statMembers','statProviders','statOpportunities'])if($(id))$(id).textContent='Explore'}
 }
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
