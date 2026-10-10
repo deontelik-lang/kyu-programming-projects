@@ -67,11 +67,12 @@ async function handleHubRoutes(ctx) {
     const persona = bounded(url.searchParams.get('persona'), 30).toLowerCase();
     const country = bounded(url.searchParams.get('country'), 80);
     const city = bounded(url.searchParams.get('city'), 100);
+    const region = bounded(url.searchParams.get('region'), 100);
     const university = bounded(url.searchParams.get('university'), 180);
     if (persona && !personaChoices.has(persona)) return fail(res, 400, 'INVALID_PERSONA', 'Choose a supported profile type.');
     const limit = Math.min(Math.max(Number(url.searchParams.get('limit')) || 36, 1), 80);
-    const r = await pool.query("SELECT pp.id AS profile_id,u.id AS user_id,u.full_name,pp.persona,pp.headline,pp.campus,pp.course,pp.study_level,pp.graduation_year,pp.bio,pp.skills,pp.organisation,pp.portfolio_url,pp.country,pp.country_code,pp.region,pp.city,pp.university,pp.language,pp.currency,pp.updated_at FROM platform_profiles pp JOIN users u ON u.id=pp.user_id WHERE pp.public_directory=true AND u.is_active=true AND ($1='' OR pp.persona=$1) AND ($2='' OR lower(pp.campus)=lower($2)) AND ($3='' OR lower(u.full_name || ' ' || pp.headline || ' ' || pp.campus || ' ' || pp.course || ' ' || pp.bio || ' ' || array_to_string(pp.skills,' ')) LIKE '%' || $3 || '%') AND ($4='' OR lower(pp.country)=lower($4)) AND ($5='' OR lower(pp.city)=lower($5)) AND ($6='' OR lower(pp.university)=lower($6)) ORDER BY pp.updated_at DESC LIMIT $7",
-      [persona,campus,q,country,city,university,limit]
+    const r = await pool.query("SELECT pp.id AS profile_id,u.id AS user_id,u.full_name,pp.persona,pp.headline,pp.campus,pp.course,pp.study_level,pp.graduation_year,pp.bio,pp.skills,pp.organisation,pp.portfolio_url,pp.country,pp.country_code,pp.region,pp.city,pp.university,pp.language,pp.currency,pp.updated_at FROM platform_profiles pp JOIN users u ON u.id=pp.user_id WHERE pp.public_directory=true AND u.is_active=true AND ($1='' OR pp.persona=$1) AND ($2='' OR lower(pp.campus)=lower($2)) AND ($3='' OR lower(u.full_name || ' ' || pp.headline || ' ' || pp.campus || ' ' || pp.course || ' ' || pp.bio || ' ' || array_to_string(pp.skills,' ')) LIKE '%' || $3 || '%') AND ($4='' OR lower(pp.country)=lower($4)) AND ($5='' OR lower(pp.city)=lower($5)) AND ($6='' OR lower(pp.region)=lower($6)) AND ($7='' OR lower(pp.university)=lower($7)) ORDER BY pp.updated_at DESC LIMIT $8",
+      [persona,campus,q,country,city,region,university,limit]
     );
     return json(res, 200, { members: r.rows, count: r.rowCount, privacyNote: 'Only members who opt into the public directory appear here. Contact details are not exposed.' });
   }
