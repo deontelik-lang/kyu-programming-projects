@@ -739,6 +739,7 @@
       '<button type="button" class="so-help-topic so-help-topic-violet" data-so-help-target="soHelpGroupAccount"><span>◉</span><b>Account & plans</b><small>Profiles and pricing</small></button>',
       '<button type="button" class="so-help-topic so-help-topic-mint" data-so-help-target="soHelpGroupFaq"><span>◇</span><b>Payments & features</b><small>Clear answers, no guesswork</small></button>',
       '<button type="button" class="so-help-topic so-help-topic-rose" data-so-help-target="soHelpGroupSafety"><span>⌑</span><b>Safety & privacy</b><small>Report a problem</small></button>',
+      '<button type="button" class="so-help-topic so-help-topic-experience" data-so-help-target="soHelpGroupExperience"><span>✦</span><b>Sound & appearance</b><small>Animation, audio & access</small></button>',
       '</div><div class="so-help-policy-links"><span>Policies</span><button type="button" data-so-help-policy="terms">Terms of Service</button><button type="button" data-so-help-policy="privacy">Privacy</button><button type="button" data-so-help-policy="safety">Safety & disputes</button></div></div>',
       '<div id="soHelpGroups" class="so-help-groups" aria-label="Help topics"></div>',
       '<div class="so-help-contact-note"><span aria-hidden="true">✦</span><div><b>Still need help?</b><p>For a specific listing or booking, use the existing in-app report and dispute controls. Help content and policies live here together. StudentOS does not yet offer a staffed live-chat or support-ticket inbox.</p></div><button type="button" data-so-help-target="soHelpGroupSafety">Safety &amp; reporting ↗</button></div>',
@@ -766,6 +767,14 @@
       group.items.forEach(function(id){const node=$(id);if(node)content.appendChild(node);});
       groups.appendChild(details);
     });
+    const experience=document.createElement('details');
+    experience.className='so-help-group';experience.id='soHelpGroupExperience';experience.open=false;
+    experience.innerHTML='<summary><span class="so-help-group-number">05</span><span class="so-help-group-copy"><b>Sound, animation & visual preferences</b><small>How to launch the cinematic experience, change audio and control motion</small></span><span class="so-help-chevron" aria-hidden="true">⌄</span></summary><div class="so-help-group-content"><div class="so-help-experience-grid">'+
+      '<article class="so-help-experience-card"><span>◉</span><b>Launch the cinematic intro</b><p>From Home, choose “Launch experience” to see the animated city approach, accelerating concept car, light tunnel, rotating connected globe and StudentOS reveal. Use Skip intro or press Escape to close it.</p></article>'+
+      '<article class="so-help-experience-card"><span>♫</span><b>Choose your soundscape</b><p>Sound is optional. Use the fixed Sound control to turn effects on or off, set the volume or select Future City, Global Explorer, Study Mode or Premium Experience. The browser-generated soundtrack may sound different across devices.</p></article>'+
+      '<article class="so-help-experience-card"><span>◌</span><b>Access & troubleshooting</b><p>If audio does not play, interact with the sound control once and check your device volume. Intro speech depends on the browser voice system. Reduced-motion settings limit decorative motion; the app remains usable without sound.</p></article>'+
+      '</div><div class="so-help-experience-note"><b>What this is:</b> a real-time canvas-rendered 2.5D animation, not a prerecorded 3D film. Sound effects are synthesized locally in your browser. No soundtrack is required to use StudentOS, and sound remains user-controlled.</div></div>';
+    groups.appendChild(experience);
     root.dataset.studentosHelpReady='true';
   }
   function init() {
