@@ -8,6 +8,16 @@ for (const [index, source] of scripts.entries()) new vm.Script(source, { filenam
 for (const required of ['CampusHub — One App. Unlimited Opportunities.', '/api/fundis', '/api/bookings', '/api/auth/register', '/api/members', 'Campus & alumni network', 'state.platformProfile=d.platformProfile', 'name="publicDirectory"', 'function showPolicy', 'directPaymentLabel', 'providerPaymentPanel', 'loadAdminBookingDisputes', 'loadAdminFundiReports', 'Report profile', 'const kenyaCounties=', 'name="policyConsent"', 'function toggleTheme', 'function loadPublicStats', 'statMembersLabel', 'statProvidersLabel', 'function openSmartRequest', 'CampusHub Starter', 'manifest.webmanifest', '/sw.js', 'Tutors & academic support', '@media(max-width:570px)']) {
   if (!html.includes(required)) throw new Error('Required UI/API reference missing: ' + required);
 }
+for (const asset of ['public/engagement.css', 'public/engagement.js']) {
+  if (!fs.existsSync(asset)) throw new Error('CampusHub discovery asset missing: ' + asset);
+}
+new vm.Script(fs.readFileSync('public/engagement.js', 'utf8'), { filename: 'public/engagement.js' });
+const serverWithDiscovery = fs.readFileSync('server.js', 'utf8');
+if (!serverWithDiscovery.includes('/engagement.css?v=1') || !serverWithDiscovery.includes('/engagement.js?v=1')) throw new Error('Dynamic discovery assets are not injected into the homepage.');
+const engagement = fs.readFileSync('public/engagement.js', 'utf8');
+for (const required of ['Your momentum', 'Check in for today', '/api/hubs/listings?limit=80', '/api/fundis', 'on-device interest signals', 'data-save']) {
+  if (!engagement.includes(required)) throw new Error('Discovery and engagement requirement missing: ' + required);
+}
 const countyArray = html.match(/const kenyaCounties=(\[[^;]+\]);/);
 if (!countyArray) throw new Error('Kenyan county list is missing.');
 const counties = vm.runInNewContext(countyArray[1]);
