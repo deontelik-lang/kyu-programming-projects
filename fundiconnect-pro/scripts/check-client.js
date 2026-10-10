@@ -20,15 +20,19 @@ const studentos = fs.readFileSync('public/studentos.js', 'utf8');
 for (const required of ['COUNTRY_DATA', 'studentosGlobal', 'studentosLaunchpad', 'studentosEntertainment', 'My country', 'Worldwide', 'languageOptions', 'save-location', 'use-location', 'so-world-map', 'soCountryMapLegend', 'UI_TEXT', 'navGlobal', 'tileCampus', 'One home. Your whole world.', 'A global window into opportunity', 'soWorldUniversities', 'soWorldEvents', 'soWorldMedia', 'Preferred supported currency']) {
   if (!studentos.includes(required)) throw new Error('StudentOS global/app shell requirement missing: ' + required);
 }
+if (!studentos.includes('function syncHomeLocationFilter') || !studentos.includes("navCommunity:'الحرم والمجتمع'")) throw new Error('Global location selector or Arabic navigation label is incorrect.');
+if (!html.includes('payload.county=payload.region||payload.county') || !html.includes('payload.town=payload.city||payload.town')) throw new Error('Provider profile must save the global region and city into the searchable legacy fields.');
+const discoverySource = fs.readFileSync('public/engagement.js','utf8');
+if (!discoverySource.includes('item.city || item.town') || !discoverySource.includes('item.region || item.county')) throw new Error('Discovery cards must show global listing locations.');
 const countriesBlob = studentos.match(/const COUNTRY_DATA = `([^\`]+)`;/);
 if (!countriesBlob) throw new Error('The StudentOS world country list is missing.');
 const countryPairs = countriesBlob[1].split('|').map(value => value.slice(0, value.indexOf(':')));
 if (countryPairs.length < 240 || new Set(countryPairs).size !== countryPairs.length) throw new Error('Global country list must contain at least 240 unique country/territory codes.');
 const serverContentForStudentOS = fs.readFileSync('server.js', 'utf8');
-if (!serverContentForStudentOS.includes('/studentos.css?v=2') || !serverContentForStudentOS.includes('/studentos.js?v=2') || !serverContentForStudentOS.includes('/api/public/global-stats')) throw new Error('StudentOS design assets are not injected into the homepage.');
+if (!serverContentForStudentOS.includes('/studentos.css?v=2') || !serverContentForStudentOS.includes('/studentos.js?v=3') || !serverContentForStudentOS.includes('/api/public/global-stats')) throw new Error('StudentOS design assets are not injected into the homepage.');
 
 const serverWithDiscovery = fs.readFileSync('server.js', 'utf8');
-if (!serverWithDiscovery.includes('/engagement.css?v=1') || !serverWithDiscovery.includes('/engagement.js?v=1')) throw new Error('Dynamic discovery assets are not injected into the homepage.');
+if (!serverWithDiscovery.includes('/engagement.css?v=1') || !serverWithDiscovery.includes('/engagement.js?v=2')) throw new Error('Dynamic discovery assets are not injected into the homepage.');
 const engagement = fs.readFileSync('public/engagement.js', 'utf8');
 for (const required of ['Your momentum', 'Check in for today', '/api/hubs/listings?', '/api/fundis', 'on-device interest signals', 'data-save']) {
   if (!engagement.includes(required)) throw new Error('Discovery and engagement requirement missing: ' + required);
