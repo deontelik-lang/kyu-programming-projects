@@ -17,7 +17,7 @@
     fr:{navHome:'Accueil',navExplore:'Explorer',navGlobal:'Monde',navServices:'Services',navCommunity:'Vie étudiante',navMedia:'Médias',navAccount:'Mon espace',launchKicker:'VOTRE ÉCOSYSTÈME AU QUOTIDIEN',launchTitle:'Un espace. Votre monde entier.',launchLede:'Choisissez une destination et concentrez-vous sur une tâche à la fois.',tileCampus:'Campus et communauté',tileMySpace:'Mon espace',assistantTitle:'Besoin d’une prochaine étape ?',assistantBody:'Demandez à StudentOS un plan pratique pour les études, le travail ou le logement.',assistantButton:'Demander à StudentOS ↗',locationTitle:'Votre région de découverte',locationEdit:'Modifier ↗',hero1:'Étudier. Vivre.',hero2:'Travailler. Connecter.',hero3:'Créer. Explorer.'},
     es:{navHome:'Inicio',navExplore:'Explorar',navGlobal:'Global',navServices:'Servicios',navCommunity:'Campus',navMedia:'Medios',navAccount:'Mi espacio',launchKicker:'TU ECOSISTEMA DIARIO',launchTitle:'Un espacio. Todo tu mundo.',launchLede:'Elige un destino y céntrate en una tarea cada vez.',tileCampus:'Campus y comunidad',tileMySpace:'Mi espacio',assistantTitle:'¿Necesitas un siguiente paso?',assistantBody:'Pide a StudentOS un plan práctico para estudiar, trabajar, encontrar vivienda o avanzar profesionalmente.',assistantButton:'Preguntar a StudentOS ↗',locationTitle:'Tu región de descubrimiento',locationEdit:'Cambiar ubicación ↗',hero1:'Estudia. Vive.',hero2:'Trabaja. Conecta.',hero3:'Crea. Explora.'},
     pt:{navHome:'Início',navExplore:'Explorar',navGlobal:'Global',navServices:'Serviços',navCommunity:'Campus',navMedia:'Mídia',navAccount:'Meu espaço',launchKicker:'SEU ECOSSISTEMA DIÁRIO',launchTitle:'Um lugar. Seu mundo inteiro.',launchLede:'Escolha um destino e concentre-se em uma tarefa de cada vez.',tileCampus:'Campus e comunidade',tileMySpace:'Meu espaço',assistantTitle:'Precisa do próximo passo?',assistantBody:'Peça ao StudentOS um plano prático para estudo, trabalho, moradia ou carreira.',assistantButton:'Perguntar ao StudentOS ↗',locationTitle:'Sua região de descoberta',locationEdit:'Editar localização ↗',hero1:'Estude. Viva.',hero2:'Trabalhe. Conecte.',hero3:'Crie. Explore.'},
-    ar:{navHome:'الرئيسية',navExplore:'استكشف',navGlobal:'العالم',navServices:'الخدمات',navCommunity:'الحرم والمجتمع',navMedia:'الو��ائط',navAccount:'مساحتي',launchKicker:'منظومتك اليومية',launchTitle:'مكان واحد. عالمك كله.',launchLede:'اختر وجهة وركّز على مهمة واحدة في كل مرة.',tileCampus:'الحرم والمجتمع',tileMySpace:'مساحتي',assistantTitle:'هل تحتاج إلى خطوة تالية؟',assistantBody:'اطلب من StudentOS خطة عملية للدراسة أو العمل أو السكن أو التطور المهني.',assistantButton:'اسأل StudentOS ↗',locationTitle:'منطقة الاستكشاف',locationEdit:'تعديل الموقع ↗',hero1:'ادرس. عش.',hero2:'اعمل. تواصل.',hero3:'ابتكر. استكشف.'},
+    ar:{navHome:'الرئيسية',navExplore:'استكشف',navGlobal:'العالم',navServices:'الخدمات',navCommunity:'الحرم والمجتمع',navMedia:'الوسائط',navAccount:'مساحتي',launchKicker:'منظومتك اليومية',launchTitle:'مكان واحد. عالمك كله.',launchLede:'اختر وجهة وركّز على مهمة واحدة في كل مرة.',tileCampus:'الحرم والمجتمع',tileMySpace:'مساحتي',assistantTitle:'هل تحتاج إلى خطوة تالية؟',assistantBody:'اطلب من StudentOS خطة عملية للدراسة أو العمل أو السكن أو التطور المهني.',assistantButton:'اسأل StudentOS ↗',locationTitle:'منطقة الاستكشاف',locationEdit:'تعديل الموقع ↗',hero1:'ادرس. عش.',hero2:'اعمل. تواصل.',hero3:'ابتكر. استكشف.'},
     sw:{navHome:'Nyumbani',navExplore:'Gundua',navGlobal:'Kimataifa',navServices:'Huduma',navCommunity:'Kampasi',navMedia:'Media',navAccount:'Nafasi yangu',launchKicker:'MFUMO WAKO WA KILA SIKU',launchTitle:'Nyumbani pamoja. Dunia yako yote.',launchLede:'Chagua unakoenda na ushughulikie jambo moja kwa wakati.',tileCampus:'Kampasi na jamii',tileMySpace:'Nafasi yangu',assistantTitle:'Unahitaji hatua inayofuata?',assistantBody:'Uliza StudentOS mpango wa vitendo kuhusu masomo, kazi, makazi au taaluma.',assistantButton:'Uliza StudentOS ↗',locationTitle:'Eneo lako la ugunduzi',locationEdit:'Badili eneo ↗',hero1:'Soma. Ishi.',hero2:'Fanya kazi. Ungana.',hero3:'Buni. Gundua.'},
     zh:{navHome:'首页',navExplore:'探索',navGlobal:'全球',navServices:'服务',navCommunity:'校园与社区',navMedia:'媒体',navAccount:'我的空间',launchKicker:'你的日常生态系统',launchTitle:'一个家，连接整个世界。',launchLede:'选择一个目的地，一次专注完成一件事。',tileCampus:'校园与社区',tileMySpace:'我的空间',assistantTitle:'需要下一步建议吗？',assistantBody:'向 StudentOS 获取有关学习、工作、住宿或职业目标的实用计划。',assistantButton:'询问 StudentOS ↗',locationTitle:'你的探索地区',locationEdit:'编辑位置 ↗',hero1:'学习。生活。',hero2:'工作。连接。',hero3:'创造。探索。'},
     de:{navHome:'Start',navExplore:'Entdecken',navGlobal:'Weltweit',navServices:'Dienste',navCommunity:'Campus & Community',navMedia:'Medien',navAccount:'Mein Bereich',launchKicker:'DEIN ALLTÄGLICHES ÖKOSYSTEM',launchTitle:'Ein Zuhause. Deine ganze Welt.',launchLede:'Wähle einen Bereich und konzentriere dich jeweils auf eine Aufgabe.',tileCampus:'Campus & Community',tileMySpace:'Mein Bereich',assistantTitle:'Brauchst du den nächsten Schritt?',assistantBody:'Bitte StudentOS um einen praktischen Plan für Studium, Arbeit, Wohnen oder Karriere.',assistantButton:'StudentOS fragen ↗',locationTitle:'Deine Entdeckungsregion',locationEdit:'Standort ändern ↗',hero1:'Lernen. Leben.',hero2:'Arbeiten. Verbinden.',hero3:'Gestalten. Entdecken.'}
@@ -204,7 +204,7 @@
         <div class="so-field"><label for="so-${idSuffix}-language">Preferred language</label><select id="so-${idSuffix}-language" name="language" data-so-language>${languageOptions()}</select></div>
         <div class="so-field"><label for="so-${idSuffix}-region">Region / state / county</label><input id="so-${idSuffix}-region" name="region" maxlength="100" value="${esc(location.region)}" placeholder="e.g. Nairobi County, California"></div>
         <div class="so-field"><label for="so-${idSuffix}-city">City</label><input id="so-${idSuffix}-city" name="city" maxlength="100" value="${esc(location.city)}" placeholder="e.g. Nairobi, London"></div>
-        <div class="so-field"><label for="so-${idSuffix}-university">University / institution</label><input id="so-${idSuffix}-university" name="university" list="so-university-suggestions" maxlength="180" value="${esc(location.university)}" placeholder="Your campus or institution"></div>
+        <div class="so-field"><label for="so-${idSuffix}-university">University / institution</label><input id="so-${idSuffix}-university" name="university" maxlength="180" value="${esc(location.university)}" placeholder="Start typing your institution" list="so-university-suggestions"></div>
         <div class="so-field"><label for="so-${idSuffix}-currency">Preferred supported currency</label><select id="so-${idSuffix}-currency" name="currency" data-so-currency>${currencyOptions()}</select></div>
       </div><p class="studentos-field-note">Choose your own location. University suggestions cover selected institutions only; type any other institution. Automatic location lookup still needs a reverse-geocoding provider.</p>
     </fieldset>`;
@@ -428,6 +428,7 @@
     if (REGION_LANGUAGE[location.countryCode]) location.language = REGION_LANGUAGE[location.countryCode];
     persistLocation();
     updateLocationInputs();
+    updateUniversitySuggestions(location.countryCode);
     applyLanguage();
   }
   function applyMode(mode) {
@@ -547,7 +548,7 @@
     location.currency=CURRENCY_BY_COUNTRY[code]||'USD';
     location.language=REGION_LANGUAGE[code]||'en';location.mode='country';
     location.region='';location.city='';location.university='';
-    persistLocation();updateLocationInputs();applyLanguage();
+    persistLocation();updateLocationInputs();updateUniversitySuggestions(location.countryCode);applyLanguage();
     if ($('soLocationNote')) $('soLocationNote').textContent='Selected '+item.name+'. Press Save location to refresh current records.';
   }
   async function useDeviceLocation() {
@@ -730,6 +731,7 @@
     persistLocation();
     bind();
     updateLocationInputs();
+    updateUniversitySuggestions(location.countryCode);
     addMobileNav();
     applyLanguage();
     loadGlobalMapStats();
