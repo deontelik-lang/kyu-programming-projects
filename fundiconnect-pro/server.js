@@ -40,7 +40,12 @@ const categories = [
   { name: 'Gardeners', slug: 'gardener', description: 'Gardening, landscaping and grounds care' },
   { name: 'Appliance Repair', slug: 'appliance-repair', description: 'Repair and maintenance for home appliances' },
   { name: 'Security Installers', slug: 'security-installer', description: 'Access control, alarms and security equipment' },
-  { name: 'General Technicians', slug: 'technician', description: 'General technical troubleshooting and installation' }
+  { name: 'General Technicians', slug: 'technician', description: 'General technical troubleshooting and installation' },
+  { name: 'Solar & Backup Power Installers', slug: 'solar', description: 'Solar panels, inverters, batteries and backup power support' },
+  { name: 'Computer Repair & IT Support', slug: 'computer-repair', description: 'Computer troubleshooting, software setup and small-office IT support' },
+  { name: 'Moving & Delivery Services', slug: 'moving', description: 'Local moves, furniture transport and delivery help' },
+  { name: 'Handyperson & General Maintenance', slug: 'handyperson', description: 'Small repairs, fittings and general property maintenance' },
+  { name: 'Locksmiths & Access Control', slug: 'locksmith', description: 'Locks, keys and non-emergency access-control services' }
 ];
 
 const hubTypes = {
