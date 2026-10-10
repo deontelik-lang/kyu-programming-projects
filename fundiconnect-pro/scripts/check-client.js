@@ -11,11 +11,18 @@ for (const required of ['so-hub-browser', 'Campus life & community', 'Work, lear
 for (const required of ['StudentOS (CampusHub) — Study. Live. Work. Connect. Create. Explore.', '/api/fundis', '/api/bookings', '/api/auth/register', '/api/members', 'Campus & alumni network', 'state.platformProfile=d.platformProfile', 'name="publicDirectory"', 'function showPolicy', 'directPaymentLabel', 'providerPaymentPanel', 'loadAdminBookingDisputes', 'loadAdminFundiReports', 'Report profile', 'const kenyaCounties=', 'name="policyConsent"', 'function toggleTheme', 'function loadPublicStats', 'statMembersLabel', 'statProvidersLabel', 'function openSmartRequest', 'CampusHub Starter', 'manifest.webmanifest', '/sw.js', 'Tutors & academic support', '@media(max-width:570px)']) {
   if (!html.includes(required)) throw new Error('Required UI/API reference missing: ' + required);
 }
-for (const asset of ['public/engagement.css', 'public/engagement.js', 'public/studentos.css', 'public/studentos.js']) {
+for (const asset of ['public/engagement.css', 'public/engagement.js', 'public/studentos.css', 'public/studentos.js', 'public/soundscape.css', 'public/soundscape.js']) {
   if (!fs.existsSync(asset)) throw new Error('CampusHub discovery asset missing: ' + asset);
 }
 new vm.Script(fs.readFileSync('public/engagement.js', 'utf8'), { filename: 'public/engagement.js' });
 new vm.Script(fs.readFileSync('public/studentos.js', 'utf8'), { filename: 'public/studentos.js' });
+new vm.Script(fs.readFileSync('public/soundscape.js', 'utf8'), { filename: 'public/soundscape.js' });
+const soundscape = fs.readFileSync('public/soundscape.js','utf8');
+for (const required of ['StudentOSSounds','soIntroOverlay','soSoundPanel','Future City','Global Explorer','Study Mode','Premium Experience','prefers-reduced-motion','studentos:wallet-success','studentos:match-success','speechSynthesis','Welcome to <span class="gradient">StudentOS.</span>']) {
+  if (!soundscape.includes(required)) throw new Error('StudentOS soundscape requirement missing: ' + required);
+}
+const sw = fs.readFileSync('public/sw.js','utf8');
+if (!sw.includes('studentos-shell-v8') || !sw.includes('/soundscape.css?v=1') || !sw.includes('/soundscape.js?v=1')) throw new Error('Soundscape assets are missing from the refreshed PWA shell cache.');
 const studentos = fs.readFileSync('public/studentos.js', 'utf8');
 for (const required of ['COUNTRY_DATA', 'studentosGlobal', 'studentosLaunchpad', 'studentosEntertainment', 'My country', 'Worldwide', 'languageOptions', 'save-location', 'use-location', 'so-world-map', 'soCountryMapLegend', 'UI_TEXT', 'navGlobal', 'tileCampus', 'One home. Your whole world.', 'A global window into opportunity', 'soWorldUniversities', 'soWorldEvents', 'soWorldMedia', 'Preferred supported currency', 'UNIVERSITIES_BY_COUNTRY', 'updateUniversitySuggestions', 'Start typing your institution', 'UNIVERSITIES_BY_COUNTRY', 'updateUniversitySuggestions', 'so-university-suggestions']) {
   if (!studentos.includes(required)) throw new Error('StudentOS global/app shell requirement missing: ' + required);
@@ -33,7 +40,7 @@ if (!countriesBlob) throw new Error('The StudentOS world country list is missing
 const countryPairs = countriesBlob[1].split('|').map(value => value.slice(0, value.indexOf(':')));
 if (countryPairs.length < 240 || new Set(countryPairs).size !== countryPairs.length) throw new Error('Global country list must contain at least 240 unique country/territory codes.');
 const serverContentForStudentOS = fs.readFileSync('server.js', 'utf8');
-if (!serverContentForStudentOS.includes('/studentos.css?v=2') || !serverContentForStudentOS.includes('/studentos.js?v=4') || !serverContentForStudentOS.includes('/api/public/global-stats')) throw new Error('StudentOS design assets are not injected into the homepage.');
+if (!serverContentForStudentOS.includes('/studentos.css?v=2') || !serverContentForStudentOS.includes('/studentos.js?v=4') || !serverContentForStudentOS.includes('/soundscape.css?v=1') || !serverContentForStudentOS.includes('/soundscape.js?v=1') || !serverContentForStudentOS.includes('/api/public/global-stats')) throw new Error('StudentOS design or soundscape assets are not injected into the homepage.');
 
 const serverWithDiscovery = fs.readFileSync('server.js', 'utf8');
 if (!serverWithDiscovery.includes('/engagement.css?v=1') || !serverWithDiscovery.includes('/engagement.js?v=2')) throw new Error('Dynamic discovery assets are not injected into the homepage.');
@@ -68,4 +75,4 @@ for (const asset of ['public/manifest.webmanifest', 'public/sw.js', 'public/camp
 }
 const manifest = JSON.parse(fs.readFileSync('public/manifest.webmanifest', 'utf8'));
 if (manifest.short_name !== 'StudentOS' || !manifest.icons?.length) throw new Error('StudentOS PWA manifest is incomplete.');
-console.log('StudentOS/CampusHub client syntax, app shell, global country engine, theme, discovery, location migration, PWA assets and all 47 Kenyan counties are valid.');
+console.log('StudentOS/CampusHub client syntax, app shell, global country engine, cinematic soundscape, theme, discovery, location migration, PWA assets and all 47 Kenyan counties are valid.');
