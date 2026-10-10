@@ -25,6 +25,9 @@ let customerId = null;
 let fundiId = null;
 let fundiProfileId = null;
 let bookingId = null;
+let smartRequestId = null;
+let smartBookingId = null;
+let portfolioItemId = null;
 let hubListingId = null;
 let hubReportId = null;
 
@@ -86,8 +89,15 @@ async function cleanup() {
     let response = await request('/api/health');
     check('API and PostgreSQL health', response.status === 200 && response.data.database === true);
 
+    response = await request('/api/public/stats');
+    check('public statistics reveal aggregate counts without identities', response.status === 200 && Number.isInteger(response.data.members) && Number.isInteger(response.data.providers) && Number.isInteger(response.data.opportunities) && !('users' in response.data));
+    response = await request('/manifest.webmanifest');
+    check('CampusHub progressive web app manifest is served', response.status === 200 && response.data.short_name === 'CampusHub' && response.data.display === 'standalone');
+    response = await request('/sw.js');
+    check('offline shell service worker is served', response.status === 200);
+
     response = await request('/api/categories');
-    check('expanded service directory is seeded', response.status === 200 && response.data.categories.length >= 13 && response.data.categories.some(c => c.slug === 'plumber'));
+    check('expanded service directory is seeded', response.status === 200 && response.data.categories.length >= 20 && ['plumber','solar','computer-repair','moving','handyperson','locksmith','tutor','freelancer'].every(slug => response.data.categories.some(c => c.slug === slug)));
     response = await request('/api/hubs/types');
     check('13 super-app hubs are available', response.status === 200 && response.data.hubs.length === 13);
     response = await request('/api/payments/mpesa/config');
@@ -216,6 +226,35 @@ async function cleanup() {
     check('provider can update defaults without silently changing an existing booking', response.status === 200 && response.data.instructions.mpesa_till === '7654321');
     response = await request('/api/bookings/' + bookingId + '/payment-instructions', { cookie: customerCookie });
     check('accepted customer sees the payment-instruction snapshot from the quote', response.status === 200 && response.data.instructions.mpesa_till === '1234567' && response.data.accountName === 'Fundi Test Recipient' && response.data.paymentStatus === 'unpaid');
+
+    response = await request('/api/job-requests', {
+      method: 'POST', cookie: customerCookie,
+      body: { serviceTitle: 'WiFi troubleshooting', description: 'Diagnose and improve weak WiFi coverage in the living room.', categorySlug: 'network', county: 'Nairobi', town: 'Westlands' }
+    });
+    check('customer can broadcast one request to matching fundis', response.status === 201 && response.data.request.status === 'open' && response.data.providersNotified >= 1);
+    smartRequestId = response.data.request.id;
+    response = await request('/api/job-requests', { cookie: fundiCookie });
+    check('matching fundi receives a private job-desk invitation', response.status === 200 && (response.data.requests || []).some(r => r.id === smartRequestId && r.invitation_status === 'invited'));
+    response = await request('/api/fundi/toolkit', { cookie: fundiCookie });
+    check('fundi business toolkit summarizes active jobs and lead counts', response.status === 200 && Number.isFinite(Number(response.data.toolkit.open_leads)));
+    response = await request('/api/fundi/portfolio', { method: 'POST', cookie: fundiCookie, body: { title: 'Small office WiFi upgrade', description: 'Configured a dual-band router and improved wireless coverage across a small office.', county: 'Nairobi', completedYear: new Date().getFullYear(), isPublic: true } });
+    check('fundi can publish a portfolio project', response.status === 201 && response.data.item.is_public === true);
+    portfolioItemId = response.data.item.id;
+    response = await request('/api/fundis/' + fundiProfileId + '/portfolio');
+    check('customers can view public portfolio examples without private profile data', response.status === 200 && (response.data.items || []).some(i => i.id === portfolioItemId) && !('fundi_id' in ((response.data.items || []).find(i => i.id === portfolioItemId) || {})));
+    response = await request('/api/job-requests/' + smartRequestId + '/quotes', { method: 'POST', cookie: fundiCookie, body: { amount: 3000, notes: 'Includes diagnosis and router configuration; replacement hardware excluded.', estimatedStartAt: new Date(Date.now() + 86400000).toISOString() } });
+    check('fundi can send a comparable quote with scope and availability', response.status === 201 && Number(response.data.quote.amount) === 3000 && response.data.quote.status === 'submitted');
+    const smartQuoteId = response.data.quote.id;
+    response = await request('/api/job-requests', { cookie: customerCookie });
+    const smartRequest = (response.data.requests || []).find(r => r.id === smartRequestId);
+    check('customer can compare received quote and provider details', response.status === 200 && smartRequest?.quotes.some(q => q.id === smartQuoteId && Number(q.amount) === 3000 && q.fundi_name === 'FundiConnect Test Fundi'));
+    response = await request('/api/job-requests/' + smartRequestId + '/quotes/' + smartQuoteId + '/accept', { method: 'PATCH', cookie: customerCookie, body: {} });
+    check('accepting a quote creates a regular booking and closes the request', response.status === 201 && response.data.booking.status === 'accepted' && Number(response.data.booking.quoted_price) === 3000);
+    smartBookingId = response.data.booking.id;
+    response = await request('/api/job-requests/' + smartRequestId + '/quotes/' + smartQuoteId + '/accept', { method: 'PATCH', cookie: customerCookie, body: {} });
+    check('request locking prevents accepting a second quote after award', response.status === 409);
+    response = await request('/api/fundi/portfolio/' + portfolioItemId, { method: 'DELETE', cookie: fundiCookie });
+    check('fundi can remove a portfolio project they own', response.status === 200);
     response = await request('/api/bookings/' + bookingId + '/payment-confirmation', { method: 'POST', cookie: customerCookie, body: { action: 'customer_paid', method: 'mpesa_till', reference: 'TEST-RECEIPT-01' } });
     check('customer payment report is timestamped but not independently verified', response.status === 200 && response.data.booking.direct_payment_status === 'customer_reported_paid' && Boolean(response.data.booking.customer_payment_confirmed_at));
     response = await request('/api/bookings/' + bookingId + '/payment-confirmation', { method: 'POST', cookie: fundiCookie, body: { action: 'provider_received', method: 'mpesa_till' } });
