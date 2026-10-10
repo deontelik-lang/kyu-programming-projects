@@ -97,7 +97,7 @@ async function cleanup() {
     check('discovery styles are served', discoveryCss.status === 200 && cssText.includes('.dh-glass') && cssText.includes('prefers-reduced-motion'));
     check('discovery interaction layer is served', discoveryJs.status === 200 && jsText.includes('Your momentum') && jsText.includes('/api/hubs/listings?'));
     check('StudentOS responsive app shell styles are served', studentosCss.status === 200 && soCssText.includes('.so-launch-grid') && soCssText.includes('.so-mobile-nav'));
-    check('StudentOS global country engine, interactive map and media view are served', studentosJs.status === 200 && soJsText.includes('COUNTRY_DATA') && soJsText.includes('studentosEntertainment') && soJsText.includes('My university') && soJsText.includes('so-world-map') && soJsText.includes('UI_TEXT') && soJsText.includes('syncHomeLocationFilter'));
+    check('StudentOS global country engine, interactive map, university suggestions and media view are served', studentosJs.status === 200 && soJsText.includes('COUNTRY_DATA') && soJsText.includes('studentosEntertainment') && soJsText.includes('My university') && soJsText.includes('so-world-map') && soJsText.includes('UI_TEXT') && soJsText.includes('syncHomeLocationFilter') && soJsText.includes('UNIVERSITIES_BY_COUNTRY') && soJsText.includes('so-university-suggestions'));
 
     let response = await request('/api/health');
     check('API and PostgreSQL health', response.status === 200 && response.data.database === true);
