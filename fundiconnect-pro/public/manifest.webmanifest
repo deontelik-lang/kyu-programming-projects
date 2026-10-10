@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "CampusHub — One App. Unlimited Opportunities.",
-  "short_name": "CampusHub",
-  "description": "A connected ecosystem for student life, local services and opportunities.",
+  "name": "StudentOS (CampusHub) — Study. Live. Work. Connect. Create. Explore.",
+  "short_name": "StudentOS",
+  "description": "A global student-life ecosystem for accommodation, work, learning, services, creators and communities.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -17,5 +17,10 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["education", "social", "lifestyle", "business"]
+  "categories": [
+    "education",
+    "social",
+    "lifestyle",
+    "business"
+  ]
 }
