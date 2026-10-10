@@ -1,7 +1,7 @@
 'use strict';
 
-const CACHE_NAME = 'studentos-shell-v8';
-const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/campushub-icon.svg', '/engagement.css?v=1', '/engagement.js?v=2', '/studentos.css?v=2', '/studentos.js?v=4', '/soundscape.css?v=1', '/soundscape.js?v=1'];
+const CACHE_NAME = 'studentos-shell-v10';
+const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/campushub-icon.svg', '/engagement.css?v=1', '/engagement.js?v=2', '/studentos.css?v=3', '/studentos.js?v=6', '/soundscape.css?v=3', '/soundscape.js?v=3'];
 
 self.addEventListener('install', event => {
   event.waitUntil(
