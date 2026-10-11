@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CBC Success Hub — 200,000+ Revision Papers | Unlock via M-Pesa</title>
-<meta name="description" content="Kenya's largest revision paper library. KJSEA, KPSEA, Grade 7-10 & KCSE papers, mocks, predictions. Preview 2 pages free, unlock full papers via M-Pesa Paybill 522522.">
+<meta name="description" content="Kenya's largest revision paper library. KJSEA, KPSEA, Grade 7-10 & KCSE papers, mocks, predictions. Preview two pages free. Unlock each complete question paper and separate marking-scheme PDF for KSh 30 after payment verification.">
 <style>
 :root{--green:#006341;--green2:#00875a;--red:#A6192E;--ink:#1a1a1a;--grey:#f4f6f5;--line:#e2e8e5}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',system-ui,sans-serif}
@@ -185,7 +185,7 @@ footer a{color:#7fd6ae}
     <div class="steps">
       <div class="step"><div class="n">1</div><h4>Preview free</h4><p>Open any paper and read the <b>first 2 pages free</b>. No payment needed.</p></div>
       <div class="step"><div class="n">2</div><h4>Pay via M-Pesa Paybill</h4><p>Go to <b>Lipa na M-Pesa → Paybill</b>, enter the details below and pay the paper's price.</p></div>
-      <div class="step"><div class="n">3</div><h4>Get full paper instantly</h4><p>Enter your confirmation code here or WhatsApp <b>0794139667</b> — we verify in minutes and send your full paper.</p></div>
+      <div class="step"><div class="n">3</div><h4>Unlock your PDFs</h4><p>Submit your M-Pesa receipt code. Downloads stay locked until a staff member matches the KSh 30 payment against the merchant records.</p></div>
     </div>
     <div class="paybox">
       <h4 style="margin-bottom:8px">💳 M-Pesa Payment Details</h4>
@@ -194,7 +194,7 @@ footer a{color:#7fd6ae}
   </section>
 
   <section class="container">
-    <h2 class="sec-title">🎁 Free Samples</h2>
+    <h2 class="sec-title">🎁 Free Exam Previews</h2>
     <p class="sec-sub">Preview the first 2 pages free. Download the complete question paper and separate marking-scheme PDF for KSh 30 after payment verification.</p>
     <div id="free-grid" class="doc-grid"></div>
   </section>
@@ -358,7 +358,7 @@ CATS.forEach(c=>{
  freebies.forEach(s=>{
   n++;
   const paper=SAMPLE_PAPERS[s.paperKey];
-  const pages=paper?Math.ceil(paper.questions.length/3):3;
+  const pages=paper?(paper.pageCount||Math.ceil(paper.questions.length/3)):3;
   DOCS.push(mk('d'+n,c.id,s.subject,s.title,2026,pages,30,true,s.paperKey));
  });
  for(let i=0;i<6;i++){
