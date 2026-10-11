@@ -27,7 +27,13 @@ for (const required of ['StudentOSSounds','soIntroOverlay','soSoundPanel','Futur
   if (!soundscape.includes(required)) throw new Error('StudentOS soundscape requirement missing: ' + required);
 }
 const sw = fs.readFileSync('public/sw.js','utf8');
-if (!sw.includes('studentos-shell-v16') || !sw.includes('/soundscape.css?v=7') || !sw.includes('/soundscape.js?v=8') || !sw.includes('/studentos.css?v=4') || !sw.includes('/studentos.js?v=8')) throw new Error('Soundscape assets are missing from the refreshed PWA shell cache.');
+if (!sw.includes('studentos-shell-v17') || !sw.includes('/soundscape.css?v=7') || !sw.includes('/soundscape.js?v=8') || !sw.includes('/studentos.css?v=5') || !sw.includes('/studentos.js?v=9')) throw new Error('Soundscape assets are missing from the refreshed PWA shell cache.');
+const createComposer = html;
+for (const required of ['pendingPublishType:null','function resumePendingPublish','window.StudentOS.prepareListingForm','hubCreateError','function showListingError','function contentDate','Your post is now live in','Publish to StudentOS']) {
+  if (!createComposer.includes(required)) throw new Error('Content publishing workflow requirement missing: ' + required);
+}
+const studentosComposer = fs.readFileSync('public/studentos.js','utf8');
+if (!studentosComposer.includes('prepareListingForm(form) { attachFormFields(form); }') || !studentosComposer.includes('mediaInput.required=isMedia') || !studentosComposer.includes('data-so-action="create-content"') || !studentosComposer.includes("element.dataset.soAction==='create-content'")) throw new Error('Content composer must synchronously load global fields and require a public URL for media listings.');
 const studentos = fs.readFileSync('public/studentos.js', 'utf8');
 for (const required of ['studentosHelpCentre','soHelpGroupExperience','Interaction feedback','Colour & visual language','Sound, animation & visual preferences']) {
   if (!studentos.includes(required)) throw new Error('StudentOS central Help & Support requirement missing: ' + required);
@@ -39,6 +45,7 @@ if (!studentos.includes('function syncHomeLocationFilter') || !studentos.include
 for (const required of ['studentosHelpCentre','soHelpSearch','soHelpGroupStart','soHelpGroupAccount','soHelpGroupFaq','soHelpGroupSafety','soHelpGroupExperience','Sound & appearance','data-so-help-policy','navHelp','Help without the hunt.','so-help-contact-note','so-help-experience-card','Sound, animation & visual preferences','does not yet offer a staffed live-chat or support-ticket inbox.']) {
   if (!studentos.includes(required)) throw new Error('StudentOS central Help Centre requirement missing: ' + required);
 }
+if (!studentos.includes('so-create-card') || !studentos.includes("element.dataset.soAction==='create-content'")) throw new Error('A home-screen Create content shortcut must be available.');
 if (!studentos.includes('organizeHelpCentre();') || !studentos.includes("help: ['studentosHelpCentre','how','journeys','membership','faq','contact','trust']")) throw new Error('Help content must be consolidated in the dedicated Help Centre destination.');
 const hubRouteSource = fs.readFileSync('hubs.js','utf8');
 if (!hubRouteSource.includes('lower(pp.region)=lower($6)') || !hubRouteSource.includes('lower(pp.university)=lower($7)')) throw new Error('Public student discovery must filter by region and university as well as country/city.');
@@ -52,7 +59,7 @@ if (!countriesBlob) throw new Error('The StudentOS world country list is missing
 const countryPairs = countriesBlob[1].split('|').map(value => value.slice(0, value.indexOf(':')));
 if (countryPairs.length < 240 || new Set(countryPairs).size !== countryPairs.length) throw new Error('Global country list must contain at least 240 unique country/territory codes.');
 const serverContentForStudentOS = fs.readFileSync('server.js', 'utf8');
-if (!serverContentForStudentOS.includes('/studentos.css?v=4') || !serverContentForStudentOS.includes('/studentos.js?v=8') || !serverContentForStudentOS.includes('/soundscape.css?v=7') || !serverContentForStudentOS.includes('/soundscape.js?v=8') || !serverContentForStudentOS.includes('/api/public/global-stats')) throw new Error('StudentOS design or soundscape assets are not injected into the homepage.');
+if (!serverContentForStudentOS.includes('/studentos.css?v=5') || !serverContentForStudentOS.includes('/studentos.js?v=9') || !serverContentForStudentOS.includes('/soundscape.css?v=7') || !serverContentForStudentOS.includes('/soundscape.js?v=8') || !serverContentForStudentOS.includes('/api/public/global-stats')) throw new Error('StudentOS design or soundscape assets are not injected into the homepage.');
 
 const serverWithDiscovery = fs.readFileSync('server.js', 'utf8');
 if (!serverWithDiscovery.includes('/engagement.css?v=1') || !serverWithDiscovery.includes('/engagement.js?v=2')) throw new Error('Dynamic discovery assets are not injected into the homepage.');
