@@ -244,3 +244,44 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @keyframes soGlobalLight{0%,58%{transform:translateX(-42%);opacity:0}66%{opacity:1}90%,100%{transform:translateX(42%);opacity:0}}
 @media(max-width:650px){.so-intro-banner{min-height:0}.so-launch-card:hover{transform:translateY(-2px)}.hero:after{display:none}}
 @media(prefers-reduced-motion:reduce){.campus-brand .brandmark:after,.hero:after,.so-intro-launch:after,.so-global-hero:after{animation:none!important}.so-launch-card,.so-help-topic{transition:none!important}.so-launch-card:hover,.so-help-topic:hover{transform:none}}
+
+/* Creator/publishing workflow: visible fields, legible validation and confident submission states. */
+#hubCreateForm{display:grid;gap:5px}
+#hubCreateForm .field{min-width:0;margin:7px 0}
+#hubCreateForm .field label{color:var(--ink);font-weight:800}
+#hubCreateForm .field input,#hubCreateForm .field select,#hubCreateForm .field textarea{
+ width:100%;max-width:100%;min-width:0;border:1px solid color-mix(in srgb,var(--line) 68%,var(--so-electric) 32%);
+ border-radius:12px;background:color-mix(in srgb,var(--surface) 96%,#132849);color:var(--ink);
+ padding:12px 13px;font:inherit;font-size:12px;transition:border-color .2s,box-shadow .2s,background .2s
+}
+#hubCreateForm .field textarea{min-height:110px;resize:vertical;line-height:1.65}
+#hubCreateForm .field input:focus,#hubCreateForm .field select:focus,#hubCreateForm .field textarea:focus{
+ outline:none;border-color:var(--so-electric);box-shadow:0 0 0 4px color-mix(in srgb,var(--so-electric) 14%,transparent);background:var(--surface)
+}
+#hubCreateForm .field input::placeholder,#hubCreateForm .field textarea::placeholder{color:var(--muted);opacity:.8}
+#hubCreateForm .help{font-size:10px;line-height:1.65;color:var(--muted)}
+#hubCreateForm fieldset.studentos-fields{margin:0 0 10px;padding:14px;border:1px solid color-mix(in srgb,var(--line) 62%,var(--so-electric) 38%);border-radius:15px;background:linear-gradient(145deg,color-mix(in srgb,var(--surface) 97%,#0891b2 3%),color-mix(in srgb,var(--surface) 97%,#7c3aed 3%))}
+#hubCreateForm fieldset.studentos-fields legend{padding:0 8px;color:var(--so-electric);font-size:9px;font-weight:900;letter-spacing:.14em}
+#hubCreateForm .studentos-field-note{color:var(--muted);font-size:9px;line-height:1.7}
+#hubCreateForm .so-media-url-field{margin:5px 0 13px!important;padding:13px!important;border:1px solid #a78bfa65!important;border-radius:13px!important;background:linear-gradient(135deg,#8b5cf610,#22d3ee0a)!important}
+#hubCreateForm .so-media-url-field label{display:block;margin-bottom:5px}
+#hubCreateForm .so-media-url-field .help{display:block;margin-top:7px}
+#hubCreateError{font-size:11px;line-height:1.65;margin:5px 0 9px;scroll-margin:20px}
+#hubCreateSubmit{position:relative;min-height:46px;margin-top:10px;border-radius:13px;font-size:12px;font-weight:900;letter-spacing:.01em}
+#hubCreateSubmit[aria-busy="true"]{cursor:progress;filter:saturate(.8);opacity:.87}
+#hubCreateSubmit[aria-busy="true"]:before{content:"";display:inline-block;vertical-align:middle;width:12px;height:12px;margin-right:8px;border:2px solid #ffffff70;border-top-color:#fff;border-radius:50%;animation:soPublishSpin .65s linear infinite}
+.so-intro-banner,.so-media-hero,.so-global-hero{isolation:isolate}
+.hub-card{border-color:color-mix(in srgb,var(--line) 78%,var(--so-electric) 22%);box-shadow:0 9px 26px #02061708;transition:transform .24s,border-color .24s,box-shadow .24s}
+.hub-card:hover{transform:translateY(-3px);border-color:#67e8f982;box-shadow:0 17px 38px #02061716,0 0 0 1px #22d3ee0a}
+.hub-card-top .hub-label{background:linear-gradient(105deg,#22d3ee12,#8b5cf612);border-color:#67e8f930}
+.hub-card-actions .btn{transition:transform .18s,border-color .18s,box-shadow .18s}
+.hub-card-actions .btn:hover{transform:translateY(-1px)}
+.so-media-card:focus-visible,.so-global-link:focus-visible,.so-launch-card:focus-visible{outline:3px solid var(--so-electric);outline-offset:3px}
+@keyframes soPublishSpin{to{transform:rotate(360deg)}}
+@media(max-width:650px){#hubCreateForm fieldset.studentos-fields{padding:10px}#hubCreateSubmit{min-height:44px}}
+@media(prefers-reduced-motion:reduce){.hub-card,.hub-card-actions .btn{transition:none!important}.hub-card:hover,.hub-card-actions .btn:hover{transform:none!important}#hubCreateSubmit[aria-busy="true"]:before{animation:none!important}}
+
+.so-create-card{--so-accent:#f472b6!important;border-color:#e879f951!important;background:linear-gradient(145deg,color-mix(in srgb,var(--surface) 88%,#7c3aed 12%),color-mix(in srgb,var(--surface) 93%,#db2777 7%))!important}
+.so-create-card .so-launch-icon{background:linear-gradient(140deg,#7c3aed26,#e879f925);box-shadow:0 0 20px #c084fc16}
+.so-create-card:hover{border-color:#e879f9a0!important;box-shadow:0 16px 35px #a21caf20,0 0 0 1px #e879f918!important}
+@media(max-width:650px){.so-create-card{grid-column:span 1}}
