@@ -23,11 +23,11 @@ const threeD = fs.readFileSync('scripts/studentos-3d-entry.js','utf8');
 for (const required of ['new THREE.WebGLRenderer','GLTFLoader','function buildGlobe','function buildTunnel','function addCarAccents','MeshPhysicalMaterial','TorusGeometry','state.wheels.forEach','state.globeRoutes.forEach','studentos-sports-car.glb']) {
  if (!threeD.includes(required)) throw new Error('StudentOS native 3D scene requirement missing: ' + required);
 }
-for (const required of ['StudentOSSounds','soIntroOverlay','soSoundPanel','Future City','Global Explorer','Study Mode','Premium Experience','prefers-reduced-motion','studentos:wallet-success','studentos:match-success','speechSynthesis','Welcome to <span class="gradient">StudentOS.</span>', 'soCinemaCar3d', 'studentos-3d.bundle.js?v=2', 'ensureStudentOS3D', 'soCinemaStatus', 'deep-space orbital stage', 'soCinemaCanvas', 'requestAnimationFrame', 'cinemaGlobe', 'cinemaTunnel', 'cinemaCar', 'cinemaSnapshotCanvas', 'cinemaSceneTransitionDuration', 'so-scene-copy-enter', 'soHeroPreviewCanvas', 'function heroDraw', 'function startHeroPreview', 'LIVE RENDER', 'Experience the next era of student life', 'Live canvas animation']) {
+for (const required of ['StudentOSSounds','soIntroOverlay','soSoundPanel','Future City','Global Explorer','Study Mode','Premium Experience','prefers-reduced-motion','studentos:wallet-success','studentos:match-success','speechSynthesis','Welcome to <span class="gradient">StudentOS.</span>', 'soCinemaCar3d', 'studentos-3d.bundle.js?v=3', 'ensureStudentOS3D', 'soCinemaStatus', 'deep-space orbital stage', 'soCinemaCanvas', 'requestAnimationFrame', 'cinemaGlobe', 'cinemaTunnel', 'cinemaCar', 'cinemaSnapshotCanvas', 'cinemaSceneTransitionDuration', 'so-scene-copy-enter', 'soHeroPreviewCanvas', 'function heroDraw', 'function startHeroPreview', 'LIVE RENDER', 'Experience the next era of student life', 'Live canvas animation']) {
   if (!soundscape.includes(required)) throw new Error('StudentOS soundscape requirement missing: ' + required);
 }
 const sw = fs.readFileSync('public/sw.js','utf8');
-if (!sw.includes('studentos-shell-v15') || !sw.includes('/soundscape.css?v=7') || !sw.includes('/soundscape.js?v=7') || !sw.includes('/studentos.css?v=4') || !sw.includes('/studentos.js?v=8')) throw new Error('Soundscape assets are missing from the refreshed PWA shell cache.');
+if (!sw.includes('studentos-shell-v16') || !sw.includes('/soundscape.css?v=7') || !sw.includes('/soundscape.js?v=8') || !sw.includes('/studentos.css?v=4') || !sw.includes('/studentos.js?v=8')) throw new Error('Soundscape assets are missing from the refreshed PWA shell cache.');
 const studentos = fs.readFileSync('public/studentos.js', 'utf8');
 for (const required of ['studentosHelpCentre','soHelpGroupExperience','Interaction feedback','Colour & visual language','Sound, animation & visual preferences']) {
   if (!studentos.includes(required)) throw new Error('StudentOS central Help & Support requirement missing: ' + required);
@@ -52,7 +52,7 @@ if (!countriesBlob) throw new Error('The StudentOS world country list is missing
 const countryPairs = countriesBlob[1].split('|').map(value => value.slice(0, value.indexOf(':')));
 if (countryPairs.length < 240 || new Set(countryPairs).size !== countryPairs.length) throw new Error('Global country list must contain at least 240 unique country/territory codes.');
 const serverContentForStudentOS = fs.readFileSync('server.js', 'utf8');
-if (!serverContentForStudentOS.includes('/studentos.css?v=4') || !serverContentForStudentOS.includes('/studentos.js?v=8') || !serverContentForStudentOS.includes('/soundscape.css?v=7') || !serverContentForStudentOS.includes('/soundscape.js?v=7') || !serverContentForStudentOS.includes('/api/public/global-stats')) throw new Error('StudentOS design or soundscape assets are not injected into the homepage.');
+if (!serverContentForStudentOS.includes('/studentos.css?v=4') || !serverContentForStudentOS.includes('/studentos.js?v=8') || !serverContentForStudentOS.includes('/soundscape.css?v=7') || !serverContentForStudentOS.includes('/soundscape.js?v=8') || !serverContentForStudentOS.includes('/api/public/global-stats')) throw new Error('StudentOS design or soundscape assets are not injected into the homepage.');
 
 const serverWithDiscovery = fs.readFileSync('server.js', 'utf8');
 if (!serverWithDiscovery.includes('/engagement.css?v=1') || !serverWithDiscovery.includes('/engagement.js?v=2')) throw new Error('Dynamic discovery assets are not injected into the homepage.');

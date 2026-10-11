@@ -88,13 +88,13 @@ async function cleanup() {
   try {
     const homepageResponse = await fetch(base + '/', { headers: { 'x-forwarded-for': testIp } });
     const homepageHtml = await homepageResponse.text();
-    check('homepage injects StudentOS discovery and refreshed cinematic assets', homepageResponse.status === 200 && homepageHtml.includes('/engagement.css?v=1') && homepageHtml.includes('/engagement.js?v=2') && homepageHtml.includes('/studentos.css?v=4') && homepageHtml.includes('/studentos.js?v=8') && homepageHtml.includes('/soundscape.css?v=7') && homepageHtml.includes('/soundscape.js?v=7'));
+    check('homepage injects StudentOS discovery and refreshed cinematic assets', homepageResponse.status === 200 && homepageHtml.includes('/engagement.css?v=1') && homepageHtml.includes('/engagement.js?v=2') && homepageHtml.includes('/studentos.css?v=4') && homepageHtml.includes('/studentos.js?v=8') && homepageHtml.includes('/soundscape.css?v=7') && homepageHtml.includes('/soundscape.js?v=8'));
     const discoveryCss = await fetch(base + '/engagement.css?v=1');
     const discoveryJs = await fetch(base + '/engagement.js?v=2');
     const studentosCss = await fetch(base + '/studentos.css?v=4');
     const studentosJs = await fetch(base + '/studentos.js?v=8');
     const soundscapeCss = await fetch(base + '/soundscape.css?v=7');
-    const soundscapeJs = await fetch(base + '/soundscape.js?v=7');
+    const soundscapeJs = await fetch(base + '/soundscape.js?v=8');
     const [cssText, jsText, soCssText, soJsText, cinemaCssText, cinemaJsText] = await Promise.all([discoveryCss.text(), discoveryJs.text(), studentosCss.text(), studentosJs.text(), soundscapeCss.text(), soundscapeJs.text()]);
     check('discovery styles are served', discoveryCss.status === 200 && cssText.includes('.dh-glass') && cssText.includes('prefers-reduced-motion'));
     check('discovery interaction layer is served', discoveryJs.status === 200 && jsText.includes('Your momentum') && jsText.includes('/api/hubs/listings?'));
@@ -103,7 +103,7 @@ async function cleanup() {
     check('StudentOS Help Centre consolidates help, FAQs, safety and account guidance', studentosJs.status === 200 && soJsText.includes('studentosHelpCentre') && soJsText.includes('soHelpSearch') && ['soHelpGroupStart','soHelpGroupAccount','soHelpGroupFaq','soHelpGroupSafety','soHelpGroupExperience'].every(id=>soJsText.includes(id)) && soJsText.includes('Sound & appearance'));
     check('live cinema renderer and aurora visuals are served', soundscapeJs.status === 200 && cinemaJsText.includes('soCinemaCanvas') && cinemaJsText.includes('requestAnimationFrame') && cinemaJsText.includes('cinemaGlobe') && cinemaJsText.includes('cinemaTunnel') && cinemaJsText.includes('cinemaCar') && cinemaJsText.includes('soHeroPreviewCanvas') && cinemaJsText.includes('function heroDraw') && cinemaJsText.includes('ensureStudentOS3D') && cinemaJsText.includes('soCinemaCar3d') && soundscapeCss.status === 200 && cinemaCssText.includes('.so-cinema-canvas') && cinemaCssText.includes('.so-cinema-car3d') && cinemaCssText.includes('.so-help-topic-grid') && cinemaCssText.includes('#22d3ee') && cinemaCssText.includes('so-scene-copy-enter') && cinemaCssText.includes('soSceneLightSweep') && cinemaCssText.includes('.so-intro-preview') && cinemaCssText.includes('.so-help-experience-card'));
     const modelHead = await fetch(base + '/assets/studentos-sports-car.glb', { method: 'HEAD' });
-    const rendererBundle = await fetch(base + '/studentos-3d.bundle.js?v=2');
+    const rendererBundle = await fetch(base + '/studentos-3d.bundle.js?v=3');
     const rendererBundleText = rendererBundle.status === 200 ? await rendererBundle.text() : '';
     check('verified 3D car model and lazy Three.js bundle are served', modelHead.status === 200 && modelHead.headers.get('content-type') === 'model/gltf-binary' && Number(modelHead.headers.get('content-length')) > 1000000 && rendererBundle.status === 200 && rendererBundleText.includes('WebGLRenderer') && rendererBundleText.length > 500000);
     let response = await request('/api/health');

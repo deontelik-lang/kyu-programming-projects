@@ -305,7 +305,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     if(!state.renderer||!state.ready||!state.car||!state.visible||document.hidden)return;
     resize();
     var name=state.sceneName,elapsed=Math.max(0,now-state.sceneStart),seconds=now*.001;
-    var carActive=['car','acceleration','tunnel'].indexOf(name)>=0;
+    // Let the outgoing 3D car recede behind the growing globe during the global reveal.
+    var carActive=['car','acceleration','tunnel'].indexOf(name)>=0||(name==='globe'&&elapsed<860);
     var globeActive=['globe','reveal'].indexOf(name)>=0;
     state.car.visible=carActive; if(state.globeGroup)state.globeGroup.visible=globeActive;
     if(state.tunnelGroup)state.tunnelGroup.visible=name==='tunnel';
@@ -352,6 +353,13 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
         state.car.scale.setScalar(state.baseScale*(1.02+.22*e));
         state.car.position.x=Math.sin(seconds*1.4)*.055*(1-p);state.car.position.z=-.25-4.7*e;
         state.car.rotation.y=-.19+Math.sin(seconds*1.3)*.025*(1-p);state.car.rotation.z=Math.sin(seconds*1.6)*.009*(1-p);
+      }else if(name==='globe'){
+        var recede=clamp(elapsed/860,0,1),recedeEase=ease(recede);
+        state.car.scale.setScalar(state.baseScale*(1-.65*recedeEase));
+        state.car.position.x=-.18-.48*recedeEase;
+        state.car.position.z=-1.15*recedeEase;
+        state.car.rotation.y=-.26+.48*recedeEase;
+        state.car.rotation.z=-.035*recedeEase;
       }
       var spin=now*.001*(name==='acceleration'?3.7:name==='tunnel'?2.2:1.15);
       state.wheels.forEach(function(item,index){item.node.rotation.x=item.rotation+spin*(index%2?-1:1);});

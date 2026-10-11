@@ -726,7 +726,7 @@
     if(threeDBundlePromise)return threeDBundlePromise;
     threeDBundlePromise=new Promise(function(resolve){
       var script=document.createElement('script');
-      script.src='/studentos-3d.bundle.js?v=2';script.async=true;
+      script.src='/studentos-3d.bundle.js?v=3';script.async=true;
       script.onload=function(){
         var engine=window.StudentOS3D;
         if(!engine||typeof engine.load!=='function'){
