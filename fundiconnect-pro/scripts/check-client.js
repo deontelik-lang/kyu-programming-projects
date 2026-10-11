@@ -27,7 +27,8 @@ for (const required of ['StudentOSSounds','soIntroOverlay','soSoundPanel','Futur
   if (!soundscape.includes(required)) throw new Error('StudentOS soundscape requirement missing: ' + required);
 }
 const sw = fs.readFileSync('public/sw.js','utf8');
-if (!sw.includes('studentos-shell-v17') || !sw.includes('/soundscape.css?v=7') || !sw.includes('/soundscape.js?v=8') || !sw.includes('/studentos.css?v=5') || !sw.includes('/studentos.js?v=9')) throw new Error('Soundscape assets are missing from the refreshed PWA shell cache.');
+if (!sw.includes('studentos-shell-v18') || !sw.includes('/soundscape.css?v=7') || !sw.includes('/soundscape.js?v=8') || !sw.includes('/studentos.css?v=5') || !sw.includes('/studentos.js?v=9')) throw new Error('Soundscape assets are missing from the refreshed PWA shell cache.');
+if (!html.includes("policyConsent:f.has('policyConsent')")) throw new Error('Registration form must forward required policy consent to the API.');
 const createComposer = html;
 for (const required of ['pendingPublishType:null','function resumePendingPublish','window.StudentOS.prepareListingForm','hubCreateError','function showListingError','function contentDate','Your post is now live in','Publish to StudentOS']) {
   if (!createComposer.includes(required)) throw new Error('Content publishing workflow requirement missing: ' + required);
