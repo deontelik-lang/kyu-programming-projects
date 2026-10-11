@@ -385,7 +385,7 @@ function showPolicy(kind){
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
 'use strict';
-const state={user:null,profile:null,platformProfile:null,category:'',fundis:[],bookings:[],notifications:[],lastToast:0,members:[],hubActivity:{myListings:[],myActions:[]},rewards:null,providerPaymentInstructions:{accepted_methods:[]},jobRequests:[],fundiToolkit:null,portfolioItems:[]};
+const state={user:null,profile:null,platformProfile:null,category:'',fundis:[],bookings:[],notifications:[],lastToast:0,members:[],hubActivity:{myListings:[],myActions:[]},rewards:null,providerPaymentInstructions:{accepted_methods:[]},jobRequests:[],fundiToolkit:null,portfolioItems:[],pendingPublishType:null};
 const $=id=>document.getElementById(id);
 function applyTheme(theme){
  const next=theme==='light'?'light':'dark';
@@ -457,13 +457,43 @@ function openAuth(mode='login',defaultRole=''){
  }
 }
 
-async function submitLogin(e){e.preventDefault();const f=new FormData(e.currentTarget),btn=$('loginSubmit');btn.disabled=true;btn.textContent='Signing in…';try{await api('/api/auth/login',{method:'POST',body:JSON.stringify({identifier:f.get('identifier'),password:f.get('password')})});closeModal();await refreshMe();toast('Signed in successfully.');showDashboard()}catch(err){toast(err.message)}finally{btn.disabled=false;btn.textContent='Sign in'}}
+async function resumePendingPublish(){
+ const type=state.pendingPublishType;
+ if(!type)return false;
+ state.pendingPublishType=null;
+ const mediaTypes=['media_video','music','podcast','student_original','creator'];
+ if(window.StudentOS)window.StudentOS.openPage(mediaTypes.includes(type)?'media':'explore');
+ state.hubType=type;
+ if($('hubType'))$('hubType').value=type;
+ if(typeof renderHubTiles==='function')renderHubTiles();
+ if(typeof loadHubListings==='function')await loadHubListings();
+ await openCreateListing(type);
+ return true;
+}
+async function submitLogin(e){
+ e.preventDefault();const f=new FormData(e.currentTarget),btn=$('loginSubmit');
+ btn.disabled=true;btn.textContent='Signing in…';
+ try{
+  await api('/api/auth/login',{method:'POST',body:JSON.stringify({identifier:f.get('identifier'),password:f.get('password')})});
+  closeModal();await refreshMe();toast('Signed in successfully.');
+  if(await resumePendingPublish())return;
+  showDashboard();
+ }catch(err){toast(err.message)}
+ finally{if(btn){btn.disabled=false;btn.textContent='Sign in'}}
+}
 async function submitRegister(e){
  e.preventDefault();const f=new FormData(e.currentTarget),persona=f.get('persona')||'student',role=persona==='worker'?'fundi':'customer';
  const payload={fullName:f.get('fullName'),email:f.get('email'),phone:f.get('phone'),password:f.get('password'),role,persona,categorySlug:f.get('categorySlug'),county:f.get('county'),town:f.get('town'),professionalTitle:f.get('professionalTitle'),campus:f.get('university')||f.get('campus'),course:f.get('course'),studyLevel:f.get('studyLevel'),graduationYear:f.get('graduationYear')||null,organisation:f.get('organisation'),country:f.get('country')||'Kenya',countryCode:f.get('countryCode')||(window.StudentOS?window.StudentOS.codeForCountry(f.get('country')):'KE'),region:f.get('region')||f.get('county')||'',city:f.get('city')||f.get('town')||'',university:f.get('university')||f.get('campus')||'',language:f.get('language')||'en',currency:f.get('currency')||(f.get('country')==='Kenya'?'KES':'USD')};
  const btn=$('registerSubmit');btn.disabled=true;btn.textContent='Creating account…';
- try{await api('/api/auth/register',{method:'POST',body:JSON.stringify(payload)});closeModal();await refreshMe();toast('Account created. Welcome to CampusHub!');await loadHubListings();showDashboard()}
- catch(err){toast(err.message)}finally{btn.disabled=false;btn.textContent='Create account'}
+ try{
+  await api('/api/auth/register',{method:'POST',body:JSON.stringify(payload)});
+  closeModal();await refreshMe();toast('Account created. Welcome to StudentOS!');
+  await loadHubListings();
+  if(await resumePendingPublish())return;
+  showDashboard();
+ }
+ catch(err){toast(err.message)}
+ finally{if(btn){btn.disabled=false;btn.textContent='Create account'}}
 }
 
 async function logout(){try{await api('/api/auth/logout',{method:'POST',body:'{}'});state.user=null;state.profile=null;state.platformProfile=null;state.hubActivity={myListings:[],myActions:[]};updateNav();showMarketplace();toast('You have signed out.')}catch(e){toast(e.message)}}
@@ -785,17 +815,111 @@ function renderHubCard(l){
  return '<article class="hub-card"><div class="hub-card-top"><span class="hub-label">'+def.icon+' '+esc(def.label)+'</span><span class="hub-state">'+(l.is_featured?'★ Featured · 7-day spotlight':esc(l.status))+'</span></div><h3>'+esc(l.title)+'</h3><p>'+esc(l.description)+'</p>'+(l.category?'<div class="hub-meta">Category: '+esc(l.category)+'</div>':'')+(location?'<div class="hub-meta">📍 '+esc(location)+'</div>':'')+date+price+'<div class="hub-meta">Posted by '+esc(l.owner_name||'Community member')+' · '+esc(isoDate(l.created_at))+'</div><div class="hub-card-actions">'+mediaButton+primary+saveButton+communityButton+messageButton+ownerButton+reportButton+'</div></article>'; 
 }
 async function openCreateListing(defaultType){
- if(!state.user){openAuth('login');toast('Sign in to publish an opportunity.');return}
- const type=hubDefs.some(h=>h.type===defaultType)?defaultType:'job';
+ const defaultCandidate=hubDefs.some(h=>h.type===defaultType)?defaultType:'job';
+ if(!state.user){
+  state.pendingPublishType=defaultCandidate;
+  openAuth('login');
+  const intro=$('modalContent')?.querySelector('.intro');
+  if(intro)intro.textContent='Sign in or create a free account to publish. After sign-in, StudentOS will bring you straight back to this composer.';
+  toast('Sign in to publish. Your selected content type will be kept.');
+  return;
+ }
+ const type=defaultCandidate;
  const opts=hubDefs.map(h=>'<option value="'+h.type+'" '+(type===h.type?'selected':'')+'>'+esc(h.label)+'</option>').join('');
- const html='<p class="intro">Publish a genuine opportunity. Listings are public; do not include passwords, payment PINs or identity-document numbers. No payment is collected through this form.</p><form id="hubCreateForm"><div class="field"><label>Hub</label><select name="type" id="newHubType">'+opts+'</select></div><div class="field"><label>Title</label><input name="title" required minlength="4" maxlength="140" placeholder="e.g. Weekend graphic designer wanted"></div><div class="formgrid"><div class="field"><label>Category / skill</label><input name="category" maxlength="100" placeholder="e.g. Graphic design"></div><div class="field"><label>Price or budget (optional; choose currency below)</label><input name="price" type="number" min="0" max="1000000000" step="0.01" placeholder="Leave blank if negotiable"></div></div><div class="field"><label>Description</label><textarea name="description" required minlength="10" maxlength="5000" placeholder="Give useful details, expectations and how someone can respond."></textarea></div><div class="formgrid"><div class="field"><label>County (optional)</label><select name="county">'+countyOptions()+'</select></div><div class="field"><label>Town / campus (optional)</label><input name="town" maxlength="100" placeholder="Kahawa, Juja…"></div></div><div class="formgrid"><div class="field"><label>Starts / date (optional)</label><input name="startsAt" type="datetime-local"></div><div class="field"><label>Ends / deadline (optional)</label><input name="endsAt" type="datetime-local"></div></div><div class="field"><label>More details (optional)</label><input name="extra" maxlength="500" placeholder="e.g. part-time, furnished, delivery options"></div><button class="btn primary" id="hubCreateSubmit" style="width:100%">Publish listing</button></form>';
- openModal('Post an opportunity',html);$('hubCreateForm').addEventListener('submit',submitHubListing);
+ const html='<p class="intro">Share a useful listing or creator post with the community. Keep personal information, passwords, payment PINs and identity-document numbers out of public posts.</p>'+
+ '<div id="hubCreateError" class="notice warn hidden" role="alert" aria-live="polite"></div>'+
+ '<form id="hubCreateForm" autocomplete="on"><div class="field"><label for="newHubType">What are you sharing?</label><select name="type" id="newHubType">'+opts+'</select></div>'+
+ '<div class="field"><label for="hubCreateTitle">Title</label><input id="hubCreateTitle" name="title" required minlength="4" maxlength="140" placeholder="Give your post a clear title"></div>'+
+ '<div class="formgrid"><div class="field"><label for="hubCreateCategory">Category / skill (optional)</label><input id="hubCreateCategory" name="category" maxlength="100" placeholder="e.g. Student film, IT, housing"></div>'+
+ '<div class="field"><label for="hubCreatePrice">Price or budget (optional)</label><input id="hubCreatePrice" name="price" type="number" min="0" max="1000000000" step="0.01" placeholder="Leave blank if negotiable"></div></div>'+
+ '<div class="field"><label for="hubCreateDescription">Description</label><textarea id="hubCreateDescription" name="description" required minlength="10" maxlength="5000" rows="4" placeholder="What should people know? Include details and how to respond."></textarea><span class="help">Write at least 10 characters. Avoid posting private information.</span></div>'+
+ '<div class="formgrid"><div class="field"><label for="hubCreateCounty">County / region (optional)</label><select id="hubCreateCounty" name="county">'+countyOptions()+'</select></div>'+
+ '<div class="field"><label for="hubCreateTown">Town / campus (optional)</label><input id="hubCreateTown" name="town" maxlength="100" placeholder="e.g. Nairobi, Juja"></div></div>'+
+ '<div class="formgrid"><div class="field"><label for="hubCreateStarts">Start date (optional)</label><input id="hubCreateStarts" name="startsAt" type="datetime-local"></div>'+
+ '<div class="field"><label for="hubCreateEnds">Deadline (optional)</label><input id="hubCreateEnds" name="endsAt" type="datetime-local"></div></div>'+
+ '<div class="field"><label for="hubCreateExtra">Extra details (optional)</label><input id="hubCreateExtra" name="extra" maxlength="500" placeholder="e.g. part-time, furnished, delivery options"></div>'+
+ '<button class="btn primary" type="submit" id="hubCreateSubmit" style="width:100%">Publish to StudentOS ↗</button>'+
+ '<p class="intro" style="margin:10px 0 0;font-size:10px">Your post becomes visible after the server accepts it. You can manage your posts from My Space.</p></form>';
+ openModal('Create content',html);
+ const form=$('hubCreateForm');
+ // Enhance the form immediately so global-location fields and the media link are present before submit.
+ if(window.StudentOS&&typeof window.StudentOS.prepareListingForm==='function')window.StudentOS.prepareListingForm(form);
+ form.addEventListener('submit',submitHubListing);
+ const typeSelect=$('newHubType');
+ if(typeSelect)typeSelect.addEventListener('change',function(){
+  const media=['media_video','music','podcast','student_original','creator'].includes(typeSelect.value);
+  const mediaField=form.querySelector('.so-media-url-field');
+  if(mediaField){
+   mediaField.classList.toggle('hidden',!media);
+   const mediaInput=mediaField.querySelector('input[name="mediaUrl"]');
+   if(mediaInput)mediaInput.required=media;
+  }
+ });
+}
+function showListingError(message){
+ const node=$('hubCreateError');
+ if(node){node.textContent=message||'Unable to publish right now. Check the details and try again.';node.classList.remove('hidden');node.scrollIntoView({block:'nearest',behavior:window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}
+ toast(message||'Unable to publish right now. Your draft is still here.');
+}
+function contentDate(value){
+ if(!value)return '';
+ const result=new Date(value);
+ return Number.isNaN(result.getTime())?null:result.toISOString();
 }
 async function submitHubListing(e){
- e.preventDefault();const f=new FormData(e.currentTarget);const payload={type:f.get('type'),title:f.get('title'),category:f.get('category'),price:f.get('price'),description:f.get('description'),county:f.get('county'),town:f.get('town'),country:f.get('country')||'Kenya',countryCode:f.get('countryCode')||(window.StudentOS?window.StudentOS.codeForCountry(f.get('country')):'KE'),region:f.get('region')||f.get('county')||'',city:f.get('city')||f.get('town')||'',university:f.get('university')||'',currency:f.get('currency')||(f.get('country')==='Kenya'?'KES':'USD'),startsAt:f.get('startsAt')?new Date(f.get('startsAt')).toISOString():'',endsAt:f.get('endsAt')?new Date(f.get('endsAt')).toISOString():'',metadata:{extra:f.get('extra')||'',mediaUrl:f.get('mediaUrl')||''}};
- const btn=$('hubCreateSubmit');btn.disabled=true;btn.textContent='Publishing…';
- try{await api('/api/hubs/listings',{method:'POST',body:JSON.stringify(payload)});state.hubType=payload.type;$('hubType').value=payload.type;closeModal();renderHubTiles();await loadHubListings();toast('Your listing is live.');}
- catch(err){toast(err.message)}finally{btn.disabled=false;btn.textContent='Publish listing'}
+ e.preventDefault();
+ const form=e.currentTarget;
+ if(!(form instanceof HTMLFormElement)||!form.reportValidity())return;
+ const f=new FormData(form);
+ const type=String(f.get('type')||'job');
+ const mediaTypes=['media_video','music','podcast','student_original','creator'];
+ const mediaUrl=String(f.get('mediaUrl')||'').trim();
+ const error=$('hubCreateError');
+ if(error){error.textContent='';error.classList.add('hidden');}
+ if(mediaTypes.includes(type)&&!mediaUrl){
+  showListingError('Add a public content link for a video, song, podcast, student film or creator portfolio. Direct file uploads are not enabled yet.');
+  form.querySelector('input[name="mediaUrl"]')?.focus();
+  return;
+ }
+ const startsAt=contentDate(f.get('startsAt')),endsAt=contentDate(f.get('endsAt'));
+ if(startsAt===null||endsAt===null){
+  showListingError('One of the dates is invalid. Clear it or choose a valid date and time.');
+  return;
+ }
+ if(startsAt&&endsAt&&new Date(endsAt)<=new Date(startsAt)){
+  showListingError('The deadline must be later than the start date.');
+  form.querySelector('[name="endsAt"]')?.focus();
+  return;
+ }
+ const selectedCountry=String(f.get('country')||'Kenya');
+ const payload={
+  type,title:String(f.get('title')||'').trim(),category:String(f.get('category')||'').trim(),
+  price:String(f.get('price')||'').trim(),description:String(f.get('description')||'').trim(),
+  county:String(f.get('county')||''),town:String(f.get('town')||''),
+  country:selectedCountry,countryCode:String(f.get('countryCode')||(window.StudentOS?window.StudentOS.codeForCountry(selectedCountry):'KE')),
+  region:String(f.get('region')||f.get('county')||''),
+  city:String(f.get('city')||f.get('town')||''),university:String(f.get('university')||''),
+  currency:String(f.get('currency')||(selectedCountry==='Kenya'?'KES':'USD')),
+  startsAt:startsAt||'',endsAt:endsAt||'',
+  metadata:{extra:String(f.get('extra')||'').trim(),mediaUrl:mediaUrl}
+ };
+ const btn=$('hubCreateSubmit'),original=btn?.textContent||'Publish to StudentOS ↗';
+ if(btn){btn.disabled=true;btn.setAttribute('aria-busy','true');btn.textContent='Publishing…';}
+ try{
+  const result=await api('/api/hubs/listings',{method:'POST',body:JSON.stringify(payload)});
+  if(!result||!result.listing||!result.listing.id)throw new Error('The server did not confirm your post. Your draft is still here—please try again.');
+  state.hubType=payload.type;
+  if($('hubType'))$('hubType').value=payload.type;
+  closeModal();
+  const destination=mediaTypes.includes(payload.type)?'media':'explore';
+  if(window.StudentOS)window.StudentOS.openPage(destination);
+  state.hubType=payload.type;
+  if($('hubType'))$('hubType').value=payload.type;
+  if(typeof renderHubTiles==='function')renderHubTiles();
+  await loadHubListings();
+  toast('Published successfully. Your post is now live in '+(destination==='media'?'Media & creators':'Explore')+'.');
+ }catch(err){showListingError(err.message)}
+ finally{if(btn){btn.disabled=false;btn.removeAttribute('aria-busy');btn.textContent=original;}}
 }
 async function doHubAction(id,action){
  if(!state.user){openAuth('login');toast('Sign in to continue.');return}
