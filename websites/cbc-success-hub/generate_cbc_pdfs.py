@@ -88,7 +88,7 @@ def build_header(p, paper_key, answer=False):
     total=sum(int(q.get("m",0)) for q in p.get("questions",[]))
     info=[["SUBJECT / RESOURCE",p.get("subject","As shown in title"),"TIME",str(p.get("duration",40))+" minutes"],
           ["TOTAL MARKS",str(p.get("marks",total)),"QUESTION PARTS",str(len(p.get("questions",[])))]]
-    t=Table(info,colWidths=[35*mm,61*mm,22*mm,34*mm],hAlign="LEFT")
+    t=Table(info,colWidths=[38*mm,55*mm,34*mm,45*mm],hAlign="LEFT")
     t.setStyle(TableStyle([
       ("FONTNAME",(0,0),(-1,-1),REG),("FONTNAME",(0,0),(0,-1),BOLD),("FONTNAME",(2,0),(2,-1),BOLD),
       ("FONTSIZE",(0,0),(-1,-1),7.4),("TEXTCOLOR",(0,0),(0,-1),forest),("TEXTCOLOR",(2,0),(2,-1),forest),
