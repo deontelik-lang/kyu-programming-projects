@@ -1,0 +1,6 @@
+papers.json
+admin_token
+orders.sqlite3
+pdfs/
+*.pdf
+.env
