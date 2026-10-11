@@ -1,252 +1,672 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#103c32">
-<meta name="description" content="Free, original KNEC-style revision papers for KPSEA, KJSEA, Grades 7–10, KCSE and teachers. Take difficult practice exams, track attempts, and reveal worked marking guides.">
-<meta property="og:title" content="CBC Success Hub — Free Kenyan Exam Practice">
-<meta property="og:description" content="Challenging original practice papers, complete with timed attempts and worked marking guides.">
-<title>CBC Success Hub | Free Exam Practice</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBC Success Hub — 200,000+ Revision Papers | Unlock via M-Pesa</title>
+<meta name="description" content="Kenya's largest revision paper library. KJSEA, KPSEA, Grade 7-10 & KCSE papers, mocks, predictions. Preview 2 pages free, unlock full papers via M-Pesa Paybill 522522.">
 <style>
-:root{--forest:#103c32;--forest2:#185647;--mint:#d8f5df;--lime:#b9f27c;--orange:#f58a52;--cream:#faf8f2;--paper:#fffefa;--ink:#182b26;--muted:#687870;--line:#e2e6dc;--soft:#f0f3e9;--rose:#ffe9de;--shadow:0 18px 50px rgba(21,53,43,.09)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font:15px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input{font:inherit}button,a{-webkit-tap-highlight-color:transparent}button{cursor:pointer}a{color:inherit}.shell{max-width:1200px;margin:auto;padding:0 26px}.topbar{height:76px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);background:rgba(250,248,242,.93);position:sticky;top:0;z-index:20;backdrop-filter:blur(14px)}.brand{display:flex;gap:10px;align-items:center;text-decoration:none;font-weight:900;letter-spacing:-.7px;font-size:20px}.brandmark{width:38px;height:38px;border-radius:12px;background:var(--forest);color:var(--lime);display:grid;place-items:center;font-size:22px}.brand small{display:block;color:var(--muted);font-weight:650;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;line-height:1.1;margin-top:2px}.nav-actions{display:flex;align-items:center;gap:9px}.btn{border:0;border-radius:11px;padding:11px 16px;background:var(--forest);color:white;font-size:13px;font-weight:800;transition:transform .15s,background .15s;display:inline-flex;align-items:center;justify-content:center;gap:7px;text-decoration:none}.btn:hover{background:var(--forest2);transform:translateY(-1px)}.btn.light{color:var(--forest);background:white;border:1px solid var(--line)}.btn.light:hover{background:var(--soft)}.btn.orange{background:var(--orange);color:#2e1c12}.btn.orange:hover{background:#f7a174}.btn.small{padding:8px 11px;font-size:12px}.btn:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #f58a5280;outline-offset:2px}.hero{padding:57px 0 43px}.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center}.eyebrow{display:inline-flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:1.4px;font-size:10px;color:var(--forest2);font-weight:900;background:var(--mint);padding:7px 11px;border-radius:40px}.dot{display:inline-block;width:7px;height:7px;background:#39885c;border-radius:50%}.hero h1{font-size:clamp(40px,5vw,64px);line-height:1.02;letter-spacing:-3.6px;margin:20px 0 16px;max-width:690px}.hero h1 span{color:var(--forest2)}.hero p{font-size:16px;color:var(--muted);max-width:590px;margin:0}.hero-buttons{display:flex;gap:10px;flex-wrap:wrap;margin:25px 0 22px}.trustline{display:flex;flex-wrap:wrap;gap:15px;color:var(--muted);font-size:11px;font-weight:750}.trustline span{display:flex;gap:6px;align-items:center}.trustline b{color:var(--forest)}.feature-panel{min-height:370px;border-radius:26px;background:var(--forest);color:white;padding:23px;position:relative;overflow:hidden;box-shadow:var(--shadow)}.feature-panel:before{content:"";position:absolute;width:280px;height:280px;border:1px solid #d8f5df2e;border-radius:50%;right:-92px;top:-105px;box-shadow:0 0 0 24px #d8f5df0a,0 0 0 49px #d8f5df07}.feature-head{display:flex;justify-content:space-between;align-items:center;gap:10px;position:relative;z-index:1}.feature-label{font-size:10px;font-weight:850;letter-spacing:1.2px;text-transform:uppercase;color:#c6e9d1}.pill{border-radius:30px;padding:5px 9px;font-size:10px;font-weight:900;white-space:nowrap}.pill.free{background:var(--lime);color:#1b402c}.pill.challenge{background:#ffe3d4;color:#773a1a}.feature-title{position:relative;z-index:1;font-size:27px;line-height:1.14;letter-spacing:-1.2px;margin:36px 0 10px;max-width:400px}.feature-copy{position:relative;z-index:1;font-size:12px;color:#c8ded6;max-width:380px}.paper-preview{position:relative;z-index:1;margin:24px 0 20px;background:#fffefa;color:var(--ink);border-radius:13px;padding:14px 16px;transform:rotate(-1deg);box-shadow:0 9px 22px #0002}.paper-preview .paper-top{display:flex;align-items:center;justify-content:space-between;border-bottom:1px dashed #d2d8ce;padding-bottom:8px;margin-bottom:9px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.7px}.paper-preview .equation{font-family:Georgia,serif;font-size:14px;margin:6px 0;color:#254f42}.paper-lines{height:6px;border-radius:8px;background:#e8ece4;margin:8px 0;width:88%}.paper-lines.short{width:58%}.feature-foot{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.feature-foot small{color:#c8ded6;font-size:11px}.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:8px 0 36px}.stat{padding:16px 18px;background:var(--paper);border:1px solid var(--line);border-radius:15px}.stat strong{display:block;font-size:25px;letter-spacing:-1.2px;color:var(--forest);line-height:1.1}.stat span{display:block;font-size:11px;color:var(--muted);margin-top:5px}.library{padding:13px 0 64px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:15px;margin-bottom:17px}.section-head h2{margin:0;font-size:clamp(25px,3vw,34px);letter-spacing:-1.4px;line-height:1.12}.section-head p{margin:6px 0 0;font-size:13px;color:var(--muted)}.section-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--forest2);font-weight:900;margin-bottom:7px}.searchbar{display:flex;gap:9px;margin:22px 0 13px}.searchwrap{flex:1;position:relative}.searchicon{position:absolute;left:15px;top:12px;color:var(--muted);font-size:17px;pointer-events:none}.searchwrap input{width:100%;padding:13px 14px 13px 43px;border:1px solid var(--line);background:var(--paper);border-radius:12px;outline:none;color:var(--ink)}.searchwrap input:focus{border-color:#6c9a80}.filters{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 20px}.filter{border:1px solid var(--line);border-radius:28px;background:var(--paper);color:var(--muted);font-size:11px;font-weight:850;padding:8px 12px}.filter.active{background:var(--forest);border-color:var(--forest);color:white}.results-caption{font-size:11px;color:var(--muted);margin-bottom:10px}.paper-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.paper-card{background:var(--paper);border:1px solid var(--line);border-radius:17px;padding:17px;display:flex;flex-direction:column;min-height:245px;transition:transform .16s,box-shadow .16s,border-color .16s}.paper-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:#b7c9b8}.card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.cat-emoji{width:39px;height:39px;border-radius:12px;background:var(--soft);display:grid;place-items:center;font-size:21px}.paper-card h3{font-size:16px;line-height:1.27;letter-spacing:-.3px;margin:15px 0 8px}.paper-card p{font-size:12px;line-height:1.55;color:var(--muted);margin:0 0 15px}.card-meta{display:flex;flex-wrap:wrap;gap:7px;border-top:1px solid var(--line);padding-top:11px;margin-top:auto;color:var(--muted);font-size:10px}.card-meta span{background:#f2f3ed;border-radius:5px;padding:4px 6px}.card-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px}.difficulty{font-size:10px;font-weight:900;color:var(--forest2)}.empty{padding:34px;text-align:center;border:1px dashed #c7d0c3;border-radius:16px;color:var(--muted);display:none}.value-section{background:#eaf1e7;padding:54px 0}.value-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;margin-top:23px}.value-card{background:#fffefa;border:1px solid #dce5d9;border-radius:16px;padding:20px}.value-icon{font-size:23px}.value-card h3{font-size:15px;margin:12px 0 5px}.value-card p{font-size:12px;color:var(--muted);margin:0}.sourcebox{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px;margin:30px 0 0}.sourcebox h3{margin:0 0 8px;font-size:14px}.sourcebox p{margin:0;font-size:12px;color:var(--muted)}.source-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.source-links a{font-size:11px;font-weight:850;color:var(--forest2);text-decoration:none;border:1px solid var(--line);padding:7px 10px;border-radius:9px}.source-links a:hover{background:var(--soft)}footer{background:#0c2e27;color:#c8ded6;padding:30px 0;font-size:11px}.footer-grid{display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap}.footer-brand{font-weight:900;font-size:16px;color:white}.footer-note{max-width:610px}.footer-links{display:flex;gap:12px;flex-wrap:wrap}.footer-links a{color:#c8ded6;text-decoration:none}.footer-links a:hover{color:white}
-.modal-backdrop{display:none;position:fixed;inset:0;z-index:50;background:#0c241ec9;backdrop-filter:blur(4px);padding:20px;overflow-y:auto;align-items:flex-start;justify-content:center}.modal-backdrop.open{display:flex}.exam-modal{width:min(900px,100%);background:var(--cream);border-radius:20px;overflow:hidden;box-shadow:0 30px 100px #00150e80;margin:auto}.exam-header{background:var(--forest);color:white;padding:22px 24px;position:sticky;top:0;z-index:2}.exam-header-top{display:flex;align-items:center;justify-content:space-between;gap:14px}.exam-brandline{font-size:10px;color:#c8ded6;font-weight:850;text-transform:uppercase;letter-spacing:1.2px}.close-btn{border:1px solid #ffffff30;background:#ffffff12;color:white;border-radius:9px;width:36px;height:36px;font-size:20px}.exam-header h2{font-size:clamp(21px,3vw,29px);line-height:1.15;letter-spacing:-.8px;margin:13px 0 8px}.exam-subtitle{font-size:12px;color:#c8ded6;margin:0}.exam-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:16px}.timer-chip{font-variant-numeric:tabular-nums;background:#ffffff14;border:1px solid #ffffff30;color:white;padding:8px 10px;border-radius:8px;font-weight:900;font-size:12px;min-width:90px;text-align:center}.exam-body{padding:22px 24px 28px}.exam-notice{background:#f0f3e9;border:1px solid #dfe6d8;padding:13px 15px;border-radius:12px;font-size:12px;color:#526359;margin-bottom:18px}.exam-notice strong{color:var(--forest)}.progress-line{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:11px;margin:14px 0 7px}.progress-track{height:6px;border-radius:10px;background:#e5e9df;overflow:hidden}.progress-fill{height:100%;background:#59a66d;width:0%;transition:width .2s}.question-list{display:grid;gap:12px;margin-top:17px}.question-card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:17px}.question-card.attempted{border-color:#9ac4a2;background:#fbfff8}.question-heading{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.question-number{font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:900;color:var(--forest2)}.question-marks{white-space:nowrap;font-size:10px;font-weight:900;color:var(--muted);border:1px solid var(--line);padding:4px 7px;border-radius:7px}.question-text{white-space:pre-line;font-size:14px;font-weight:650;line-height:1.65;margin:9px 0 15px}.attempt-toggle{font-size:11px;font-weight:800;display:inline-flex;align-items:center;gap:7px;color:var(--muted);cursor:pointer}.attempt-toggle input{accent-color:var(--forest);width:15px;height:15px}.answer-box{background:#f1f5eb;border:1px solid #dce8d6;border-radius:10px;margin-top:13px;padding:13px;font-size:12px;white-space:pre-line;line-height:1.7;color:#334a3d}.answer-box strong{color:var(--forest)}.answer-box summary{font-weight:900;color:var(--forest2);cursor:pointer;font-size:12px}.answer-content{padding-top:9px}.marking-note{font-size:11px;color:var(--muted);margin-top:16px}.exam-bottom{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:80;background:var(--lime);color:#173723;padding:11px 16px;border-radius:10px;font-size:12px;font-weight:900;display:none;box-shadow:var(--shadow)}.toast.show{display:block}.resource-callout{border-left:3px solid var(--orange);padding:11px 13px;background:#fff2e9;border-radius:0 9px 9px 0;font-size:12px;color:#71452f;margin-bottom:14px}
-@media(max-width:880px){.hero-grid{grid-template-columns:1fr 1fr;gap:20px}.hero h1{font-size:47px}.paper-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.feature-panel{padding:20px}.value-grid{grid-template-columns:1fr 1fr}}@media(max-width:640px){.shell{padding:0 16px}.topbar{height:67px}.brand{font-size:17px}.brandmark{width:34px;height:34px}.nav-actions .light{display:none}.hero{padding:38px 0 28px}.hero-grid{grid-template-columns:1fr}.hero h1{font-size:46px;letter-spacing:-2.8px}.hero p{font-size:14px}.feature-panel{min-height:0}.feature-title{margin-top:25px}.paper-preview{margin:17px 0}.stats-row{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:30px}.stat{padding:13px}.stat strong{font-size:22px}.section-head{align-items:flex-start;flex-direction:column}.searchbar{flex-direction:column}.searchbar .btn{width:100%}.paper-grid{grid-template-columns:1fr}.paper-card{min-height:0}.paper-card h3{font-size:17px}.value-section{padding:38px 0}.value-grid{grid-template-columns:1fr}.modal-backdrop{padding:0}.exam-modal{border-radius:0;min-height:100vh}.exam-header{padding:17px 16px}.exam-body{padding:16px}.exam-controls .btn{font-size:11px;padding:9px 10px}.footer-grid{align-items:flex-start;flex-direction:column}}@media print{body{background:white}.topbar,body>main,footer,.toast,.exam-controls,.close-btn,.exam-bottom,.attempt-toggle,.marking-note{display:none!important}.modal-backdrop{position:static;display:block!important;background:white;padding:0;overflow:visible}.exam-modal{width:100%;box-shadow:none;border-radius:0;overflow:visible}.exam-header{position:static;background:white;color:#111;border-bottom:2px solid #111;padding:0 0 12px}.exam-brandline,.exam-subtitle{color:#444}.exam-header h2{color:#111}.exam-body{padding:12px 0}.exam-notice{background:white;border:1px solid #aaa}.question-card{break-inside:avoid;border:1px solid #aaa;padding:10px}.question-text{font-size:12px}.answer-box{background:white;border:1px solid #aaa}.answer-box[open] .answer-content{display:block}.question-list{gap:7px}}
+:root{--green:#006341;--green2:#00875a;--red:#A6192E;--ink:#1a1a1a;--grey:#f4f6f5;--line:#e2e8e5}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',system-ui,sans-serif}
+h1,h2,h3,h4{font-family:'Poppins',system-ui,sans-serif}
+body{background:#fff;color:var(--ink);line-height:1.55}
+a{color:var(--green)}
+.container{max-width:1100px;margin:0 auto;padding:0 16px}
+.btn{display:inline-block;background:var(--green);color:#fff;padding:12px 22px;border-radius:10px;border:none;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;text-align:center}
+.btn:hover{background:var(--green2)}
+.btn.red{background:var(--red)}
+.btn.ghost{background:#fff;color:var(--green);border:2px solid var(--green)}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.badge.free{background:#e7f7ef;color:var(--green)}
+.badge.locked{background:#fdeaea;color:var(--red)}
+/* header */
+header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line)}
+.hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;max-width:1100px;margin:0 auto;gap:10px}
+.logo{font-family:Poppins;font-weight:800;font-size:19px;color:var(--green);text-decoration:none}
+.logo span{color:var(--red)}
+.wa-fab{position:fixed;bottom:18px;right:18px;z-index:60;width:56px;height:56px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.3);text-decoration:none}
+.wa-fab svg{width:30px;height:30px;fill:#fff}
+/* hero */
+.hero{background:linear-gradient(135deg,var(--green) 0%,#004d33 100%);color:#fff;padding:44px 0 36px;text-align:center}
+.hero h1{font-size:clamp(24px,5vw,40px);margin-bottom:10px}
+.hero p{opacity:.92;max-width:640px;margin:0 auto 22px}
+.searchbox{max-width:560px;margin:0 auto;display:flex;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.searchbox input{flex:1;border:none;padding:14px 16px;font-size:16px;outline:none}
+.searchbox button{border:none;background:var(--red);color:#fff;padding:0 22px;font-weight:700;cursor:pointer}
+.countdown{display:flex;gap:10px;justify-content:center;margin-top:24px;flex-wrap:wrap}
+.cd{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:8px 14px;min-width:64px}
+.cd b{font-size:22px;display:block;font-family:Poppins}
+.cd small{font-size:11px;opacity:.85}
+/* stats */
+.stats{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;background:var(--grey);padding:18px 16px}
+.stat{text-align:center;padding:0 18px}
+.stat b{font-size:24px;color:var(--green);font-family:Poppins;display:block}
+.stat small{color:#555}
+/* sections */
+section{padding:36px 0}
+.sec-title{font-size:clamp(20px,4vw,28px);margin-bottom:6px}
+.sec-sub{color:#555;margin-bottom:22px}
+/* how it works */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.step{background:var(--grey);border-radius:14px;padding:20px;border:1px solid var(--line)}
+.step .n{width:34px;height:34px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;margin-bottom:10px}
+.paybox{background:var(--green);color:#fff;border-radius:14px;padding:20px;margin-top:18px}
+.paybox code{background:rgba(255,255,255,.15);padding:3px 10px;border-radius:6px;font-size:16px}
+/* categories & cards */
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.cat-card{border:1px solid var(--line);border-radius:14px;padding:18px;cursor:pointer;transition:.15s;background:#fff}
+.cat-card:hover{border-color:var(--green);box-shadow:0 4px 16px rgba(0,99,65,.12)}
+.cat-card .ic{font-size:26px;margin-bottom:8px}
+.cat-card small{color:#777}
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:18px}
+.doc-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.thumb{height:110px;background:linear-gradient(120deg,#e8f5ef,#d7ede4);display:flex;align-items:center;justify-content:center;font-size:36px;position:relative}
+.doc-body{padding:12px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.doc-body h4{font-size:14px;line-height:1.35;min-height:38px}
+.doc-meta{font-size:12px;color:#777}
+.doc-foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.price{font-weight:800;color:var(--green);font-size:16px}
+.mini-btn{padding:8px 14px;font-size:13px;border-radius:8px}
+/* viewer modal */
+.modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.65);display:none;align-items:flex-start;justify-content:center;padding:20px 12px;overflow-y:auto}
+.modal.open{display:flex}
+.modal-box{background:#fff;border-radius:16px;max-width:640px;width:100%;padding:22px;position:relative;margin:auto 0}
+.modal-box h3{margin-bottom:4px}
+.close-x{position:absolute;top:12px;right:14px;border:none;background:var(--grey);width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer}
+.page{background:#fff;border:1px solid var(--line);border-radius:8px;padding:22px;margin:12px 0;position:relative;min-height:300px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.page.wm::after{content:"SAMPLE — CBC SUCCESS HUB";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform:rotate(-28deg);color:rgba(166,25,46,.14);font-size:26px;font-weight:800;pointer-events:none;white-space:nowrap}
+.page h5{font-family:Poppins;margin-bottom:10px;color:var(--green)}
+.page ol{padding-left:20px;font-size:13.5px;color:#333;display:grid;gap:8px}
+.page .foot{margin-top:16px;font-size:11px;color:#999;border-top:1px dashed var(--line);padding-top:8px}
+.locked-pages{border:2px dashed var(--red);border-radius:10px;padding:26px;text-align:center;background:repeating-linear-gradient(45deg,#fff,#fff 10px,#fdf1f1 10px,#fdf1f1 20px)}
+.form-row{display:grid;gap:10px;margin:12px 0}
+input,select{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;font-size:15px;outline:none}
+input:focus{border-color:var(--green)}
+.notice{border-radius:10px;padding:12px 14px;font-size:14px;margin:10px 0}
+.notice.ok{background:#e7f7ef;color:var(--green);border:1px solid #b9e6cf}
+.notice.warn{background:#fff7e0;color:#8a6d00;border:1px solid #f0dfa0}
+.notice.err{background:#fdeaea;color:var(--red);border:1px solid #f3c1c1}
+.hidden{display:none!important}
+/* orders */
+.orders-list{display:grid;gap:10px;margin-top:16px}
+.order-item{border:1px solid var(--line);border-left:5px solid var(--green);border-radius:10px;padding:14px}
+.order-item.pending{border-left-color:#e6a700}
+/* footer */
+footer{background:#0e2b22;color:#cfe3db;padding:34px 0;margin-top:30px;font-size:14px}
+footer b{color:#fff}
+footer a{color:#7fd6ae}
+@media(max-width:600px){.hd .btn{padding:9px 12px;font-size:13px}}
+
+/* Original free sample paper enhancements */
+.exam-q{white-space:pre-line;font-size:13.5px;line-height:1.65;color:#263b33;margin:12px 0 10px}
+.sample-question{border-bottom:1px solid var(--line);padding:8px 0 12px;margin-bottom:10px}
+.sample-question:last-child{border-bottom:0}
+.q-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;color:var(--green);font-weight:800;font-size:13px}
+.q-marks{font-size:11px;color:#777;white-space:nowrap}
+.scheme{border:1px solid #d7e6dc;background:#f7fbf7;border-radius:8px;padding:8px 10px;margin-top:9px;font-size:12.5px}
+.scheme summary{color:var(--green);font-weight:800;cursor:pointer}
+.scheme .scheme-body{white-space:pre-line;margin-top:8px;line-height:1.65;color:#31473c}
+.paper-instructions{background:#f5f8f4;border-left:4px solid var(--green);border-radius:6px;padding:10px 12px;font-size:12.5px;margin:10px 0 14px;color:#33483e;white-space:pre-line}
+.page.full-sample{min-height:0}
+.page.full-sample h5{font-size:16px}
+@media print{
+ body *{visibility:hidden!important}
+ #viewer,#viewer *{visibility:visible!important}
+ #viewer{display:block!important;position:static!important;inset:auto!important;background:#fff!important;padding:0!important;overflow:visible!important}
+ #viewer .modal-box{max-width:none!important;width:100%!important;padding:0!important;margin:0!important;box-shadow:none!important;border:0!important;border-radius:0!important}
+ #viewer .close-x,#v-free-box,#v-unlock-box,#v-verified-box,footer,header,.wa-fab{display:none!important}
+ #v-pages{display:block!important}
+ #v-pages .page{break-after:page;page-break-after:always;min-height:0!important;box-shadow:none!important;border:0!important;border-radius:0!important;margin:0!important;padding:12mm!important}
+ #v-pages .page:last-child{break-after:auto;page-break-after:auto}
+ #v-pages .page.wm:after{font-size:22px!important}
+}
+
 </style>
+<base target="_blank">
 </head>
 <body>
-<header class="topbar shell">
-<a class="brand" href="#" aria-label="CBC Success Hub home"><span class="brandmark">✳</span><span>CBC Success Hub<small>Practice with purpose</small></span></a>
-<div class="nav-actions"><button class="btn light" type="button" onclick="scrollToLibrary()">Browse papers</button><button class="btn" type="button" onclick="openPaper('kcse-logs')">Start a challenge ↗</button></div>
+
+<header>
+  <div class="hd">
+    <a class="logo" href="#" onclick="showHome();return false">📚 CBC <span>Success</span> Hub</a>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn ghost mini-btn" onclick="showOrders()">My Orders</button>
+      <a class="btn mini-btn" href="https://wa.me/254794139667" target="_blank">WhatsApp</a>
+    </div>
+  </div>
 </header>
-<main>
-<section class="hero shell">
-<div class="hero-grid">
-<div>
-<span class="eyebrow"><span class="dot"></span> Free Kenyan exam practice</span>
-<h1>Real practice.<br><span>Serious progress.</span></h1>
-<p>Hard, original KNEC-style practice papers for learners and teachers. Attempt the paper first, then unlock the worked marking guide — all free, with no sign-up.</p>
-<div class="hero-buttons"><button class="btn" onclick="scrollToLibrary()">Explore free samples ↓</button><button class="btn light" onclick="openPaper('kjsea-logs')">Try Grade 9 logarithms</button></div>
-<div class="trustline"><span>✓ <b>All samples free</b></span><span>✓ <b>Worked solutions</b></span><span>✓ <b>Phone-friendly</b></span></div>
+
+<a class="wa-fab" href="https://wa.me/254794139667?text=Habari!%20Natafuta%20revision%20papers." target="_blank" aria-label="WhatsApp">
+  <svg viewBox="0 0 32 32"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.1.6 4.2 1.6 6L4 29l8.2-1.5c1.9 1 4 1.5 6.1 1.5h.1c6.6 0 12-5.4 12-12S22.6 3 16 3zm0 21.8c-1.9 0-3.7-.5-5.3-1.5l-.4-.2-4.1.7 1.3-3.9-.3-.4c-1-1.6-1.6-3.5-1.6-5.4C5.7 9.7 10.3 5.2 16 5.2S26.3 9.7 26.3 15 21.7 24.8 16 24.8zm5.8-7.4c-.3-.2-1.9-1-2.2-1.1-.3-.1-.5-.2-.7.2-.2.3-.8 1.1-1 1.3-.2.2-.4.3-.7.1-.3-.2-1.4-.5-2.6-1.6-1-.9-1.6-1.9-1.8-2.3-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.4.3-.6.1-.2 0-.5 0-.6-.1-.2-.7-1.7-1-2.3-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1.1-1.1 2.7s1.2 3.2 1.3 3.4c.2.2 2.3 3.5 5.6 4.9.8.3 1.4.5 1.9.7.8.2 1.5.2 2 .1.6-.1 1.9-.8 2.2-1.6.3-.8.3-1.4.2-1.6-.1-.1-.3-.2-.6-.4z"/></svg>
+</a>
+
+<!-- ============ HOME VIEW ============ -->
+<div id="view-home">
+  <div class="hero">
+    <div class="container">
+      <h1>200,000+ Revision Papers.<br>Unlock Any Paper via M-Pesa.</h1>
+      <p>KJSEA · KPSEA · Grade 7–10 · KCSE — mocks, predictions &amp; marking schemes. Preview 2 pages <b>free</b>, pay, get the full paper instantly on WhatsApp.</p>
+      <div class="searchbox">
+        <input id="home-search" type="text" placeholder="Search papers… e.g. KJSEA Mathematics 2026" onkeydown="if(event.key==='Enter')doSearch(this.value)">
+        <button onclick="doSearch(document.getElementById('home-search').value)">Search</button>
+      </div>
+      <div class="countdown">
+        <div class="cd"><b id="cd-d">—</b><small>DAYS</small></div>
+        <div class="cd"><b id="cd-h">—</b><small>HOURS</small></div>
+        <div class="cd"><b id="cd-m">—</b><small>MINS</small></div>
+        <div class="cd"><b id="cd-s">—</b><small>SECS</small></div>
+      </div>
+      <p style="margin:12px 0 0;font-size:13px;opacity:.85">⏳ Countdown to KCSE 2026 · Oct 26 – Nov 20</p>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b>200,000+</b><small>Revision papers</small></div>
+    <div class="stat"><b id="stat-unlocked">1,248</b><small>Papers unlocked this week</small></div>
+    <div class="stat"><b>47</b><small>Counties served</small></div>
+    <div class="stat"><b>4.8★</b><small>Parent &amp; teacher rating</small></div>
+  </div>
+
+  <section class="container">
+    <h2 class="sec-title">How it works</h2>
+    <p class="sec-sub">3 simple steps — no app download needed.</p>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><h4>Preview free</h4><p>Open any paper and read the <b>first 2 pages free</b>. No payment needed.</p></div>
+      <div class="step"><div class="n">2</div><h4>Pay via M-Pesa Paybill</h4><p>Go to <b>Lipa na M-Pesa → Paybill</b>, enter the details below and pay the paper's price.</p></div>
+      <div class="step"><div class="n">3</div><h4>Get full paper instantly</h4><p>Enter your confirmation code here or WhatsApp <b>0794139667</b> — we verify in minutes and send your full paper.</p></div>
+    </div>
+    <div class="paybox">
+      <h4 style="margin-bottom:8px">💳 M-Pesa Payment Details</h4>
+      <p>Business No: <code>522522</code> &nbsp;·&nbsp; Account: <code>1354206606</code> &nbsp;·&nbsp; Amount: <span id="paybox-amount">as shown on each paper</span></p>
+    </div>
+  </section>
+
+  <section class="container">
+    <h2 class="sec-title">🎁 Free Samples</h2>
+    <p class="sec-sub">2 free papers per category. Open the complete original practice paper, attempt the questions, then reveal its worked marking guide. No payment needed.</p>
+    <div id="free-grid" class="doc-grid"></div>
+  </section>
+
+  <section class="container">
+    <h2 class="sec-title">Browse Categories</h2>
+    <p class="sec-sub">Thousands of papers in each category.</p>
+    <div id="cat-grid" class="cat-grid"></div>
+  </section>
+
+  <section class="container" style="padding-bottom:10px">
+    <h2 class="sec-title">❓ Frequently Asked Questions</h2>
+    <div class="steps" style="grid-template-columns:1fr">
+      <div class="step"><h4>How fast do I get my paper?</h4><p>Usually 2–5 minutes after your confirmation code is verified. During exam season peak hours it can take up to 15 minutes. For fastest delivery, WhatsApp your code to 0794139667.</p></div>
+      <div class="step"><h4>What if I pay but don't receive my paper?</h4><p>Message us on WhatsApp with your confirmation code — we'll resolve it immediately or refund via M-Pesa.</p></div>
+      <div class="step"><h4>Are these real KNEC papers?</h4><p>We sell mock, prediction and practice papers plus marking schemes — not leaked KNEC exams. Buying leaked exams is illegal; our materials are 100% safe and legal.</p></div>
+      <div class="step"><h4>Do teachers get discounts?</h4><p>Yes — teachers buying in bulk (10+ papers) get 20% off. WhatsApp 0794139667 with your school name.</p></div>
+    </div>
+  </section>
 </div>
-<aside class="feature-panel">
-<div class="feature-head"><span class="feature-label">Featured challenge · Mathematics</span><span class="pill challenge">High difficulty</span></div>
-<h2 class="feature-title">Logarithms & Indices Master Paper</h2>
-<p class="feature-copy">A demanding KCSE-style topical paper: index laws, common logarithms, domain restrictions, log equations and applied growth.</p>
-<div class="paper-preview" aria-hidden="true"><div class="paper-top"><span>Mathematics · Practice paper</span><span>45 marks</span></div><div class="equation">1. Simplify: (27a⁶b⁻³)²⁄³ ÷ (3a²b⁻¹)</div><div class="paper-lines"></div><div class="equation">2. Evaluate log₁₀(0.042) using the data given.</div><div class="paper-lines short"></div><div class="equation">3. Solve and state all restrictions.</div></div>
-<div class="feature-foot"><small>9 structured questions · 60 minutes · full worked guide</small><button class="btn orange" onclick="openPaper('kcse-logs')">Open free paper ↗</button></div>
-</aside>
+
+<!-- ============ CATEGORY VIEW ============ -->
+<div id="view-category" class="hidden">
+  <section class="container">
+    <a href="#" onclick="showHome();return false" style="font-size:14px">← Back to home</a>
+    <h2 class="sec-title" id="cat-title" style="margin-top:10px"></h2>
+    <p class="sec-sub" id="cat-desc"></p>
+    <h3 style="font-size:16px;color:var(--green)">🎁 Free samples in this category</h3>
+    <div id="cat-free" class="doc-grid"></div>
+    <h3 style="font-size:16px;margin-top:26px">🔒 Premium papers <span id="cat-count" style="color:#777;font-weight:400;font-size:13px"></span></h3>
+    <div id="cat-locked" class="doc-grid"></div>
+  </section>
 </div>
-</section>
-<section class="shell">
-<div class="stats-row">
-<div class="stat"><strong id="paperCount">11</strong><span>Original practice resources</span></div>
-<div class="stat"><strong id="questionCount">0</strong><span>Question parts with guidance</span></div>
-<div class="stat"><strong>100%</strong><span>Free in this sample library</span></div>
-<div class="stat"><strong>0</strong><span>Sign-ups or phone numbers needed</span></div>
+
+<!-- ============ SEARCH VIEW ============ -->
+<div id="view-search" class="hidden">
+  <section class="container">
+    <a href="#" onclick="showHome();return false" style="font-size:14px">← Back to home</a>
+    <h2 class="sec-title" style="margin-top:10px" id="search-title"></h2>
+    <div id="search-grid" class="doc-grid"></div>
+    <p id="search-none" class="sec-sub hidden">No results — try a different keyword or WhatsApp 0794139667 and we'll find it for you.</p>
+  </section>
 </div>
-</section>
-<section id="library" class="library shell">
-<div class="section-head"><div><div class="section-label">The free sample library</div><h2>Pick a paper. Test yourself.</h2><p>Browse every category below. All questions are original practice material, not official KNEC papers.</p></div><button class="btn light" onclick="openPaper('teacher-plan')">For teachers & tutors ↗</button></div>
-<div class="searchbar"><label class="searchwrap"><span class="searchicon">⌕</span><input id="searchInput" type="search" placeholder="Search subject, topic or grade…" aria-label="Search sample papers"></label><button class="btn" onclick="clearSearch()">Clear search</button></div>
-<div class="filters" id="filters" aria-label="Filter papers by category"></div>
-<div class="results-caption" id="resultsCaption" aria-live="polite">Loading free papers…</div>
-<div class="paper-grid" id="paperGrid"></div>
-<div class="empty" id="emptyState">No papers match that search. Try a different topic or category.</div>
-</section>
-<section class="value-section">
-<div class="shell">
-<div class="section-label">Designed for real learning</div><h2 style="font-size:clamp(27px,4vw,38px);letter-spacing:-1.5px;margin:0">Not just questions. A better way to revise.</h2>
-<div class="value-grid">
-<article class="value-card"><div class="value-icon">⏱️</div><h3>Practise under time</h3><p>Use the built-in timer to recreate exam pressure. Pause it when you need a break; it is a revision aid, not an official exam clock.</p></article>
-<article class="value-card"><div class="value-icon">✍️</div><h3>Attempt before you peek</h3><p>Mark each question as attempted and monitor your progress. The worked scheme stays hidden until you choose to reveal it.</p></article>
-<article class="value-card"><div class="value-icon">🧠</div><h3>Learn the method</h3><p>Solutions show the steps, restrictions and reasoning — including why invalid roots must be rejected in logarithmic equations.</p></article>
+
+<!-- ============ MY ORDERS VIEW ============ -->
+<div id="view-orders" class="hidden">
+  <section class="container" style="max-width:640px">
+    <a href="#" onclick="showHome();return false" style="font-size:14px">← Back to home</a>
+    <h2 class="sec-title" style="margin-top:10px">My Orders</h2>
+    <p class="sec-sub">Enter the phone number you used when unlocking a paper.</p>
+    <div style="display:flex;gap:8px">
+      <input id="orders-phone" type="tel" placeholder="e.g. 0712345678">
+      <button class="btn" onclick="lookupOrders()">Check</button>
+    </div>
+    <div id="orders-list" class="orders-list"></div>
+  </section>
 </div>
-<div class="sourcebox"><h3>Curriculum alignment & transparency</h3><p>The Grade 9 Mathematics sample uses the KICD curriculum design’s “Indices and Logarithms” sub-strand, including the relationship between powers of 10 and common logarithms. KNEC-style means exam-inspired layout and difficulty; this is an independent revision resource, not an official KNEC publication or a reproduced past paper.</p><div class="source-links"><a href="https://kicd.ac.ke/wp-content/uploads/2024/09/GRADE-9-MATHEMATICS.pdf" target="_blank" rel="noopener">KICD Grade 9 Mathematics design ↗</a><a href="https://www.knec.ac.ke/timetables/" target="_blank" rel="noopener">Official KNEC timetables ↗</a><a href="https://www.knec.ac.ke/2026-kcse-timetable/" target="_blank" rel="noopener">2026 KCSE timetable ↗</a></div></div>
+
+<!-- ============ VIEWER MODAL ============ -->
+<div class="modal" id="viewer">
+  <div class="modal-box">
+    <button class="close-x" onclick="closeViewer()">✕</button>
+    <span id="v-badge" class="badge locked">LOCKED</span>
+    <h3 id="v-title" style="margin-top:8px"></h3>
+    <p class="doc-meta" id="v-meta"></p>
+
+    <div id="v-pages"></div>
+
+    <div id="v-unlock-box" class="hidden">
+      <div class="locked-pages">
+        <div style="font-size:34px">🔒</div>
+        <h4 id="v-locktext"></h4>
+        <p style="font-size:13.5px;color:#666;margin-top:6px">Pay <b id="v-price2"></b> via M-Pesa Paybill <b>522522</b>, Account <b>1354206606</b></p>
+      </div>
+      <h4 style="margin-top:16px">Enter your payment details to unlock:</h4>
+      <div class="form-row">
+        <input id="u-name" type="text" placeholder="Your name">
+        <input id="u-phone" type="tel" placeholder="M-Pesa number (e.g. 0712345678)">
+        <input id="u-code" type="text" placeholder="M-Pesa confirmation code (e.g. SGL7ABC123)">
+      </div>
+      <div id="u-msg"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+        <button class="btn" onclick="submitUnlock()">✅ I have paid — Unlock my paper</button>
+        <a class="btn red" id="u-wa" href="#" target="_blank" style="background:#25D366">Send code on WhatsApp instead</a>
+      </div>
+      <p style="font-size:12.5px;color:#777;margin-top:10px">⏱ Verified within 2–5 minutes. Paper delivered on this page + WhatsApp.</p>
+    </div>
+
+    <div id="v-verified-box" class="hidden">
+      <div class="notice ok">✅ Payment verified! Your full paper has been unlocked.</div>
+      <a class="btn" id="v-download" href="#" onclick="alert('Demo: connect your real PDF storage here.');return false">⬇ Download full paper (PDF)</a>
+      <p style="font-size:12.5px;color:#777;margin-top:8px">Also sent to your WhatsApp. Link expires in 24 hours.</p>
+    </div>
+
+    <div id="v-free-box" class="hidden">
+      <div class="notice ok">🎁 This is a complete FREE practice paper. The full questions are above; open each “Show marking guide” panel when you are ready to check your work. You can print or save the paper as a PDF.</div>
+      <div class="form-row">
+        <input id="f-name" type="text" placeholder="Your name">
+        <input id="f-phone" type="tel" placeholder="WhatsApp number">
+      </div>
+      <div id="f-msg"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" onclick="printFreeSample()">⬇ Print / Save as PDF</button><button class="btn ghost" onclick="submitFree()">Request copy on WhatsApp</button></div>
+    </div>
+  </div>
 </div>
-</section>
-</main>
-<footer><div class="shell footer-grid"><div><div class="footer-brand">✳ CBC Success Hub</div><div>Practice with purpose. Learn the method.</div></div><div class="footer-note">Independent educational practice resource. “KNEC-style” describes the format of original questions; no affiliation with or endorsement by KNEC or KICD is implied. The samples are free and this demo does not request payment or personal contact details.</div><div class="footer-links"><a href="#library">Free papers</a><a href="https://kicd.ac.ke/" target="_blank" rel="noopener">KICD</a><a href="https://www.knec.ac.ke/" target="_blank" rel="noopener">KNEC</a></div></div></footer>
-<div class="modal-backdrop" id="paperModal" role="dialog" aria-modal="true" aria-labelledby="examTitle" onclick="backdropClose(event)">
-<div class="exam-modal">
-<div class="exam-header"><div class="exam-header-top"><span class="exam-brandline">CBC Success Hub · Original practice paper</span><button class="close-btn" aria-label="Close paper" onclick="closePaper()">×</button></div><h2 id="examTitle">Practice paper</h2><p class="exam-subtitle" id="examSubtitle"></p><div class="exam-controls"><button class="btn orange small" id="timerButton" onclick="toggleTimer()">▶ Start timer</button><span class="timer-chip" id="timerDisplay">60:00</span><button class="btn light small" onclick="toggleAllAnswers()">Show all marking guides</button><button class="btn light small" onclick="printPaper()">Print / save PDF</button></div></div>
-<div class="exam-body"><div id="examNotice" class="exam-notice"></div><div class="progress-line"><span id="progressLabel">Attempt progress: 0 of 0</span><span id="progressPercent">0%</span></div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><div id="resourceCallout"></div><div class="question-list" id="questionList"></div><div class="exam-bottom"><span class="marking-note">Tip: write your working on paper. Your attempt checklist stays in this browser only.</span><button class="btn" onclick="revealAllAndReview()">Finish attempt & review answers ✓</button></div></div>
-</div>
-</div>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<footer>
+  <div class="container">
+    <div style="display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+      <div><b>📚 CBC Success Hub</b><p style="margin-top:6px">Kenya's largest library of revision papers — KJSEA, KPSEA, Grade 7–10 &amp; KCSE.</p></div>
+      <div><b>Contact</b><p style="margin-top:6px">WhatsApp: <a href="https://wa.me/254794139667">0794 139 667</a><br>Mon–Sat, 7am–9pm EAT</p></div>
+      <div><b>Payment</b><p style="margin-top:6px">M-Pesa Paybill: <b style="color:#fff">522522</b><br>Account: <b style="color:#fff">1354206606</b></p></div>
+    </div>
+    <p style="margin-top:24px;font-size:12px;opacity:.75">© 2026 CBC Success Hub · Free samples are original KNEC-style practice material, not official KNEC papers. Grade 9 indices/common logarithms scope checked against the KICD Grade 9 Mathematics design. Production payments and PDF delivery still require real integrations.</p>
+  </div>
+</footer>
+
 <script>
-const CATEGORIES = [
- {id:"all",label:"All categories",icon:"✳"},
- {id:"KJSEA / Grade 9",label:"KJSEA · Grade 9",icon:"📗"},
- {id:"KPSEA / Grade 6",label:"KPSEA · Grade 6",icon:"📘"},
- {id:"Grade 7",label:"Grade 7",icon:"🌱"},
- {id:"Grade 8",label:"Grade 8",icon:"📙"},
- {id:"Grade 10",label:"Grade 10",icon:"📓"},
- {id:"KCSE",label:"KCSE",icon:"🎓"},
- {id:"Teacher resources",label:"Teacher resources",icon:"🧑🏽‍🏫"}
+/* ==================== DATA ==================== */
+const CATS = [
+ {id:'kjsea', ic:'📗', name:'KJSEA (Grade 9)', desc:'Prediction papers, mocks & marking schemes for the Grade 9 national assessment.'},
+ {id:'kpsea', ic:'📘', name:'KPSEA (Grade 6)', desc:'Practice papers and marking schemes for the Grade 6 national assessment.'},
+ {id:'g7', ic:'📙', name:'Grade 7', desc:'End-of-term exams and topical questions — CBC junior secondary.'},
+ {id:'g8', ic:'📕', name:'Grade 8', desc:'End-term exams, mocks and topical revision.'},
+ {id:'g10', ic:'📓', name:'Grade 10 (Senior School)', desc:'Brand-new CBC senior school curriculum materials and formative assessments.'},
+ {id:'kcse', ic:'📔', name:'KCSE (Final Cohorts)', desc:'Mocks and prediction papers for the last 8-4-4 KCSE cohorts.'},
+ {id:'teacher', ic:'🍎', name:'Teacher Resources', desc:'Schemes of work, lesson plans, records of work and assessment rubrics.'}
 ];
-const PAPERS = [
- {id:"kcse-logs",cat:"KCSE",grade:"Secondary · KCSE revision",subject:"Mathematics",title:"Logarithms & Indices Master Paper",summary:"A tough topical paper on index laws, common logs, equation solving, domain restrictions and exponential growth.",marks:45,minutes:60,difficulty:"High challenge",featured:true,instructions:"Answer all questions. Show your working clearly. Unless a question states otherwise, give exact answers where possible. Use log₁₀ for common logarithms. Reject any solution that violates the domain of a logarithm.",questions:[
- {q:"Simplify fully: (27a⁶b⁻³)²⁄³ ÷ (3a²b⁻¹), giving your answer using positive indices. Assume a and b are positive.",m:5,a:"(27a⁶b⁻³)²⁄³ = 27²⁄³ × a⁴ × b⁻² = 9a⁴b⁻².\nNow divide by 3a²b⁻¹: (9a⁴b⁻²)/(3a²b⁻¹) = 3a²b⁻¹ = 3a²/b."},
- {q:"Given log₁₀2 = 0.3010, log₁₀3 = 0.4771 and log₁₀7 = 0.8451, evaluate log₁₀(0.042).",m:4,a:"0.042 = 42 × 10⁻³ = 2 × 3 × 7 × 10⁻³.\nlog₁₀(0.042) = log₁₀2 + log₁₀3 + log₁₀7 − 3.\n= 0.3010 + 0.4771 + 0.8451 − 3 = −1.3768."},
- {q:"Solve log₂(x − 1) + log₂(x − 3) = 3. State the restriction on x and show why any rejected root is invalid.",m:6,a:"Restrictions: x − 1 > 0 and x − 3 > 0, so x > 3.\nCombine logs: log₂[(x − 1)(x − 3)] = 3, hence (x − 1)(x − 3) = 2³ = 8.\nx² − 4x + 3 = 8 → x² − 4x − 5 = 0 → (x − 5)(x + 1) = 0.\nRoots are x = 5 or x = −1. Since x > 3, reject −1. Answer: x = 5."},
- {q:"Solve log₃(x + 1) + log₃(2x − 1) = 2, stating the domain restriction.",m:6,a:"Domain: x + 1 > 0 and 2x − 1 > 0, so x > 1/2.\nCombine: log₃[(x + 1)(2x − 1)] = 2, so (x + 1)(2x − 1) = 9.\n2x² + x − 1 = 9 → 2x² + x − 10 = 0 → (2x + 5)(x − 2) = 0.\nx = −5/2 or x = 2. Only x = 2 satisfies x > 1/2. Answer: x = 2."},
- {q:"The logarithm logₐ81 = 4 is defined for a positive base a ≠ 1. Find a.",m:4,a:"By the definition of a logarithm, a⁴ = 81. Since 81 = 3⁴ and the logarithm base must be positive and not equal to 1, a = 3."},
- {q:"Solve 5ˣ⁺¹ = 125²ˣ⁻¹.",m:4,a:"Write 125 as 5³: 5ˣ⁺¹ = (5³)²ˣ⁻¹ = 5⁶ˣ⁻³.\nEquate powers: x + 1 = 6x − 3 → 4 = 5x → x = 4/5."},
- {q:"Evaluate log₁₀3.6 + log₁₀2.5 − log₁₀0.09 without using a calculator.",m:4,a:"Use the product and quotient laws: log₁₀[(3.6 × 2.5)/0.09].\n3.6 × 2.5 = 9, and 9/0.09 = 100.\nTherefore log₁₀100 = 2."},
- {q:"A model predicts the quantity N = 640 × 10⁰·²⁵ᵗ after t years. Find t when N = 2,560. Give your answer to 3 decimal places.",m:5,a:"2,560 = 640 × 10⁰·²⁵ᵗ, so 4 = 10⁰·²⁵ᵗ.\nTake common logarithms: log₁₀4 = 0.25t.\nUsing log₁₀4 ≈ 0.60206, t = 0.60206 ÷ 0.25 = 2.40824…\nTo 3 decimal places, t = 2.408 years."},
- {q:"Solve log₅(x² − 4) = 1. Give all valid real solutions.",m:7,a:"Convert to index form: x² − 4 = 5¹ = 5, hence x² = 9 and x = ±3.\nCheck the argument: for either x = 3 or x = −3, x² − 4 = 5 > 0, so both are valid.\nAnswer: x = −3 or x = 3."}
- ]},
- {id:"kjsea-logs",cat:"KJSEA / Grade 9",grade:"Junior School · Grade 9",subject:"Mathematics",title:"Indices & Common Logarithms Challenge",summary:"A difficult Grade 9 paper grounded in index laws and the relationship between powers of 10 and common logarithms.",marks:40,minutes:50,difficulty:"Stretch",featured:true,instructions:"Answer every question and show your method. For logarithms, use log₁₀ unless another base is shown. The questions are original practice items aligned to the topic scope, not official assessment questions.",questions:[
- {q:"Simplify: (2⁵ × 2³) ÷ 2⁶. Show the law of indices used.",m:4,a:"For the same base, add powers when multiplying and subtract powers when dividing: 2⁵ × 2³ ÷ 2⁶ = 2⁵⁺³⁻⁶ = 2² = 4."},
- {q:"Write 0.000729 in standard form. Hence find its cube root.",m:4,a:"0.000729 = 7.29 × 10⁻⁴ in standard form.\nSince 0.09³ = 0.000729, the cube root is 0.09."},
- {q:"Simplify (27x⁶y⁻³)¹⁄³ using positive indices. Assume x and y are positive.",m:5,a:"Take the cube root of each factor: 27¹⁄³ = 3, (x⁶)¹⁄³ = x², (y⁻³)¹⁄³ = y⁻¹.\nSo the expression is 3x²y⁻¹ = 3x²/y."},
- {q:"Find: (a) log₁₀1000, (b) log₁₀0.01, (c) k if 10ᵏ = 0.0001.",m:6,a:"(a) 10³ = 1,000, so log₁₀1000 = 3.\n(b) 0.01 = 10⁻², so log₁₀0.01 = −2.\n(c) 0.0001 = 10⁻⁴, hence k = −4."},
- {q:"Given log₁₀2 = 0.3010, calculate log₁₀0.08.",m:5,a:"0.08 = 8 × 10⁻² = 2³ × 10⁻².\nlog₁₀0.08 = 3log₁₀2 − 2 = 3(0.3010) − 2 = 0.9030 − 2 = −1.0970."},
- {q:"If 2ˣ = 32 and 10ʸ = 0.001, find x + y.",m:8,a:"32 = 2⁵, so x = 5.\n0.001 = 10⁻³, so y = −3.\nTherefore x + y = 5 + (−3) = 2."},
- {q:"A culture begins with 800 bacteria and doubles every hour. (a) Write an expression for its population after t hours. (b) Find the population after 6 hours. (c) How many hours will it take to reach 25,600?",m:8,a:"(a) P = 800 × 2ᵗ.\n(b) After 6 hours: P = 800 × 2⁶ = 800 × 64 = 51,200.\n(c) 25,600 = 800 × 2ᵗ, so 2ᵗ = 32 = 2⁵. Thus t = 5 hours."}
- ]},
- {id:"kpsea-math",cat:"KPSEA / Grade 6",grade:"Primary · Grade 6",subject:"Mathematics",title:"Numeracy, Fractions & Data Paper",summary:"Multi-step fraction operations, ratio sharing, unit pricing, averages and range — aimed at careful working, not guesswork.",marks:30,minutes:40,difficulty:"Challenging",instructions:"Show all working. Include units in money and measurement questions. Reduce fractions to their simplest form.",questions:[
- {q:"Calculate 3/4 + 5/8 − 1/2. Give your answer as a mixed number in simplest form.",m:6,a:"Use denominator 8: 3/4 = 6/8 and 1/2 = 4/8.\n6/8 + 5/8 − 4/8 = 7/8."},
- {q:"KSh 840 is shared among A, B and C in the ratio 2 : 3 : 7. Find each person's share.",m:6,a:"Total parts = 2 + 3 + 7 = 12.\nOne part = 840 ÷ 12 = KSh 70.\nA = 2 × 70 = KSh 140; B = 3 × 70 = KSh 210; C = 7 × 70 = KSh 490."},
- {q:"A water container is 3/5 full. After 12 litres are added, it is 4/5 full. Find the container's total capacity.",m:6,a:"The increase is 4/5 − 3/5 = 1/5 of the capacity.\nIf 1/5 equals 12 litres, capacity = 12 × 5 = 60 litres."},
- {q:"The marks of five learners are 12, 16, 18, 14 and 20. Find the mean and the range.",m:6,a:"Total = 12 + 16 + 18 + 14 + 20 = 80.\nMean = 80 ÷ 5 = 16.\nRange = highest − lowest = 20 − 12 = 8."},
- {q:"Six identical exercise books cost KSh 270. At the same rate, find (a) the cost of one book and (b) the cost of 10 books.",m:6,a:"One book costs 270 ÷ 6 = KSh 45.\nTen books cost 10 × 45 = KSh 450."}
- ]},
- {id:"kpsea-english",cat:"KPSEA / Grade 6",grade:"Primary · Grade 6",subject:"English",title:"Comprehension & Grammar Paper",summary:"A fresh comprehension passage, inference questions, language use and a short composition task.",marks:25,minutes:35,difficulty:"Stretch",instructions:"Read the passage carefully before answering. Use complete sentences for comprehension and correct grammar in Section B.",questions:[
- {q:"Read this passage: “At the edge of Mwangaza village, a dry stream used to carry rubbish after every heavy rain. A group of learners asked residents to map where the waste came from. They placed labelled bins near the market, shared a collection timetable, and planted grass beside the stream. Three months later, less rubbish reached the water, although some households still needed reminders.” (a) What problem did the village face? (b) Give two actions taken by the learners and residents. (c) Why did the group map where the waste came from?",m:6,a:"(a) Rubbish was being carried into the stream after heavy rain.\n(b) Any two: placed labelled bins near the market; shared a collection timetable; planted grass beside the stream.\n(c) To identify the sources of waste so that they could plan appropriate action."},
- {q:"From the passage, what does the phrase “still needed reminders” suggest about some households?",m:4,a:"It suggests that not every household had adopted the new waste-disposal habits consistently and some still needed encouragement."},
- {q:"Choose the correct word: Neither the teacher nor the learners (was / were) late for the assembly. Explain your choice.",m:4,a:"“Were” is correct. With “neither…nor”, the verb usually agrees with the nearer subject; “learners” is plural."},
- {q:"Rewrite in the past tense: “The class collects litter and plants trees beside the stream.”",m:5,a:"The class collected litter and planted trees beside the stream."},
- {q:"Write a paragraph of 80–100 words explaining two ways learners can keep their school environment clean. Give a marking guide.",m:6,a:"Marking guide (6): relevant ideas (2); two clear ways explained (2); logical paragraph organisation (1); spelling, punctuation and grammar (1). Accept original examples such as sorting waste, using bins, reducing single-use plastics or organising supervised clean-up activities."}
- ]},
- {id:"g7-math",cat:"Grade 7",grade:"Junior School · Grade 7",subject:"Mathematics",title:"Number, Ratio & Algebra Challenge",summary:"A multi-topic practice paper combining integers, ratio, algebraic expressions, percentages and simple equations.",marks:30,minutes:40,difficulty:"Challenging",instructions:"Answer all parts. Show steps for calculations and simplify expressions fully.",questions:[
- {q:"Evaluate: −8 + 3(5 − 9) − (−6).",m:5,a:"First, 5 − 9 = −4. Then 3 × (−4) = −12.\n−8 − 12 + 6 = −14."},
- {q:"Simplify 4(2x − 3) − 3(x + 5).",m:5,a:"Expand: 8x − 12 − 3x − 15.\nCollect like terms: 5x − 27."},
- {q:"A school has 480 learners. The ratio of boys to girls is 7 : 9. How many girls are there?",m:6,a:"Total parts = 7 + 9 = 16. One part = 480 ÷ 16 = 30.\nGirls = 9 × 30 = 270."},
- {q:"A jacket marked KSh 2,400 is discounted by 15%. Find the discount and the sale price.",m:6,a:"Discount = 15/100 × 2,400 = KSh 360.\nSale price = 2,400 − 360 = KSh 2,040."},
- {q:"Solve 5(2y − 1) = 3y + 16.",m:8,a:"10y − 5 = 3y + 16.\n7y = 21, so y = 3. Check: left side 5(6 − 1) = 25; right side 9 + 16 = 25."}
- ]},
- {id:"g7-science",cat:"Grade 7",grade:"Junior School · Grade 7",subject:"Integrated Science",title:"Science in Everyday Life",summary:"Application questions about mixtures, electric circuits, fair tests, food chains and safe laboratory practice.",marks:30,minutes:40,difficulty:"Challenging",instructions:"Answer in clear scientific language. Where a question asks you to explain, give a reason rather than naming an item only.",questions:[
- {q:"A mixture contains iron filings, sand and salt. Describe a safe sequence of steps for separating all three substances.",m:6,a:"Use a magnet to remove the iron filings. Add water to the remaining sand-and-salt mixture to dissolve the salt. Filter to separate the sand. Evaporate the filtrate to recover the salt, using suitable heat safety procedures."},
- {q:"A bulb does not light in a simple cell-bulb-switch circuit. Give three possible causes and one test for each.",m:6,a:"Possible causes: flat cell (replace/test with a known working cell); loose connection (inspect and secure wires); blown bulb (test with a known working bulb). An open switch or broken wire could also be responsible."},
- {q:"A learner investigates whether the amount of sunlight affects seedling growth. Identify the independent variable, dependent variable and two factors that should be kept constant.",m:6,a:"Independent variable: amount of sunlight. Dependent variable: seedling growth, measured consistently (for example, height). Constants could include plant species, water volume, soil type, pot size and duration."},
- {q:"Construct a food chain using grass, grasshopper, frog and snake. State the role of grass and explain what might happen to the frog population if grasshoppers decline sharply.",m:6,a:"Grass → grasshopper → frog → snake. Grass is the producer. If grasshoppers decline, frogs may have less food and their population could decline; the effect may then extend to predators such as snakes."},
- {q:"State three laboratory safety rules and explain why each matters.",m:6,a:"Award 2 marks for each sound rule with its reason. Examples: follow instructions to prevent accidents; never taste laboratory substances to avoid poisoning; wear appropriate eye protection when directed; report spills or breakages immediately; keep bags away from walkways."}
- ]},
- {id:"g8-english",cat:"Grade 8",grade:"Junior School · Grade 8",subject:"English",title:"Reading, Grammar & Writing",summary:"Higher-order comprehension, sentence transformation, grammar editing and a structured composition task.",marks:30,minutes:40,difficulty:"Stretch",instructions:"Use evidence from the passage. In the writing task, plan your ideas before drafting and check sentence structure, spelling and punctuation.",questions:[
- {q:"Read: “When the county library extended its opening hours, the first week was quiet. The librarian did not assume that learners were uninterested; she asked them what prevented them from visiting. Many mentioned transport costs and the lack of a safe place to study after dusk. The library then arranged a supervised study room before sunset and partnered with nearby schools to share the schedule. Attendance gradually improved.” (a) Why was the library quiet at first? (b) Identify two barriers learners reported. (c) What evidence shows that the librarian responded to the problem rather than blaming learners?",m:6,a:"(a) The passage does not state one single cause; learners faced practical barriers despite the longer hours. Answers should avoid inventing unsupported facts.\n(b) Transport costs and the lack of a safe place to study after dusk.\n(c) She asked learners about the barriers, arranged a supervised room before sunset and partnered with nearby schools to share the schedule."},
- {q:"Explain the meaning of “did not assume” as used in the passage and use the phrase “gradually improved” in a sentence of your own.",m:5,a:"“Did not assume” means the librarian did not decide what learners thought without checking. Example: The team's performance gradually improved after regular practice. Award credit for a correct original sentence."},
- {q:"Rewrite in reported speech: Amina said, “I will return these books tomorrow.”",m:5,a:"Amina said that she would return those books the following day."},
- {q:"Correct the errors in this sentence: “Each of the students have submitted their assignment late.”",m:5,a:"“Each of the students has submitted their assignment late.” A singular verb (“has”) agrees with “each”. Depending on the style guide, “his or her assignment” may be used, though singular “their” is also accepted in modern English."},
- {q:"Write 120–150 words on: “A small change that made our school better.” Include a clear opening, at least two supporting details and a conclusion.",m:9,a:"Marking guide (9): relevance and development (3); clear organisation and paragraphing (2); appropriate vocabulary (1); grammar and sentence variety (2); spelling and punctuation (1). Credit original, coherent work rather than a memorised model."}
- ]},
- {id:"g8-social",cat:"Grade 8",grade:"Junior School · Grade 8",subject:"Social Studies",title:"Citizenship, Environment & Map Skills",summary:"A reasoning-focused paper covering responsible citizenship, conservation, map scale and community problem-solving.",marks:30,minutes:40,difficulty:"Challenging",instructions:"Use relevant examples. For map calculations, write the scale conversion before giving the final answer.",questions:[
- {q:"Explain three ways a learner can demonstrate responsible citizenship in school or in the local community.",m:5,a:"Any three explained points: follow fair rules; respect others and their property; participate in community service; report hazards responsibly; protect public resources; listen respectfully and resolve disagreements peacefully."},
- {q:"A map has a scale of 1 : 50,000. Two places are 7.2 cm apart on the map. Calculate the actual distance in kilometres.",m:5,a:"1 cm represents 50,000 cm. Actual distance = 7.2 × 50,000 = 360,000 cm.\n360,000 cm = 3,600 m = 3.6 km."},
- {q:"A wetland near a settlement is being filled with rubbish. Describe three likely environmental effects and suggest one practical community response.",m:6,a:"Possible effects: loss of habitat and biodiversity; reduced natural water filtration; increased flooding; unpleasant odours or pests; polluted surface water. A response could combine waste collection points, community education, enforcement and restoration with local authorities."},
- {q:"Distinguish a right from a responsibility and give one relevant example of each in school life.",m:6,a:"A right is an entitlement or protection (for example, access to education or fair treatment). A responsibility is a duty one should carry out (for example, respecting others, protecting shared materials or attending lessons)." },
- {q:"A community meeting has disagreement about where to place a new public water point. Give a fair four-step process for reaching a decision.",m:8,a:"Possible sequence: identify affected groups and needs; share reliable information on access, cost and safety; allow all groups to speak respectfully; compare options using agreed criteria; record the decision and reasons; assign responsibilities and review the outcome. Award marks for a logical, inclusive process."}
- ]},
- {id:"g10-math",cat:"Grade 10",grade:"Senior School · Grade 10",subject:"Mathematics",title:"Algebra, Functions & Modelling Diagnostic",summary:"A demanding transition diagnostic on equations, quadratic expressions, functions, straight-line graphs and percentage change.",marks:35,minutes:45,difficulty:"High challenge",instructions:"This is an independent transition diagnostic, not an official Grade 10 national paper. Show algebraic steps and state units where appropriate.",questions:[
- {q:"Solve 3(2x − 1) = 5x + 7.",m:5,a:"6x − 3 = 5x + 7. Subtract 5x from both sides: x − 3 = 7. Hence x = 10."},
- {q:"Factorise x² − x − 12 completely. Hence solve x² − x − 12 = 0.",m:6,a:"Find two numbers whose product is −12 and sum is −1: −4 and 3.\nx² − x − 12 = (x − 4)(x + 3).\nThus x = 4 or x = −3."},
- {q:"Given f(x) = 2x² − 3x + 1, calculate f(−2) and f(3).",m:6,a:"f(−2) = 2(4) − 3(−2) + 1 = 8 + 6 + 1 = 15.\nf(3) = 2(9) − 9 + 1 = 10."},
- {q:"Find the equation of the straight line through A(2, 5) and B(6, 13). Give its gradient and y-intercept.",m:6,a:"Gradient m = (13 − 5)/(6 − 2) = 8/4 = 2.\nUse y = mx + c and point (2,5): 5 = 2(2) + c, so c = 1.\nEquation: y = 2x + 1; gradient 2; y-intercept 1."},
- {q:"A laptop price rises from KSh 40,000 to KSh 46,000. Find the percentage increase.",m:6,a:"Increase = 46,000 − 40,000 = KSh 6,000.\nPercentage increase = (6,000 ÷ 40,000) × 100% = 15%."},
- {q:"The mean of five values is 14. Four values are 9, 11, 15 and 18. Find the fifth value.",m:6,a:"Total of five values = 5 × 14 = 70.\nKnown total = 9 + 11 + 15 + 18 = 53.\nFifth value = 70 − 53 = 17."}
- ]},
- {id:"kcse-business",cat:"KCSE",grade:"Secondary · KCSE revision",subject:"Business Studies",title:"Business Studies Applied Concepts",summary:"Exam-style structured responses on business activities, customer service, budgeting and factors of production.",marks:30,minutes:40,difficulty:"Challenging",instructions:"Give concise, relevant points. Where asked to explain, include the point and how it affects the business.",questions:[
- {q:"Differentiate between goods and services, giving two examples of each.",m:5,a:"Goods are tangible items that can usually be stored, such as exercise books or maize flour. Services are activities or benefits provided to customers, such as transport or hairdressing."},
- {q:"Explain three ways good customer care can improve the performance of a small retail shop.",m:6,a:"It encourages repeat purchases and loyalty; creates positive word-of-mouth; helps resolve complaints before they damage reputation; can distinguish the shop from competitors; and helps the owner understand customer needs."},
- {q:"A trader begins a week with KSh 12,500. During the week, cash sales are KSh 8,400, other cash income is KSh 1,100, and cash expenses total KSh 9,650. Calculate the closing cash balance.",m:6,a:"Closing balance = opening balance + receipts − expenses.\n= 12,500 + 8,400 + 1,100 − 9,650 = KSh 12,350."},
- {q:"State and explain three factors a business should consider before choosing a location for a shop.",m:6,a:"Possible factors: proximity to customers; rent and other operating costs; transport and accessibility; security; availability of utilities; competition; reliable suppliers; and local rules. Each point should be linked to the business."},
- {q:"Name the four factors of production and give the reward associated with each.",m:7,a:"Land — rent; labour — wages or salaries; capital — interest; entrepreneurship/enterprise — profit. Award credit for naming each factor and matching it with the correct reward."}
- ]},
- {id:"teacher-plan",cat:"Teacher resources",grade:"Teacher / tutor resource",subject:"Mathematics · Lesson plan",title:"Grade 9 Lesson Plan: Indices & Common Logs",summary:"A classroom-ready 40-minute lesson sequence with objectives, guided practice, assessment checkpoints and differentiation notes.",marks:15,minutes:40,difficulty:"Teaching resource",kind:"resource",instructions:"Adapt examples to your learners and school context. The sequence is a planning aid, not a prescribed national lesson plan.",questions:[
- {q:"Learning outcomes: what should learners be able to do by the end of the lesson?",m:3,a:"Learners should be able to: (1) express numbers in index form; (2) apply basic laws of indices; (3) relate powers of 10 to common logarithms; and (4) evaluate simple common logarithms with reasoning."},
- {q:"Suggested 40-minute teaching sequence. Include the purpose of each phase.",m:5,a:"0–5 min: connect to prior learning by writing 10, 100, 1,000 as powers of 10.\n5–12 min: learners infer the index laws from repeated multiplication and division.\n12–22 min: guided practice simplifying expressions with the laws of indices.\n22–32 min: connect 10ⁿ = N to log₁₀N = n; model log₁₀100 = 2 and log₁₀0.01 = −2.\n32–38 min: paired challenge using a short common-log table exercise.\n38–40 min: exit ticket and identify any misconceptions."},
- {q:"Write two assessment questions and provide expected answers.",m:4,a:"1. Simplify 2⁷ ÷ 2⁴. Expected answer: 2³ = 8.\n2. If 10ᵏ = 0.001, find k. Expected answer: k = −3 because 0.001 = 10⁻³.\nFor deeper checking, ask learners to explain why the logarithm equals the exponent."},
- {q:"Give two differentiation ideas and a simple 3-level feedback rubric.",m:3,a:"Support: use a powers-of-ten chart and worked examples. Stretch: give expressions combining index laws or ask learners to interpret negative logarithms.\nFeedback rubric: Secure — correct method and explanation; Developing — partly correct method with a conceptual error; Beginning — needs support identifying base, exponent or powers of ten."}
- ]}
-];
-let activeCategory="all", activePaper=null, timerInterval=null, timerSeconds=0, timerRunning=false, allAnswersShown=false, attempted={};
-const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
-function init(){
- document.getElementById("paperCount").textContent=PAPERS.length;
- document.getElementById("questionCount").textContent=PAPERS.reduce((n,p)=>n+p.questions.length,0);
- buildFilters(); renderPapers();
- document.getElementById("searchInput").addEventListener("input",renderPapers);
- document.addEventListener("keydown",function(e){if(e.key==="Escape")closePaper();});
+const SUBJECTS = ['Mathematics','English','Kiswahili','Science & Technology','Social Studies','CRE','Creative Arts','Pre-Technical Studies'];
+function mk(id,cat,subject,title,year,pages,price,free,paperKey){return {id,cat,subject,title,year,pages,price:price||0,free:!!free,paperKey:paperKey||null};}
+
+/* Original questions written for this website. These are KNEC-style practice items,
+   not leaked, copied or official KNEC examination questions. */
+const SAMPLE_PAPERS = {
+ 'kjsea-logs': {
+  title:'KJSEA Grade 9 Mathematics — Indices & Common Logarithms Challenge', duration:50, marks:40,
+  instructions:'Answer ALL questions. Show each step of your working. Use positive indices in final answers where possible. For common logarithms, log means log₁₀ unless another base is written. Give answers to 4 significant figures where required.',
+  questions:[
+   {q:'Simplify fully: (2⁵ × 2⁻²) ÷ 2. State the index laws used.',m:4,a:'For multiplication with the same base, add indices; for division, subtract indices.\n2⁵ × 2⁻² ÷ 2¹ = 2⁵⁻²⁻¹ = 2² = 4.'},
+   {q:'Simplify (81x⁸/y⁴)¹⁄⁴, assuming x and y are positive.',m:4,a:'81¹⁄⁴ = 3, (x⁸)¹⁄⁴ = x² and (y⁴)¹⁄⁴ = y.\nAnswer: 3x²/y.'},
+   {q:'(a) Express 0.000064 in the form A × 10ⁿ, where 1 ≤ A < 10. (b) Hence find the sixth root of 0.000064.',m:4,a:'(a) 0.000064 = 6.4 × 10⁻⁵.\n(b) Since 0.2⁶ = 0.000064, the sixth root is 0.2.'},
+   {q:'Given log₁₀2 = 0.3010 and log₁₀3 = 0.4771, calculate log₁₀0.024.',m:6,a:'0.024 = 24 × 10⁻³ = 2³ × 3 × 10⁻³.\nlog₁₀0.024 = 3log₁₀2 + log₁₀3 − 3.\n= 3(0.3010) + 0.4771 − 3 = −1.6199.'},
+   {q:'Solve 2ˣ⁺¹ = 16ˣ⁻².',m:5,a:'Write 16 as 2⁴: 2ˣ⁺¹ = 2⁴ˣ⁻⁸.\nEquate powers: x + 1 = 4x − 8.\n9 = 3x, therefore x = 3.'},
+   {q:'Solve log₁₀(x − 1) + log₁₀(x + 1) = log₁₀15. State the restriction on x.',m:7,a:'For the logarithms to exist, x − 1 > 0 and x + 1 > 0; hence x > 1.\nCombine logs: log₁₀[(x − 1)(x + 1)] = log₁₀15.\n(x − 1)(x + 1) = 15 → x² − 1 = 15 → x² = 16.\nx = ±4, but x > 1, so reject −4. Answer: x = 4.'},
+   {q:'Given log₁₀2 = 0.3010 and log₁₀5 = 0.6990, evaluate log₁₀(0.25) + 2log₁₀40 − log₁₀10.',m:10,a:'Use the logarithm laws: the expression equals log₁₀[(0.25 × 40²)/10].\n(0.25 × 1,600)/10 = 40. Thus the expression is log₁₀40.\nlog₁₀40 = log₁₀4 + log₁₀10 = 2log₁₀2 + 1 = 2(0.3010) + 1 = 1.6020.'}
+  ]
+ },
+ 'kjsea-english': {
+  title:'KJSEA Grade 9 English — Comprehension & Language Paper', duration:45, marks:35,
+  instructions:'Answer all questions. Use complete sentences in comprehension. In the writing question, organise ideas into paragraphs and check grammar, spelling and punctuation.',
+  questions:[
+   {q:'Read the passage. “When the school garden failed during a dry term, the environment club did not simply plant more seeds. Members interviewed the groundskeeper, checked the watering timetable and compared which beds received shade. They discovered that a leaking tap wasted water while two beds dried out quickly in the afternoon sun. The club repaired the tap with adult supervision, mulched the beds and recorded plant growth weekly. By the next term, more seedlings survived, although the learners agreed that the records should be collected for longer before drawing firm conclusions.” (a) Why did the garden fail? (b) Name two actions taken after the investigation. (c) Why did the learners avoid drawing a firm conclusion too early?',m:8,a:'(a) The passage identifies wasted water from a leaking tap and beds drying quickly in afternoon sun.\n(b) Any two: interviewed the groundskeeper; checked the watering timetable; compared shade; repaired the tap with adult supervision; mulched beds; recorded plant growth weekly.\n(c) They recognised that a longer period of records was needed to judge the result reliably.'},
+   {q:'Explain the meaning of “drawing firm conclusions” as used in the passage.',m:3,a:'Making a definite judgement based on sufficient evidence.'},
+   {q:'Rewrite in reported speech: The club leader said, “We will compare the records tomorrow.”',m:4,a:'The club leader said that they would compare the records the following day.'},
+   {q:'Correct the sentence and explain the error: “Neither the gardeners nor the teacher were aware of the leak.”',m:4,a:'In formal examination grammar, the verb agrees with the nearer subject, “teacher”, which is singular. Corrected: “Neither the gardeners nor the teacher was aware of the leak.”'},
+   {q:'Write 120–150 words on: “A problem at school that learners solved together.” Include the problem, the steps taken and the lesson learnt.',m:16,a:'Marking guide (16): relevance and clear development (5); logical sequence and paragraphing (3); supporting detail/examples (3); vocabulary and sentence variety (2); grammar, spelling and punctuation (3). Accept any coherent, original response.'}
+  ]
+ },
+ 'kpsea-math': {
+  title:'KPSEA Grade 6 Mathematics — Numeracy & Reasoning Paper', duration:40, marks:30,
+  instructions:'Answer all questions. Show working for multi-step calculations. Give units in measurement and money questions.',
+  questions:[
+   {q:'Calculate 3/4 + 5/8 − 1/2. Give your answer in simplest form.',m:5,a:'Use denominator 8: 6/8 + 5/8 − 4/8 = 7/8.'},
+   {q:'KSh 840 is shared in the ratio 2 : 3 : 7. Find the largest share and the difference between the largest and smallest shares.',m:6,a:'Total parts = 2 + 3 + 7 = 12. One part = 840 ÷ 12 = KSh 70.\nLargest = 7 × 70 = KSh 490; smallest = 2 × 70 = KSh 140. Difference = KSh 350.'},
+   {q:'A container is 3/5 full. After 12 litres are added it becomes 4/5 full. Find the capacity of the container.',m:6,a:'The increase is 4/5 − 3/5 = 1/5 of capacity.\nIf 1/5 = 12 litres, capacity = 12 × 5 = 60 litres.'},
+   {q:'The marks of six learners are 12, 16, 18, 14, 20 and 10. Calculate the mean and the range.',m:6,a:'Total = 90; mean = 90 ÷ 6 = 15.\nRange = 20 − 10 = 10.'},
+   {q:'A shop buys 8 identical exercise books for KSh 360. It sells each book for KSh 55. Calculate the total profit if all 8 books are sold.',m:7,a:'Cost per book = 360 ÷ 8 = KSh 45.\nTotal selling price = 8 × 55 = KSh 440.\nProfit = 440 − 360 = KSh 80.'}
+  ]
+ },
+ 'kpsea-english': {
+  title:'KPSEA Grade 6 English — Comprehension & Grammar', duration:35, marks:25,
+  instructions:'Read the passage carefully. Answer comprehension questions in complete sentences and follow the instructions in the language questions.',
+  questions:[
+   {q:'Read: “Every Friday, Naliaka and her grandfather walked to the market with a woven basket. One morning they noticed that the path beside the stream was blocked with plastic waste. They organised a small clean-up with permission from the village elder and put up a sign asking people to use the collection point. The stream became clearer after several weeks, but the two continued checking the path instead of assuming the problem had ended.” (a) What problem did they notice? (b) Why did they seek permission? (c) What does their continued checking show?',m:7,a:'(a) Plastic waste blocked the path beside the stream.\n(b) To organise the clean-up responsibly and with the village elder’s approval.\n(c) They understood that keeping the area clean required continued effort and monitoring.'},
+   {q:'Choose the correct verb and explain: “Each of the pupils (has / have) a reading book.”',m:4,a:'“Has” is correct because “each” is singular.'},
+   {q:'Rewrite in the past tense: “The class collects rubbish and plants flowers.”',m:4,a:'The class collected rubbish and planted flowers.'},
+   {q:'Write 80–100 words on two ways children can protect a local water source.',m:10,a:'Marking guide (10): relevant ideas (4); explanation/examples (2); organisation (2); grammar and spelling (2). Accept coherent original work such as avoiding dumping rubbish, protecting stream banks and reporting pollution.'}
+  ]
+ },
+ 'g7-math': {
+  title:'Grade 7 Mathematics — Algebra, Ratio & Percentages', duration:40, marks:30,
+  instructions:'Answer all questions. Show algebraic working and simplify expressions fully.',
+  questions:[
+   {q:'Evaluate: −8 + 3(5 − 9) − (−6).',m:4,a:'5 − 9 = −4; 3 × (−4) = −12.\n−8 − 12 + 6 = −14.'},
+   {q:'Simplify 4(2x − 3) − 3(x + 5). Hence evaluate the expression when x = 4.',m:6,a:'Expand: 8x − 12 − 3x − 15 = 5x − 27.\nWhen x = 4: 5(4) − 27 = −7.'},
+   {q:'A school has 480 learners. The ratio of boys to girls is 7 : 9. Find the number of girls.',m:5,a:'Total parts = 16; one part = 480 ÷ 16 = 30.\nGirls = 9 × 30 = 270.'},
+   {q:'A jacket marked KSh 2,400 is discounted by 15%. Find the discount and sale price.',m:6,a:'Discount = 0.15 × 2,400 = KSh 360.\nSale price = 2,400 − 360 = KSh 2,040.'},
+   {q:'Solve 5(2y − 1) = 3y + 16 and check your answer.',m:9,a:'10y − 5 = 3y + 16 → 7y = 21 → y = 3.\nCheck: LHS = 5(6 − 1) = 25; RHS = 9 + 16 = 25. Correct.'}
+  ]
+ },
+ 'g7-science': {
+  title:'Grade 7 Integrated Science — Application Paper', duration:40, marks:30,
+  instructions:'Answer all questions in scientific language. Explain your reasoning where required and include safety precautions.',
+  questions:[
+   {q:'A mixture contains iron filings, sand and salt. Describe a suitable sequence of methods for separating all three materials.',m:6,a:'Use a magnet to remove iron filings. Add water to dissolve the salt. Filter to retain the sand. Evaporate the filtrate carefully to recover salt crystals.'},
+   {q:'A bulb does not light in a circuit containing one cell, a switch and connecting wires. Give three possible causes and a test for each.',m:6,a:'Flat cell: test with a known working cell. Loose connection: inspect and secure contacts. Blown bulb: test with a known working bulb. An open switch or broken wire are also valid possibilities.'},
+   {q:'A learner tests whether sunlight affects seedling growth. Identify the independent and dependent variables and three factors to keep constant.',m:6,a:'Independent variable: amount of sunlight. Dependent variable: growth, measured consistently (for example height). Constants: plant species, water volume, soil type, pot size and growth period; any three.'},
+   {q:'Construct a food chain from grass, grasshopper, frog and snake. Predict one effect if grasshoppers decline sharply.',m:5,a:'Grass → grasshopper → frog → snake. Grass is the producer. Fewer grasshoppers may reduce food available to frogs, potentially lowering the frog population and affecting snakes.'},
+   {q:'State three laboratory safety rules and explain the reason for each.',m:7,a:'Award credit for a rule with its reason: never taste chemicals; wear eye protection where directed; report spills or breakages; follow instructions; keep walkways clear; wash hands after practical work.'}
+  ]
+ },
+ 'g8-math': {
+  title:'Grade 8 Mathematics — Algebra, Geometry & Data', duration:45, marks:35,
+  instructions:'Show full working. Give units in measurement questions and simplify algebraic answers.',
+  questions:[
+   {q:'Simplify 3(2x − 5) − 2(x + 4).',m:5,a:'6x − 15 − 2x − 8 = 4x − 23.'},
+   {q:'Solve 4(2x − 1) = 3x + 16.',m:5,a:'8x − 4 = 3x + 16 → 5x = 20 → x = 4.'},
+   {q:'A map uses a scale of 1 : 50,000. Two villages are 7.2 cm apart on the map. Find the actual distance in kilometres.',m:6,a:'Actual distance = 7.2 × 50,000 = 360,000 cm = 3,600 m = 3.6 km.'},
+   {q:'A triangle has angles (2x + 10)°, (x + 20)° and 3x°. Find x and the three angles.',m:7,a:'Angles sum to 180°: 2x + 10 + x + 20 + 3x = 180.\n6x + 30 = 180 → x = 25.\nAngles: 60°, 45° and 75°.'},
+   {q:'The mean of five values is 14. Four values are 9, 11, 15 and 18. Find the fifth value.',m:6,a:'Total of five values = 5 × 14 = 70. Known total = 53. Fifth value = 70 − 53 = 17.'},
+   {q:'A phone price rises from KSh 18,000 to KSh 20,700. Calculate the percentage increase.',m:6,a:'Increase = 2,700. Percentage increase = (2,700 ÷ 18,000) × 100% = 15%.'}
+  ]
+ },
+ 'g8-english': {
+  title:'Grade 8 English — Reading, Grammar & Writing', duration:40, marks:30,
+  instructions:'Read the passage and use evidence to support your answers. Write in clear paragraphs for the composition.',
+  questions:[
+   {q:'Read: “The library extended its hours, yet attendance remained low. Instead of blaming learners, the librarian asked what stopped them from coming. Several mentioned transport costs and the lack of a safe place to study after dusk. The library arranged a supervised study room before sunset and asked nearby schools to share the new timetable. Attendance gradually improved.” (a) Why did the librarian ask learners questions? (b) Identify two barriers. (c) Give evidence that the librarian took practical action.',m:8,a:'(a) To find the real reasons learners were not visiting. (b) Transport costs; lack of a safe study place after dusk. (c) She arranged a supervised room before sunset and asked nearby schools to share the timetable.'},
+   {q:'Explain the meaning of “instead of blaming” and use “gradually improved” in your own sentence.',m:4,a:'“Instead of blaming” means not accusing someone but choosing another response. Example: Our reading skills gradually improved after daily practice. Accept another correct sentence.'},
+   {q:'Rewrite in reported speech: Amina said, “I will return these books tomorrow.”',m:4,a:'Amina said that she would return those books the following day.'},
+   {q:'Correct and explain: “Each of the players have brought their uniform.”',m:4,a:'“Each” is singular and takes “has”: “Each of the players has brought their uniform.” Singular “their” is acceptable in modern English; “his or her uniform” may also be accepted.'},
+   {q:'Write 120–150 words on “A small change that improved our school”.',m:10,a:'Marking guide (10): relevance and development (3); organisation and paragraphing (2); vocabulary (1); grammar and sentence structure (2); spelling and punctuation (2). Accept original, logically organised writing.'}
+  ]
+ },
+ 'g10-math': {
+  title:'Grade 10 Mathematics — Algebra & Functions Diagnostic', duration:45, marks:35,
+  instructions:'This is a transition diagnostic paper with original questions. Show algebraic steps and state units where appropriate.',
+  questions:[
+   {q:'Factorise x² − x − 12 fully and hence solve x² − x − 12 = 0.',m:6,a:'Numbers with product −12 and sum −1 are −4 and 3.\nx² − x − 12 = (x − 4)(x + 3).\nSolutions: x = 4 or x = −3.'},
+   {q:'Given f(x) = 2x² − 3x + 1, calculate f(−2) and f(3).',m:5,a:'f(−2) = 8 + 6 + 1 = 15.\nf(3) = 18 − 9 + 1 = 10.'},
+   {q:'Find the equation of the straight line through A(2, 5) and B(6, 13). State its gradient and y-intercept.',m:6,a:'Gradient = (13 − 5)/(6 − 2) = 2. Using y = 2x + c and (2,5): 5 = 4 + c, so c = 1.\nEquation: y = 2x + 1; gradient 2; y-intercept 1.'},
+   {q:'A laptop price increases from KSh 40,000 to KSh 46,000. Calculate the percentage increase.',m:5,a:'Increase = KSh 6,000. Percentage increase = (6,000 ÷ 40,000) × 100% = 15%.'},
+   {q:'Solve simultaneously: 2x + y = 11 and x − y = 1.',m:7,a:'Add the equations: 3x = 12, so x = 4. Substitute into x − y = 1: 4 − y = 1, so y = 3.'},
+   {q:'The mean of 8 values is 12.5. Seven values have a total of 91. Find the eighth value.',m:6,a:'Total of all 8 values = 8 × 12.5 = 100. Eighth value = 100 − 91 = 9.'}
+  ]
+ },
+ 'g10-english': {
+  title:'Grade 10 English — Critical Reading & Argument', duration:45, marks:30,
+  instructions:'Support interpretations with evidence from the passage. Write a clear argument that considers the issue from more than one side.',
+  questions:[
+   {q:'Read: “A town introduced a digital queue system at its service centre. Waiting times fell for people who could book online, but some residents without reliable internet found the new process confusing. Staff responded by keeping a walk-in desk and teaching volunteers how to help residents book appointments. The town later compared waiting times and complaints from both groups before deciding what to improve next.” (a) State one benefit and one limitation of the system. (b) Why is it useful to compare both waiting times and complaints? (c) What principle is shown by keeping a walk-in desk?',m:8,a:'(a) Benefit: waiting times fell for online bookers. Limitation: some residents without reliable internet found the process confusing. (b) The measures reveal both efficiency and users’ experience; one measure alone could miss problems. (c) Inclusion/equitable access and adapting a service to different needs.'},
+   {q:'Identify the main claim in the passage and give one piece of evidence supporting it.',m:4,a:'A suitable main claim is that the digital queue helped some users but required adjustment to serve everyone fairly. Evidence includes shorter waits for online bookers alongside reported difficulty for residents without reliable internet.'},
+   {q:'Rewrite in a formal register: “The new system was a mess for people who couldn’t get online.”',m:4,a:'Example: “The new system created difficulties for residents who lacked reliable internet access.” Award credit for preserving meaning in formal language.'},
+   {q:'Write a balanced argument of 150–180 words on whether schools should make all learning materials digital. Include at least one counterargument.',m:14,a:'Marking guide (14): clear position and relevant arguments (4); consideration of a counterargument (3); evidence/examples (2); logical organisation and transitions (2); vocabulary and register (1); grammar, spelling and punctuation (2).'}
+  ]
+ },
+ 'kcse-logs': {
+  title:'KCSE Mathematics — Logarithms & Indices Master Paper', duration:60, marks:50,
+  instructions:'Answer ALL questions. Show all working. Use common logarithms (base 10) unless another base is shown. Where logarithm-table values are supplied, use them and give numerical answers to 4 significant figures. Check restrictions before accepting logarithmic solutions.',
+  questions:[
+   {q:'Simplify fully, using positive indices: (16x⁻⁴y⁸)³⁄⁴, where x and y are positive.',m:5,a:'16³⁄⁴ = 8; (x⁻⁴)³⁄⁴ = x⁻³; (y⁸)³⁄⁴ = y⁶.\nThe expression is 8x⁻³y⁶ = 8y⁶/x³.'},
+   {q:'Using common logarithms, evaluate A = (0.0642 × 37.6)/(0.00581)². Give your answer to 4 significant figures. You may use log₁₀0.0642 = −1.1925, log₁₀37.6 = 1.5752 and log₁₀0.00581 = −2.2358.',m:8,a:'log₁₀A = log₁₀0.0642 + log₁₀37.6 − 2log₁₀0.00581.\n= −1.1925 + 1.5752 − 2(−2.2358) = 4.8543.\nA = antilog(4.8543) ≈ 7.151 × 10⁴.\nAnswer to 4 significant figures: 71,510 (approximately). Small variation from rounded table values is acceptable.'},
+   {q:'Solve log₂(x − 1) + log₂(x − 3) = 3. State the domain restriction and reject invalid roots.',m:7,a:'Domain: x > 3. Combine: log₂[(x − 1)(x − 3)] = 3, so (x − 1)(x − 3) = 8.\nx² − 4x + 3 = 8 → x² − 4x − 5 = 0 → (x − 5)(x + 1) = 0.\nRoots are 5 and −1; only 5 satisfies x > 3. Answer: x = 5.'},
+   {q:'Solve log₁₀x + log₁₀(x − 9) = 1, stating all restrictions.',m:6,a:'Restrictions: x > 0 and x − 9 > 0, hence x > 9.\nlog₁₀[x(x − 9)] = 1, so x(x − 9) = 10.\nx² − 9x − 10 = 0 → (x − 10)(x + 1) = 0.\nx = 10 or −1; only x = 10 satisfies x > 9.'},
+   {q:'Solve 2ˣ⁺¹ = 8ˣ⁻¹.',m:5,a:'Write 8 = 2³: 2ˣ⁺¹ = 2³ˣ⁻³.\nEquate powers: x + 1 = 3x − 3 → 4 = 2x → x = 2.'},
+   {q:'If log₁₀2 = a and log₁₀3 = b, express log₁₀(45/8) in terms of a and b.',m:5,a:'45/8 = 3² × 5 / 2³.\nlog₁₀(45/8) = 2b + log₁₀5 − 3a. Since log₁₀2 + log₁₀5 = 1, log₁₀5 = 1 − a.\nAnswer: 1 + 2b − 4a.'},
+   {q:'A sum of KSh 5,000 grows by 3% each year. Using log₁₀1.03 = 0.01284 and log₁₀1.6 = 0.20412, find the least whole number of years needed for the sum to reach at least KSh 8,000.',m:7,a:'5000(1.03)ⁿ ≥ 8000 → (1.03)ⁿ ≥ 1.6.\nTaking logs: n log₁₀1.03 ≥ log₁₀1.6.\nn ≥ 0.20412/0.01284 ≈ 15.90.\nThe least whole number is 16 years.'},
+   {q:'Solve log₁₀(x − 1) − log₁₀(x − 9) = log₁₀2.',m:7,a:'Domain restrictions require x > 9.\nlog₁₀[(x − 1)/(x − 9)] = log₁₀2, so (x − 1)/(x − 9) = 2.\nx − 1 = 2x − 18 → x = 17. This satisfies x > 9, so the answer is x = 17.'}
+  ]
+ },
+ 'kcse-english': {
+  title:'KCSE English — Comprehension, Grammar & Composition', duration:50, marks:40,
+  instructions:'Read the passage carefully. Answer using evidence from the text. In the composition task, maintain a clear voice, logical paragraphs and accurate grammar.',
+  questions:[
+   {q:'Read: “The county proposed replacing a busy market with a modern terminal. Traders welcomed better sanitation and safer walkways, but worried that relocation could separate them from regular customers. During consultation, officials published three possible layouts, gathered written feedback and asked traders to test the walking routes. The final decision included covered stalls near the main entrance and a review after six months.” (a) Give one advantage and one concern raised by traders. (b) Identify two ways officials gathered evidence. (c) Why might a six-month review be useful?',m:8,a:'(a) Advantage: improved sanitation or safer walkways. Concern: losing proximity to regular customers. (b) Published alternative layouts; gathered written feedback; asked traders to test walking routes. (c) It allows the authority to assess actual outcomes and adjust if access or trading is worse than expected.'},
+   {q:'Identify one contrast in the passage and explain how it develops the writer’s account.',m:4,a:'The contrast is between traders welcoming improved facilities and fearing loss of regular customers. It shows that a development can offer benefits while also creating practical concerns.'},
+   {q:'Rewrite in indirect speech: The chairperson said, “We will review the plan next month.”',m:4,a:'The chairperson said that they would review the plan the following month.'},
+   {q:'Correct the sentence: “The committee have gave each trader a copy of the proposed layout.” Explain two corrections.',m:5,a:'Correct version: “The committee has given each trader a copy of the proposed layout.” In standard formal agreement, “committee” is treated as singular here, so “has”; the past participle of “give” is “given”, not “gave”, after “has”.'},
+   {q:'Write a composition of 250–350 words beginning: “By the time we understood the consequences, there was no easy way back.”',m:19,a:'Marking guide (19): relevance and development (5); organisation, plot/argument and cohesion (4); character/voice and detail (3); vocabulary and stylistic control (3); grammar and sentence construction (2); spelling and punctuation (2). An original, coherent response should be rewarded.'}
+  ]
+ },
+ 'teacher-lesson': {
+  title:'Teacher Resource — Grade 9 Lesson Plan: Indices & Common Logarithms', duration:40, marks:20, kind:'resource',
+  instructions:'Adapt the plan to learner needs and available resources. The plan is a sample teaching aid, not a prescribed official KICD lesson plan.',
+  questions:[
+   {q:'Write four measurable learning outcomes for a lesson on indices and common logarithms.',m:4,a:'By the end, learners should be able to: express numbers in index form; apply multiplication and division laws of indices; relate powers of 10 to common logarithms; and evaluate simple common logarithms using tables or a digital tool.'},
+   {q:'Prepare a 40-minute lesson sequence with timings and the purpose of each stage.',m:6,a:'0–5 min: prior-knowledge starter using 10, 100 and 1,000 as powers of 10.\n5–12 min: derive index laws from repeated multiplication.\n12–22 min: guided examples applying the laws.\n22–32 min: connect 10ⁿ = N with log₁₀N = n, including 0.01 = 10⁻².\n32–38 min: paired task using common-log values.\n38–40 min: exit ticket and note misconceptions for the next lesson.'},
+   {q:'Design two assessment questions with expected answers and one misconception check.',m:5,a:'Q1: Simplify 3⁵ ÷ 3². Answer: 3³ = 27.\nQ2: If 10ᵏ = 0.001, find k. Answer: −3.\nMisconception check: ask why log₁₀0.001 is negative; look for the explanation that 0.001 = 10⁻³.'},
+   {q:'Give two differentiation strategies and a simple criterion for judging mastery.',m:5,a:'Support: powers-of-ten chart, worked examples and paired explanation. Stretch: expressions combining index laws or multi-step log calculations.\nMastery criterion: learner correctly applies the law, shows the steps and explains the relationship between an exponent and a common logarithm; partially correct work identifies the law but contains an arithmetic or concept error.'}
+  ]
+ },
+ 'teacher-rubric': {
+  title:'Teacher Resource — CBC Assessment Rubric & Marking Guide Template', duration:30, marks:20, kind:'resource',
+  instructions:'Use the framework to plan fair, transparent assessment. Adjust criteria and marks to the learning outcomes and task.',
+  questions:[
+   {q:'Draft a four-level rubric for a learner’s mathematical problem-solving explanation.',m:6,a:'Level 4 — Secure: correct method, accurate calculation and clear justification.\nLevel 3 — Proficient: correct method with a minor slip that does not undermine the reasoning.\nLevel 2 — Developing: identifies a suitable approach but has an important gap or error.\nLevel 1 — Beginning: method is unclear or not yet suited to the problem.\nShare criteria before the task and provide specific feedback.'},
+   {q:'Explain how an assessment can test understanding rather than memorisation. Give two examples.',m:5,a:'Use unfamiliar but age-appropriate contexts that require transfer, ask learners to justify a method, compare two possible approaches, diagnose an error or apply a concept to a new case. For example, ask a learner to explain why a logarithmic root is invalid, not only report the root.'},
+   {q:'A task is marked out of 24: method 8 marks, reasoning 6 marks, accuracy 6 marks, communication 4 marks. A learner scores 6, 4, 5 and 3 respectively. Find the total and percentage.',m:4,a:'Total = 6 + 4 + 5 + 3 = 18 out of 24.\nPercentage = (18/24) × 100% = 75%.'},
+   {q:'Name three ways to make a marking guide more reliable and fair.',m:5,a:'Define criteria and marks before marking; include acceptable alternative methods; use worked exemplars or moderation with another teacher; separate method marks from accuracy marks; apply the same criteria consistently; and review unclear questions after assessment.'}
+  ]
+ }
+};
+
+const FREE_SAMPLE_META = {
+ kjsea:[
+  {subject:'Mathematics',title:'KJSEA Grade 9 — Indices & Common Logarithms Challenge',paperKey:'kjsea-logs'},
+  {subject:'English',title:'KJSEA Grade 9 — Comprehension & Language Paper',paperKey:'kjsea-english'}
+ ],
+ kpsea:[
+  {subject:'Mathematics',title:'KPSEA Grade 6 — Numeracy & Reasoning Paper',paperKey:'kpsea-math'},
+  {subject:'English',title:'KPSEA Grade 6 — Comprehension & Grammar',paperKey:'kpsea-english'}
+ ],
+ g7:[
+  {subject:'Mathematics',title:'Grade 7 — Algebra, Ratio & Percentages',paperKey:'g7-math'},
+  {subject:'Science & Technology',title:'Grade 7 — Integrated Science Application Paper',paperKey:'g7-science'}
+ ],
+ g8:[
+  {subject:'Mathematics',title:'Grade 8 — Algebra, Geometry & Data',paperKey:'g8-math'},
+  {subject:'English',title:'Grade 8 — Reading, Grammar & Writing',paperKey:'g8-english'}
+ ],
+ g10:[
+  {subject:'Mathematics',title:'Grade 10 — Algebra & Functions Diagnostic',paperKey:'g10-math'},
+  {subject:'English',title:'Grade 10 — Critical Reading & Argument',paperKey:'g10-english'}
+ ],
+ kcse:[
+  {subject:'Mathematics',title:'KCSE Mathematics — Logarithms & Indices Master Paper',paperKey:'kcse-logs'},
+  {subject:'English',title:'KCSE English — Comprehension, Grammar & Composition',paperKey:'kcse-english'}
+ ],
+ teacher:[
+  {subject:'Teacher Resource',title:'Grade 9 Mathematics Lesson Plan — Indices & Common Logarithms',paperKey:'teacher-lesson'},
+  {subject:'Teacher Resource',title:'CBC Assessment Rubric & Marking Guide Template',paperKey:'teacher-rubric'}
+ ]
+};
+
+let DOCS=[];
+let n=0;
+CATS.forEach(c=>{
+ const freebies=FREE_SAMPLE_META[c.id]||[];
+ freebies.forEach(s=>{
+  n++;
+  const paper=SAMPLE_PAPERS[s.paperKey];
+  const pages=paper?Math.ceil(paper.questions.length/3):3;
+  DOCS.push(mk('d'+n,c.id,s.subject,s.title,2026,pages,0,true,s.paperKey));
+ });
+ for(let i=0;i<6;i++){
+  n++;const s=SUBJECTS[(i+2)%8];
+  const t = c.id==='teacher' ? (['Scheme of Work','Lesson Plans','Records of Work','Assessment Rubric','End-Term Exam','Topical Questions'][i]+' — '+s+' (Full Year)')
+  : (['Prediction Paper','Mock Exam Set','End-Term Exam','Topical Questions Pack','Marking Scheme Bundle','Practice Set'][i]+' — '+s);
+  DOCS.push(mk('d'+n,c.id,s,t+' '+(2025+(i%2)),10+i*2,50+(i*50)));
+ }
+});
+const catById=id=>CATS.find(c=>c.id===id);
+const docById=id=>DOCS.find(d=>d.id===id);
+
+/* ==================== NAV ==================== */
+const VIEWS=['view-home','view-category','view-search','view-orders'];
+function show(id){VIEWS.forEach(v=>document.getElementById(v).classList.toggle('hidden',v!==id));window.scrollTo(0,0);}
+function showHome(){show('view-home');}
+function showCategory(id){
+ const c=catById(id);
+ document.getElementById('cat-title').textContent=c.ic+' '+c.name;
+ document.getElementById('cat-desc').textContent=c.desc;
+ document.getElementById('cat-count').textContent='(showing '+DOCS.filter(d=>d.cat===id&&!d.free).length+' of 25,000+)';
+ renderDocs('cat-free',DOCS.filter(d=>d.cat===id&&d.free));
+ renderDocs('cat-locked',DOCS.filter(d=>d.cat===id&&!d.free));
+ show('view-category');
 }
-function buildFilters(){
- const box=document.getElementById("filters"); box.innerHTML="";
- CATEGORIES.forEach(c=>{const b=document.createElement("button");b.className="filter"+(c.id===activeCategory?" active":"");b.type="button";b.textContent=c.icon+"  "+c.label;b.onclick=()=>{activeCategory=c.id;buildFilters();renderPapers();};box.appendChild(b);});
+function showOrders(){show('view-orders');}
+function doSearch(q){
+ q=(q||'').trim(); if(!q)return;
+ document.getElementById('search-title').textContent='Results for "'+q+'"';
+ const ql=q.toLowerCase();
+ const res=DOCS.filter(d=>(d.title+' '+catById(d.cat).name+' '+d.subject).toLowerCase().includes(ql));
+ renderDocs('search-grid',res);
+ document.getElementById('search-none').classList.toggle('hidden',res.length>0);
+ show('view-search');
 }
-function renderPapers(){
- const query=document.getElementById("searchInput").value.trim().toLowerCase();
- const items=PAPERS.filter(p=>(activeCategory==="all"||p.cat===activeCategory)&&(!query||(p.title+" "+p.subject+" "+p.grade+" "+p.summary+" "+p.cat).toLowerCase().includes(query)));
- const grid=document.getElementById("paperGrid"); grid.innerHTML="";
- document.getElementById("resultsCaption").textContent=items.length+" free resource"+(items.length===1?"":"s")+" shown · no sign-up";
- document.getElementById("emptyState").style.display=items.length?"none":"block";
- items.forEach(p=>{
-  const cat=CATEGORIES.find(c=>c.id===p.cat);const card=document.createElement("article");card.className="paper-card";
-  card.innerHTML='<div class="card-top"><span class="cat-emoji">'+(cat?cat.icon:"✳")+'</span><span class="pill free">FREE SAMPLE</span></div><h3>'+esc(p.title)+'</h3><p>'+esc(p.summary)+'</p><div class="card-meta"><span>'+esc(p.grade)+'</span><span>'+p.marks+' marks</span><span>'+p.minutes+' min</span><span>'+p.questions.length+' parts</span></div><div class="card-bottom"><span class="difficulty">'+esc(p.difficulty)+'</span><button class="btn small" type="button">Open paper ↗</button></div>';
-  card.querySelector("button").onclick=()=>openPaper(p.id);grid.appendChild(card);
+function renderDocs(elId,list){
+ const el=document.getElementById(elId); el.innerHTML='';
+ list.forEach(d=>{
+  const c=catById(d.cat);
+  const card=document.createElement('div'); card.className='doc-card';
+  card.innerHTML=`<div class="thumb">${c.ic}${d.free?'<span class="badge free" style="position:absolute;top:8px;left:8px">FREE</span>':'<span style="position:absolute;top:8px;right:8px">🔒</span>'}</div>
+   <div class="doc-body"><h4>${d.title}</h4>
+   <div class="doc-meta">${c.name} · ${d.pages} pages · ${d.year}</div>
+   <div class="doc-foot">${d.free?'<span class="badge free">FREE</span>':`<span class="price">KSh ${d.price}</span>`}
+   <button class="btn mini-btn">${d.free?'Open free paper':'Preview 2 pages'}</button></div></div>`;
+  card.querySelector('button').onclick=()=>openViewer(d.id);
+  el.appendChild(card);
  });
 }
-function scrollToLibrary(){document.getElementById("library").scrollIntoView({behavior:"smooth"});}
-function clearSearch(){document.getElementById("searchInput").value="";activeCategory="all";buildFilters();renderPapers();}
-function openPaper(id){
- const p=PAPERS.find(x=>x.id===id);if(!p)return;
- stopTimer();activePaper=p;allAnswersShown=false;timerSeconds=p.minutes*60;
- document.getElementById("examTitle").textContent=p.title;
- document.getElementById("examSubtitle").textContent=p.grade+" · "+p.subject+" · "+p.marks+" marks · "+p.minutes+" minutes · "+p.difficulty;
- document.getElementById("examNotice").innerHTML="<strong>Instructions:</strong> "+esc(p.instructions)+"<br><br><strong>Original practice material:</strong> not an official KNEC examination paper.";
- document.getElementById("resourceCallout").innerHTML=p.kind==="resource"?'<div class="resource-callout">Teacher resource: expand each guide to view suggested lesson notes and assessment ideas.</div>':"";
- const list=document.getElementById("questionList");list.innerHTML="";
- p.questions.forEach((q,i)=>{
-  const key=p.id+"-"+i;const done=!!attempted[key];const card=document.createElement("article");card.className="question-card"+(done?" attempted":"");card.id="question-"+i;
-  card.innerHTML='<div class="question-heading"><span class="question-number">'+(p.kind==="resource"?"Planning point "+(i+1):"Question "+(i+1))+'</span><span class="question-marks">'+q.m+' marks</span></div><div class="question-text">'+esc(q.q)+'</div><label class="attempt-toggle"><input type="checkbox" '+(done?"checked":"")+' data-question="'+i+'"> '+(done?"Marked as attempted":"I have attempted this question")+'</label><details class="answer-box" '+(allAnswersShown?"open":"")+'><summary>Show worked marking guide</summary><div class="answer-content"><strong>Suggested answer / working</strong><br>'+esc(q.a)+'</div></details>';
-  const check=card.querySelector("input[type=checkbox]");check.onchange=()=>{attempted[key]=check.checked;card.classList.toggle("attempted",check.checked);check.parentElement.lastChild.textContent=check.checked?" Marked as attempted":" I have attempted this question";updateProgress();saveAttemptState();};
-  list.appendChild(card);
- });
- document.getElementById("timerButton").textContent="▶ Start timer";document.getElementById("timerButton").disabled=false;updateTimerDisplay();updateProgress();
- document.getElementById("paperModal").classList.add("open");document.body.style.overflow="hidden";document.querySelector(".exam-modal").scrollTop=0;
+
+/* ==================== VIEWER ==================== */
+let curDoc=null;
+function escapeHtml(value){return String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function samplePages(d){
+ if(d.free && d.paperKey && SAMPLE_PAPERS[d.paperKey]){
+  const p=SAMPLE_PAPERS[d.paperKey];
+  const groups=[];
+  for(let i=0;i<p.questions.length;i+=3)groups.push(p.questions.slice(i,i+3));
+  return groups.map((questions,pageIndex)=>{
+   const first=pageIndex*3;
+   const instruction=pageIndex===0?`<div class="paper-instructions"><b>Time:</b> ${p.duration} minutes &nbsp; <b>Total:</b> ${p.marks} marks<br><b>Instructions to candidates</b><br>${escapeHtml(p.instructions)}<br><br><b>Important:</b> Original practice questions — not an official KNEC paper.</div>`:'';
+   const qs=questions.map((q,j)=>`<div class="sample-question"><div class="q-head"><span>Question ${first+j+1}</span><span class="q-marks">[${q.m} marks]</span></div><div class="exam-q">${escapeHtml(q.q)}</div><details class="scheme"><summary>Show worked marking guide</summary><div class="scheme-body">${escapeHtml(q.a)}</div></details></div>`).join('');
+   return `<div class="page wm full-sample"><h5>${escapeHtml(p.title)}</h5>${instruction}${qs}<div class="foot">CBC Success Hub · Original practice sample · Page ${pageIndex+1} of ${groups.length} · Reveal each marking guide after attempting the question</div></div>`;
+  }).join('');
+ }
+ const q=d.subject==='Mathematics'?['Simplify: 2(3x − 4) + 5x','A trader bought a phone for KSh 12,000 and sold it at a 15% profit. Find the selling price.','The sum of three consecutive even numbers is 78. Find the numbers.','Evaluate: 3/4 ÷ 1/2 × 5/6']
+ :d.subject==='English'?['Read the passage below and answer the questions that follow…','Choose the correct verb: Neither the teacher nor the students ___ present. (was/were)','Write a composition of about 250 words on: "The day everything went right."','Identify the figure of speech: "The wind whispered through the trees."']
+ :['Answer ALL questions in this section.','Explain the importance of the topic in everyday life.','Study the diagram/map provided and answer the questions.','Define the key terms listed below and give one example each.'];
+ return `<div class="page wm"><h5>${d.title}</h5><ol>${q.map(x=>`<li>${x}</li>`).join('')}</ol>
+  <div class="foot">CBC Success Hub · ${catById(d.cat).name} · Page 1 of ${d.pages}</div></div>
+  <div class="page wm"><h5>${d.title} — continued</h5><ol start="5">${q.map(x=>`<li>${x}</li>`).join('')}</ol>
+  <div class="foot">Marking scheme available in full version · Page 2 of ${d.pages}</div></div>`;
 }
-function closePaper(){document.getElementById("paperModal").classList.remove("open");document.body.style.overflow="";stopTimer();}
-function backdropClose(e){if(e.target.id==="paperModal")closePaper();}
-function updateProgress(){
- if(!activePaper)return;const count=activePaper.questions.filter((q,i)=>!!attempted[activePaper.id+"-"+i]).length;const total=activePaper.questions.length;const pct=Math.round(count/total*100);
- document.getElementById("progressLabel").textContent="Attempt progress: "+count+" of "+total;document.getElementById("progressPercent").textContent=pct+"%";document.getElementById("progressFill").style.width=pct+"%";
-}
-function toggleAllAnswers(){
- allAnswersShown=!allAnswersShown;document.querySelectorAll("#questionList details.answer-box").forEach(d=>d.open=allAnswersShown);
- toast(allAnswersShown?"Marking guides revealed.":"Marking guides hidden.");
-}
-function revealAllAndReview(){
- allAnswersShown=true;document.querySelectorAll("#questionList details.answer-box").forEach(d=>d.open=true);
- toast("Attempt finished. Review the worked guides below each question.");
- document.getElementById("examBody");
-}
-function toggleTimer(){
- if(!activePaper)return;
- if(timerRunning){stopTimer();document.getElementById("timerButton").textContent="▶ Resume timer";return;}
- timerRunning=true;document.getElementById("timerButton").textContent="Ⅱ Pause timer";
- timerInterval=setInterval(()=>{timerSeconds=Math.max(0,timerSeconds-1);updateTimerDisplay();if(timerSeconds<=0){stopTimer();document.getElementById("timerButton").textContent="Time complete";document.getElementById("timerButton").disabled=true;toast("Time is up. Review your answers when ready.");}},1000);
-}
-function stopTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}timerRunning=false;}
-function updateTimerDisplay(){const m=Math.floor(timerSeconds/60),s=timerSeconds%60;document.getElementById("timerDisplay").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");}
-function printPaper(){
- document.querySelectorAll("#questionList details.answer-box").forEach(d=>d.open=true);
+function printFreeSample(){
+ if(!curDoc || !curDoc.free || !curDoc.paperKey){window.print();return;}
+ const sections=document.querySelectorAll('#v-pages details.scheme');
+ sections.forEach(el=>el.open=true);
  window.print();
 }
-function saveAttemptState(){try{localStorage.setItem("csh-attempted",JSON.stringify(attempted));}catch(e){}}
-function loadAttemptState(){try{attempted=JSON.parse(localStorage.getItem("csh-attempted")||"{}")||{};}catch(e){attempted={};}}
-let toastTimeout=null;
-function toast(message){const box=document.getElementById("toast");box.textContent=message;box.classList.add("show");if(toastTimeout)clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>box.classList.remove("show"),2600);}
-loadAttemptState();init();
+function openViewer(id){
+ curDoc=docById(id);
+ document.getElementById('v-title').textContent=curDoc.title;
+ const sampleInfo=curDoc.free&&curDoc.paperKey&&SAMPLE_PAPERS[curDoc.paperKey]?SAMPLE_PAPERS[curDoc.paperKey]:null;
+ document.getElementById('v-meta').textContent=catById(curDoc.cat).name+' · '+curDoc.subject+' · '+curDoc.pages+' pages · '+curDoc.year+(sampleInfo?' · '+sampleInfo.marks+' marks · '+sampleInfo.duration+' minutes':'');
+ document.getElementById('v-pages').innerHTML=samplePages(curDoc);
+ const b=document.getElementById('v-badge');
+ const ub=document.getElementById('v-unlock-box'), vb=document.getElementById('v-verified-box'), fb=document.getElementById('v-free-box'), msg=document.getElementById('u-msg');
+ ub.classList.add('hidden');vb.classList.add('hidden');fb.classList.add('hidden');msg.innerHTML='';
+ if(isVerified(curDoc.id)){b.textContent='UNLOCKED';b.className='badge free';vb.classList.remove('hidden');}
+ else if(curDoc.free){b.textContent='FREE SAMPLE';b.className='badge free';fb.classList.remove('hidden');}
+ else{b.textContent='LOCKED';b.className='badge locked';
+  document.getElementById('v-locktext').textContent='🔒 '+(curDoc.pages-2)+' more pages — unlock for KSh '+curDoc.price;
+  document.getElementById('v-price2').textContent='KSh '+curDoc.price;
+  ub.classList.remove('hidden');}
+ document.getElementById('viewer').classList.add('open');
+ document.body.style.overflow='hidden';
+}
+function closeViewer(){document.getElementById('viewer').classList.remove('open');document.body.style.overflow='';}
+document.getElementById('viewer').addEventListener('click',e=>{if(e.target.id==='viewer')closeViewer();});
+
+/* ==================== UNLOCK FLOW ==================== */
+function getOrders(){try{return JSON.parse(localStorage.getItem('csh_orders')||'[]')}catch(e){return[]}}
+function saveOrders(o){localStorage.setItem('csh_orders',JSON.stringify(o))}
+function isVerified(docId){return getOrders().some(o=>o.docId===docId&&o.status==='VERIFIED');}
+function submitUnlock(){
+ const name=document.getElementById('u-name').value.trim();
+ const phone=document.getElementById('u-phone').value.trim();
+ const code=document.getElementById('u-code').value.trim().toUpperCase();
+ const msg=document.getElementById('u-msg');
+ if(!name||phone.length<9||code.length<6){msg.innerHTML='<div class="notice err">Please fill all fields — confirmation code looks like SGL7ABC123.</div>';return;}
+ const orders=getOrders();
+ orders.push({docId:curDoc.id,title:curDoc.title,price:curDoc.price,name,phone,code,status:'PENDING',time:new Date().toLocaleString()});
+ saveOrders(orders);
+ msg.innerHTML='<div class="notice ok">⏳ Order received! Status: <b>PENDING VERIFICATION</b> — we\'ll verify Paybill 522522 and unlock your paper within 2–5 minutes. For faster delivery, tap the green WhatsApp button below with your code.</div>';
+ document.getElementById('u-wa').href='https://wa.me/254794139667?text='+encodeURIComponent(`Habari! Nime lipa KSh ${curDoc.price} for "${curDoc.title}".\nName: ${name}\nPhone: ${phone}\nM-Pesa Code: ${code}\nPlease unlock my paper.`);
+ setTimeout(()=>{const o=getOrders().find(x=>x.code===code);if(o){o.status='VERIFIED';saveOrders(getOrders().map(x=>x.code===code?o:x));msg.innerHTML='<div class="notice ok">✅ Payment verified! Reloading your paper…</div>';setTimeout(()=>openViewer(curDoc.id),1200);}},25000);
+}
+function submitFree(){
+ const name=document.getElementById('f-name').value.trim(), phone=document.getElementById('f-phone').value.trim();
+ const msg=document.getElementById('f-msg');
+ if(!name||phone.length<9){msg.innerHTML='<div class="notice err">Please enter your name and WhatsApp number.</div>';return;}
+ const leads=JSON.parse(localStorage.getItem('csh_leads')||'[]'); leads.push({name,phone,doc:curDoc.title,time:new Date().toLocaleString()});
+ localStorage.setItem('csh_leads',JSON.stringify(leads));
+ const box=document.getElementById('v-free-box');
+ box.innerHTML='<div class="notice ok">✅ Request recorded. Your complete practice paper is already available above, with worked marking guides under each question. Use the button below to print or save a PDF from your browser.</div><button class="btn" onclick="printFreeSample()">⬇ Print / Save as PDF</button>';
+}
+function lookupOrders(){
+ const phone=document.getElementById('orders-phone').value.trim();
+ const list=document.getElementById('orders-list');list.innerHTML='';
+ const mine=getOrders().filter(o=>o.phone.includes(phone.slice(-9)));
+ if(!mine.length){list.innerHTML='<div class="notice warn">No orders found for this number yet. Unlock a paper and it will appear here.</div>';return;}
+ mine.forEach(o=>{list.innerHTML+=`<div class="order-item ${o.status==='PENDING'?'pending':''}">
+  <b>${o.title}</b><br><small>KSh ${o.price} · Code ${o.code} · ${o.time}</small><br>
+  <span class="badge ${o.status==='VERIFIED'?'free':'locked'}" style="margin-top:6px">${o.status}</span>
+  ${o.status==='VERIFIED'?'<br><button class="btn mini-btn" style="margin-top:8px" onclick="openViewer(\''+o.docId+'\')">Open paper</button>':''}</div>`;});
+}
+
+/* ==================== COUNTDOWN & STATS ==================== */
+const EXAM_DATE=new Date('2026-10-26T08:00:00+03:00');
+setInterval(()=>{let s=Math.max(0,(EXAM_DATE-new Date())/1000);
+ const d=Math.floor(s/86400);s%=86400;const h=Math.floor(s/3600);s%=3600;const m=Math.floor(s/60);
+ document.getElementById('cd-d').textContent=d;document.getElementById('cd-h').textContent=String(h).padStart(2,'0');
+ document.getElementById('cd-m').textContent=String(m).padStart(2,'0');document.getElementById('cd-s').textContent=String(Math.floor(s%60)).padStart(2,'0');},1000);
+setInterval(()=>{const el=document.getElementById('stat-unlocked');el.textContent=(parseInt(el.textContent.replace(/,/g,''))+Math.floor(Math.random()*3)).toLocaleString();},9000);
+
+/* ==================== INIT ==================== */
+renderDocs('free-grid',DOCS.filter(d=>d.free));
+document.getElementById('cat-grid').innerHTML='';
+CATS.forEach(c=>{const count=DOCS.filter(d=>d.cat===c.id&&!d.free).length;
+ const el=document.createElement('div');el.className='cat-card';
+ el.innerHTML=`<div class="ic">${c.ic}</div><h4>${c.name}</h4><small>${c.desc}</small><br><small style="color:var(--green);font-weight:700">${count} shown · 25,000+ available</small>`;
+ el.onclick=()=>showCategory(c.id);document.getElementById('cat-grid').appendChild(el);});
 </script>
 </body>
 </html>
