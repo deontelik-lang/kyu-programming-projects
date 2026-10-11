@@ -42,6 +42,13 @@ CampusHub is a connected campus and local-services super app evolved from the ea
 - Google Fonts typography uses Inter and Poppins when the fonts are reachable, with system-font fallbacks.
 
 
+## Reliable content publishing
+
+- The listing/media composer now initializes global location fields before submission instead of depending solely on a delayed DOM observer, and shows publishing errors inside the draft so the user can correct the problem without losing the text.
+- Starting a post while signed out preserves the chosen hub, then returns to that composer after sign-in or registration.
+- Successful posts redirect to the relevant Explore or Media area and reload the new listing.
+- Media and creator posts require a public content URL. This is link publishing, not native video/audio file upload; native uploads and hosted streaming remain disabled.
+
 ## StudentOS cinematic soundscape
 
 - Optional, user-triggered cinematic intro rendered live on a high-DPI HTML canvas with five animated scenes: futuristic car reveal, acceleration and speed streaks, perspective light tunnel, rotating graticule-and-continent globe, and StudentOS logo/voiceover. This is rendered animation, not a prerecorded video or a static SVG with a few transitions.
