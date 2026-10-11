@@ -388,6 +388,7 @@
         <button class="so-launch-card" type="button" data-so-page="services"><span class="so-launch-icon">⚒</span><b data-so-i18n="navServices">Services</b><small>Skilled professionals & local help</small></button>
         <button class="so-launch-card" type="button" data-so-page="media"><span class="so-launch-icon">▶️</span><b data-so-i18n="navMedia">Media</b><small>Videos, music, podcasts & creators</small></button>
         <button class="so-launch-card" type="button" data-so-page="account"><span class="so-launch-icon">◉</span><b data-so-i18n="tileMySpace">My space</b><small>Profile, applications & saved items</small></button>
+        <button class="so-launch-card so-create-card" type="button" data-so-action="create-content"><span class="so-launch-icon">＋</span><b>Create content</b><small>Post a campus update, opportunity or creator link</small></button>
       </div>
       <div class="so-assistant-strip">
         <span class="so-assistant-orb" aria-hidden="true">✦</span>
@@ -640,10 +641,10 @@
       if(typeSelect) {
         const mediaField=document.createElement('div');
         mediaField.className='field so-media-url-field';
-        mediaField.innerHTML='<label for="so-media-url">Public content link (optional)</label><input id="so-media-url" name="mediaUrl" type="url" maxlength="800" placeholder="https://your-video-or-audio-page.example"><span class="help">For creator/media listings only. This links to content; it does not upload a file.</span>';
+        mediaField.innerHTML='<label for="so-media-url">Public content link</label><input id="so-media-url" name="mediaUrl" type="url" maxlength="800" placeholder="https://your-video-or-audio-page.example"><span class="help">Required for media posts. Paste a public link from your content host; direct file uploads are not enabled yet.</span>';
         const titleField=form.querySelector('input[name="title"]')?.closest('.field');
         if(titleField)titleField.insertAdjacentElement('afterend',mediaField);else typeSelect.closest('.field')?.insertAdjacentElement('afterend',mediaField);
-        const refreshMedia=()=>{const isMedia=['media_video','music','podcast','student_original','creator'].includes(typeSelect.value);mediaField.classList.toggle('hidden',!isMedia);};
+        const refreshMedia=()=>{const isMedia=['media_video','music','podcast','student_original','creator'].includes(typeSelect.value);mediaField.classList.toggle('hidden',!isMedia);const mediaInput=mediaField.querySelector('input[name="mediaUrl"]');if(mediaInput){mediaInput.required=isMedia;mediaInput.setAttribute('aria-required',String(isMedia));}};
         typeSelect.addEventListener('change',refreshMedia);refreshMedia();
       }
     } else if (form.id==='platformProfileForm') {
@@ -683,6 +684,11 @@
       if(element.dataset.soType){
         const mediaTypes=['media_video','music','podcast','student_original','creator'];
         if(mediaTypes.includes(element.dataset.soType))openMediaType(element.dataset.soType);else openGlobalType(element.dataset.soType);
+        return;
+      }
+      if(element.dataset.soAction==='create-content'){
+        openPage('explore');
+        if(typeof window.openCreateListing==='function')window.openCreateListing('community');
         return;
       }
       if(element.dataset.soAction==='publish-media'){
@@ -837,6 +843,7 @@
     codeForCountry,
     countries: COUNTRIES.map(item=>({...item})),
     registerFieldsMarkup,
+    prepareListingForm(form) { attachFormFields(form); },
     openPage,
     saveLocation,
     hydrateFromProfile,
