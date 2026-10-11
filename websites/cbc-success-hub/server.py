@@ -18,7 +18,7 @@ if not TOKEN_PATH.exists():
     token=secrets.token_urlsafe(36)
     TOKEN_PATH.write_text(token,encoding="utf-8")
     os.chmod(TOKEN_PATH,0o600)
-    print("CBC_SUCCESS_HUB_ADMIN_TOKEN="+token,flush=True)
+    print("Generated private admin token at the protected data path.",flush=True)
 
 def now_local():
     return datetime.now(ZoneInfo("Africa/Nairobi")).isoformat(timespec="seconds")
@@ -103,7 +103,7 @@ class Handler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(content)
             return
-        if path in ("/server.py","/generate_cbc_pdfs.py") or any(part.startswith(".") for part in Path(path).parts if part not in ("/",".","..")):
+        if path in ("/server.py","/generate_cbc_pdfs.py","/cbc-success-hub-server.log","/cbc-success-hub-server.pid","/server.log","/orders.sqlite3","/papers.json","/admin_token") or any(part.startswith(".") for part in Path(path).parts if part not in ("/",".","..")):
             self.send_error(404,"Not found")
             return
         return super().do_GET()
