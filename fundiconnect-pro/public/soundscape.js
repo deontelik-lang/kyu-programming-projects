@@ -25,7 +25,7 @@
   var settings=readSettings(),ctx=null,master=null,ambientNodes=[],introTimer=0,activeScene=0,lastHover=0,ambientStarted=false;
   var $=function(id){return document.getElementById(id);};
   var cinemaCanvas=null,cinemaCtx=null,cinemaFrameId=0,cinemaStart=0,cinemaDpr=1,cinemaWidth=0,cinemaHeight=0,cinemaStars=[],cinemaLastTime=0,ambientBeatTimer=0,cinemaSnapshotCanvas=null,cinemaSnapshotCtx=null,cinemaHasFrame=false,cinemaSceneTransitionAt=0,cinemaSceneTransitionDuration=860,cinemaSceneTransitionTimer=0;
-  var cinemaSceneStartedAt=0,heroCanvas=null,heroCtx=null,heroFrameId=0,heroWidth=0,heroHeight=0,heroDpr=1,heroStars=[],heroLastFrame=0,heroObserver=null,heroVisible=true,heroReducedMotion=false;
+  var cinemaSceneStartedAt=0,heroCanvas=null,heroCtx=null,heroFrameId=0,heroWidth=0,heroHeight=0,heroDpr=1,heroStars=[],heroLastFrame=0,heroObserver=null,heroVisible=true,heroReducedMotion=false,threeDBundlePromise=null;
   var scenes=[
     {id:'car',kicker:'01 / FIRST CONTACT',title:'The future starts here.',description:'A new kind of student experience is coming into view.',duration:2200},
     {id:'acceleration',kicker:'02 / BUILT TO MOVE',title:'Your world. In motion.',description:'Ideas, people and opportunities move with you.',duration:1850},
@@ -192,8 +192,9 @@
   function modalMarkup(){
     var points=scenes.map(function(_,i){return '<i'+(i===0?' class="active"':'')+'></i>';}).join('');
     return '<div id="soIntroOverlay" class="so-intro-overlay" data-scene="car" role="dialog" aria-modal="true" aria-label="StudentOS cinematic introduction" aria-describedby="soIntroDescription" hidden>'+
-      '<div class="so-intro-stage" aria-hidden="true"><canvas id="soCinemaCanvas" class="so-cinema-canvas"></canvas>'+
+      '<div class="so-intro-stage" aria-hidden="true"><canvas id="soCinemaCanvas" class="so-cinema-canvas"></canvas><canvas id="soCinemaCar3d" class="so-cinema-car3d"></canvas>'+
       '<div class="so-intro-logo"><div class="so-intro-logo-mark">S<span>O</span></div></div></div>'+
+      '<div id="soCinemaStatus" class="so-cinema-status"><i></i><span>REAL-TIME GRAPHICS</span><b data-so3d-status>Starting the 3D scene on launch</b></div>'+
       '<button class="so-intro-actions so-intro-skip" type="button" data-sound-action="close-intro">Skip intro ×</button>'+
       '<div class="so-intro-content"><div id="soIntroKicker" class="so-intro-kicker">01 / FIRST CONTACT</div><h1 id="soIntroTitle" class="so-intro-title">The future starts here.</h1><p id="soIntroDescription" class="so-intro-description">A new kind of student experience is coming into view.</p>'+
       '<div class="so-intro-progress" aria-hidden="true">'+points+'</div><div class="so-intro-actions"><button id="soIntroEnter" class="primary" type="button" data-sound-action="enter-intro" hidden>Explore StudentOS ↗</button></div></div></div>';
@@ -232,6 +233,7 @@
     activeScene=index;
     cinemaSceneStartedAt=performance.now();
     overlay.dataset.scene=scene.id;
+    if(window.StudentOS3D&&typeof window.StudentOS3D.setScene==='function')window.StudentOS3D.setScene(scene.id,cinemaSceneStartedAt);
     $('soIntroKicker').textContent=scene.kicker;
     $('soIntroTitle').innerHTML=scene.title;
     $('soIntroDescription').textContent=scene.description;
@@ -417,6 +419,28 @@
       c.beginPath();c.arc(x,y,star.r*star.z,0,Math.PI*2);c.fill();
     });
     c.globalAlpha=1;
+    if(scene==='globe'||scene==='reveal'){
+      // Switch the environment itself from the urban road into a deep-space orbital stage.
+      var cx=w*.5,cy=h*.46,span=Math.min(w,h)*.42;
+      for(var orbit=0;orbit<7;orbit++){
+        c.save();c.translate(cx,cy);c.rotate((orbit-3)*.19+t*.000018*(orbit%2?-1:1));
+        c.beginPath();c.ellipse(0,0,span*(1.02+orbit*.13),span*(.25+orbit*.035),0,0,Math.PI*2);
+        c.strokeStyle=orbit%3===0?'rgba(240,171,252,.28)':'rgba(103,232,249,.21)';c.lineWidth=orbit%3===0?1.2:.7;c.stroke();c.restore();
+      }
+      for(var particle=0;particle<62;particle++){
+        var phase=(particle*.6180339887+t*.000026*(.4+(particle%5)*.19))%1;
+        var angle=particle*2.3999632297+t*.000055,rr=span*(.48+phase*.82);
+        var px=cx+Math.cos(angle)*rr,py=cy+Math.sin(angle)*rr*.58;
+        c.globalAlpha=.14+.62*(.5+.5*Math.sin(t*.002+particle));
+        c.fillStyle=particle%5===0?'#f0abfc':particle%3===0?'#a5b4fc':'#a5f3fc';
+        c.beginPath();c.arc(px,py,.4+(particle%4)*.32,0,Math.PI*2);c.fill();
+      }
+      c.globalAlpha=1;
+      var vignette=c.createRadialGradient(cx,cy,span*.22,cx,cy,Math.max(w,h)*.72);
+      vignette.addColorStop(0,'rgba(4,12,30,0)');vignette.addColorStop(1,'rgba(1,3,12,.44)');
+      c.fillStyle=vignette;c.fillRect(0,0,w,h);
+      return;
+    }
     // layered glass towers give the horizon depth and gentle parallax.
     for(var layer=0;layer<3;layer++){
       var base=h*(.69+layer*.035),speed=(layer+1)*.004,ww=14+layer*7;
@@ -640,10 +664,11 @@
   function paintCinemaScene(t,scene,elapsed){
     var c=cinemaCtx,w=cinemaWidth,h=cinemaHeight;
     cinemaBackground(t,scene);
-    if(scene==='tunnel'){cinemaTunnel(t);cinemaCar(t,scene,elapsed);}
-    else if(scene==='globe'){cinemaGlobe(t,false);cinemaCar(t,scene,elapsed);}
-    else if(scene==='reveal'){cinemaGlobe(t,true);cinemaGlow(w*.5,h*.43,Math.min(w,h)*.28,'rgba(139,92,246,ALPHA)',.16);}
-    else cinemaCar(t,scene,elapsed);
+    var real3D=!!(window.StudentOS3D&&window.StudentOS3D.isReady&&window.StudentOS3D.isReady());
+    if(scene==='tunnel'){cinemaTunnel(t);if(!real3D)cinemaCar(t,scene,elapsed);}
+    else if(scene==='globe'){if(!real3D)cinemaGlobe(t,false);if(!real3D)cinemaCar(t,scene,elapsed);}
+    else if(scene==='reveal'){if(!real3D){cinemaGlobe(t,true);cinemaGlow(w*.5,h*.43,Math.min(w,h)*.28,'rgba(139,92,246,ALPHA)',.16);}}
+    else if(!real3D)cinemaCar(t,scene,elapsed);
     if(scene==='car'||scene==='reveal'){
       for(var i=0;i<16;i++){
         var a=t*.00021+i*Math.PI/8,rad=Math.min(w,h)*(.19+(i%5)*.035),x=w*.5+Math.cos(a)*rad*1.22,y=h*.48+Math.sin(a)*rad*.62;
@@ -691,9 +716,39 @@
     if(overlay){overlay.classList.add('is-leaving');window.setTimeout(function(){overlay.hidden=true;overlay.classList.remove('is-leaving');},620);}
     if(window.speechSynthesis){try{window.speechSynthesis.cancel();}catch(_){}}
     document.body.classList.remove('so-intro-open');
+    if(window.StudentOS3D&&typeof window.StudentOS3D.setScene==='function')window.StudentOS3D.setScene('closed',performance.now());
     stopCinema();
     if(settings.enabled&&settings.theme!=='off')startAmbient();
     var launch=document.querySelector('[data-sound-action="intro"]');if(launch)launch.focus({preventScroll:true});
+  }
+  function ensureStudentOS3D(){
+    if(window.StudentOS3D&&typeof window.StudentOS3D.load==='function')return window.StudentOS3D.load();
+    if(threeDBundlePromise)return threeDBundlePromise;
+    threeDBundlePromise=new Promise(function(resolve){
+      var script=document.createElement('script');
+      script.src='/studentos-3d.bundle.js?v=2';script.async=true;
+      script.onload=function(){
+        var engine=window.StudentOS3D;
+        if(!engine||typeof engine.load!=='function'){
+          set3DStatus('3D renderer unavailable · live canvas fallback',false);resolve(false);return;
+        }
+        engine.setScene(scenes[activeScene]?scenes[activeScene].id:'car',cinemaSceneStartedAt);
+        engine.load().then(function(ok){
+          if(ok){engine.setScene(scenes[activeScene]?scenes[activeScene].id:'car',cinemaSceneStartedAt);set3DStatus('3D vehicle + connected Earth online',true);}
+          else set3DStatus('WebGL unavailable · live canvas fallback',false);
+          resolve(Boolean(ok));
+        }).catch(function(){set3DStatus('3D model unavailable · live canvas fallback',false);resolve(false);});
+      };
+      script.onerror=function(){set3DStatus('3D package unavailable · live canvas fallback',false);resolve(false);};
+      document.head.appendChild(script);
+    });
+    return threeDBundlePromise;
+  }
+  function set3DStatus(label,ready){
+    var status=$('soCinemaStatus');if(!status)return;
+    var target=status.querySelector('[data-so3d-status]');if(target)target.textContent=label;
+    status.classList.toggle('is-ready',Boolean(ready));
+    status.classList.toggle('is-fallback',label.indexOf('fallback')>=0||label.indexOf('unavailable')>=0);
   }
   function playIntro(){
     if(!settings.enabled&&!settings.userMuted){settings.enabled=true;saveSettings();wakeAudio();updateDock();}
@@ -703,6 +758,7 @@
     updateDock();
     overlay.hidden=false;overlay.classList.remove('is-leaving');document.body.classList.add('so-intro-open');
     startCinema();
+    ensureStudentOS3D();
     if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){renderScene(scenes.length-1);}
     else {renderScene(0);advanceIntro();}
     var skip=overlay.querySelector('[data-sound-action="close-intro"]');if(skip)skip.focus({preventScroll:true});

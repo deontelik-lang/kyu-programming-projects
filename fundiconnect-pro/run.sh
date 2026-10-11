@@ -21,4 +21,9 @@ if [ "$NODE_MAJOR" -lt 24 ]; then
   exit 1
 fi
 cd "$ROOT"
+# Build the lazy-loaded Three.js renderer from the pinned, hash-verified CC0 model.
+# If WebGL assets cannot be prepared, the app remains available with its animated canvas fallback.
+if [ -x "$ROOT/node_modules/.bin/esbuild" ] && [ -f "$ROOT/scripts/build-studentos-3d.js" ]; then
+  node "$ROOT/scripts/build-studentos-3d.js" || echo "StudentOS 3D build unavailable; using the live canvas fallback." >&2
+fi
 exec node server.js

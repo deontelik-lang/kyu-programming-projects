@@ -12,9 +12,12 @@
     "check": "node --check server.js && node --check hubs.js && node --check payments.js && node --check marketplace.js && node --check upgrades.js && node scripts/check-client.js",
     "test": "npm run check",
     "admin:promote": "node scripts/promote-admin.js",
-    "test:integration": "node scripts/integration-test.js"
+    "test:integration": "node scripts/integration-test.js",
+    "build:cinematic": "node scripts/build-studentos-3d.js"
   },
   "dependencies": {
-    "pg": "^8.23.1"
+    "esbuild": "^0.28.2",
+    "pg": "^8.23.1",
+    "three": "^0.186.1"
   }
 }

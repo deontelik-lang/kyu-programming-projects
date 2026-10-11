@@ -286,3 +286,25 @@ body.so-intro-open{overflow:hidden}
 @media(prefers-reduced-motion:reduce){.so-help-experience-card,.so-help-experience-card:hover{transition:none!important;transform:none!important}}
 
 @media(max-width:650px){.so-intro-skip{right:10px;top:max(10px,env(safe-area-inset-top));min-height:34px;padding:0 10px;font-size:9px}}
+
+
+/* Aurora Circuit 3D stage: native WebGL vehicle/Earth render, with canvas fallback beneath it. */
+.so-cinema-car3d{position:absolute;inset:0;z-index:2;display:block;width:100%;height:100%;opacity:0;pointer-events:none;background:transparent;transition:opacity .72s cubic-bezier(.2,.7,.2,1);will-change:opacity}
+.so-cinema-car3d.is-loaded{opacity:1}
+.so-intro-overlay[data-scene="car"] .so-cinema-car3d,
+.so-intro-overlay[data-scene="acceleration"] .so-cinema-car3d,
+.so-intro-overlay[data-scene="tunnel"] .so-cinema-car3d,
+.so-intro-overlay[data-scene="globe"] .so-cinema-car3d,
+.so-intro-overlay[data-scene="reveal"] .so-cinema-car3d{opacity:1}
+.so-intro-overlay .so-intro-logo{z-index:3}
+.so-cinema-status{position:absolute;z-index:5;top:max(17px,env(safe-area-inset-top));left:18px;display:flex;align-items:center;gap:8px;max-width:min(420px,calc(100vw - 125px));padding:9px 12px;border:1px solid #67e8f939;border-radius:11px;background:linear-gradient(115deg,#061527c7,#15152fc9);box-shadow:0 8px 28px #0206174d;backdrop-filter:blur(15px);color:#b9cae7;font-size:8px;letter-spacing:.09em;pointer-events:none}
+.so-cinema-status>i{width:6px;height:6px;flex-shrink:0;border-radius:50%;background:#fbbf24;box-shadow:0 0 10px #fbbf24;animation:soSignalPulse 1.4s infinite}
+.so-cinema-status>span{color:#a5f3fc;white-space:nowrap;font-weight:900}
+.so-cinema-status>b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:7px;letter-spacing:.015em;font-weight:650;color:#aebbd3}
+.so-cinema-status.is-ready>i{background:#34d399;box-shadow:0 0 11px #34d399}
+.so-cinema-status.is-fallback>i{background:#fb923c;box-shadow:0 0 9px #fb923c}
+.so-intro-overlay[data-scene="globe"] .so-cinema-car3d,
+.so-intro-overlay[data-scene="reveal"] .so-cinema-car3d{filter:saturate(1.2) contrast(1.04)}
+.so-intro-overlay[data-scene="reveal"] .so-intro-logo{filter:drop-shadow(0 0 35px #67e8f9a0)}
+@media(max-width:650px){.so-cinema-status{top:max(9px,env(safe-area-inset-top));left:9px;gap:6px;padding:7px 8px;max-width:calc(100vw - 115px)}.so-cinema-status>span{font-size:6px}.so-cinema-status>b{font-size:6px}.so-cinema-car3d{image-rendering:auto}}
+@media(prefers-reduced-motion:reduce){.so-cinema-car3d{transition:none!important}.so-cinema-status>i{animation:none!important}}
