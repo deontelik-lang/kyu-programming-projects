@@ -99,6 +99,13 @@ def build_header(p, paper_key, answer=False):
       story.extend([P("GUIDANCE FOR SELF-MARKING AND TEACHER REVIEW","qhead"),
         P("These are suggested answers and indicative marks for original practice questions. Credit mathematically valid alternatives and clear equivalent reasoning where appropriate.","instructions"),
         Spacer(1,4),HRFlowable(width="100%",thickness=.5,color=line,spaceAfter=6)])
+    if p.get("kind") == "trend_pack":
+      story.extend([
+        P("QUALITATIVE KCSE TOPIC REVIEW | 2016-2025","qhead"),
+        P(p.get("trend_summary","Subject-specific topic emphasis for revision."),"instructions"),
+        P(p.get("trend_methodology","This is a qualitative revision guide, not a numerical frequency count or a guarantee of future examination content."),"small"),
+        Spacer(1,5), HRFlowable(width="100%",thickness=.5,color=line,spaceAfter=6)
+      ])
     return story
 
 def build_questions(key,p):
