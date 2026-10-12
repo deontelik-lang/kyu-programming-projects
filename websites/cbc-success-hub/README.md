@@ -1,9 +1,9 @@
 # CBC Success Hub — Original Design + Protected Exam PDF Bundles
 
-This website preserves the supplied CBC Success Hub green/red layout and adds realistic two-page previews for 14 original practice resources across KJSEA Grade 9, KPSEA Grade 6, Grades 7–8, Grade 10 transition practice, KCSE revision and teacher resources.
+This website preserves the supplied CBC Success Hub green/red layout and adds realistic one-page previews for 14 original practice resources across KJSEA Grade 9, KPSEA Grade 6, Grades 7–8, Grade 10 transition practice, KCSE revision and teacher resources.
 
 ## Learner experience
-- The first two preview pages are viewable online for free.
+- Exactly one preview page is viewable online for free.
 - Each published bundle costs **KSh 30**.
 - After verification, learners receive two separate file links: a complete question paper PDF and a separate marking-scheme / worked-answer PDF.
 - The browser source contains only preview questions. Full question data and marking answers are kept server-side, outside the public web root.
