@@ -14,6 +14,8 @@ This website preserves the supplied CBC Success Hub green/red layout, offers one
 - Thirty additional locked 50-mark practice packs cover Mathematics Alternative A/B, English, Kiswahili, Biology, Chemistry, Physics, General Science, History and Government, Geography, CRE, IRE, HRE, Agriculture, Business Studies, Computer Studies, Home Science, French, German, Arabic, Music, Art and Design, Drawing and Design, Aviation Technology, Building Construction, Electricity, Metalwork, Power Mechanics, Woodwork and Kenya Sign Language.
 - The packs include subject-specific qualitative topic notes and original hard questions with a separate worked marking guide. The topic notes are not a statistically verified item-by-item count of every 2016–2025 question and are not guarantees about a future exam. The website links to outside archives rather than rehosting their past-paper files. For official publication information, it links to KNEC's Bookshop.
 
+- Each KCSE year card includes an alternate archive link for 2016–2025, so learners can try another host if one collection is unavailable; third-party access may still require sign-in or change over time.
+
 ## Payment and access control
 - New orders remain **PENDING** until an authorised staff member confirms the receipt against the merchant’s M-Pesa/Paybill transaction records.
 - The server does not mark orders verified from a client-side timer, localStorage flag, or receipt code alone.
