@@ -115,11 +115,31 @@ def build_questions(key,p):
       text=q.get("q","")
       story.append(P(f"QUESTION {i}  [{q.get('m',0)} MARKS]","qhead"))
       story.append(P(text,"q"))
-      # Exam-booklet-style working space: enough room to set out steps without consuming whole pages.
+      # Ruled response space scales with the mark allocation. Extended writing tasks get a
+      # larger writing area; calculations get concise, ruled work lines.
       m=int(q.get("m",2))
-      height=max(9,min(31,5+2.4*m))*mm
-      work=Table([[" "]],colWidths=[170*mm],rowHeights=[height])
-      work.setStyle(TableStyle([("BOX",(0,0),(-1,-1),.35,colors.HexColor("#d7ddd5")),("BACKGROUND",(0,0),(-1,-1),colors.white)]))
+      subject=str(p.get("subject","")).lower()
+      qtext=str(q.get("q","")).lower()
+      extended_writing = (("english" in subject) and any(term in qtext for term in
+          ("composition", "write a balanced argument", "write a narrative", "write a formal letter",
+           "write a summary", "write 100", "write 120", "write 250", "write 350")))
+      if extended_writing:
+          line_count=max(8,min(20,int(round(m*0.55))))
+      elif "english" in subject and m >= 12:
+          line_count=max(7,min(12,int(round(m*0.55))))
+      else:
+          line_count=max(4,min(9,int((m+1)//2)))
+      row_h=5.6*mm
+      work=Table([[""] for _ in range(line_count)],colWidths=[170*mm],
+                 rowHeights=[row_h]*line_count,hAlign="LEFT")
+      work.setStyle(TableStyle([
+          ("LINEBELOW",(0,0),(-1,-1),.35,colors.HexColor("#d7ddd5")),
+          ("BOX",(0,0),(-1,-1),.35,colors.HexColor("#d7ddd5")),
+          ("LEFTPADDING",(0,0),(-1,-1),2),("RIGHTPADDING",(0,0),(-1,-1),2),
+          ("TOPPADDING",(0,0),(-1,-1),0),("BOTTOMPADDING",(0,0),(-1,-1),0),
+          ("VALIGN",(0,0),(-1,-1),"MIDDLE"),
+          ("BACKGROUND",(0,0),(-1,-1),colors.white)
+      ]))
       story.extend([work,Spacer(1,4)])
     story.extend([Spacer(1,8),P("END OF QUESTION PAPER","title2"),P("Check that you have answered every question. The separate marking scheme is a different PDF file.","small")])
     doc_base(PDFDIR/f"{key}_paper.pdf",story)
@@ -137,6 +157,10 @@ def build_answers(key,p):
     doc_base(PDFDIR/f"{key}_answers.pdf",story)
 
 for key,p in DATA.items():
+    calculated=sum(int(q.get("m",0)) for q in p.get("questions",[]))
+    declared=int(p.get("marks",calculated))
+    if calculated != declared:
+        raise ValueError(f"{key}: declared total {declared} does not match question marks {calculated}")
     build_questions(key,p)
     build_answers(key,p)
     qpath=PDFDIR/f"{key}_paper.pdf"; apath=PDFDIR/f"{key}_answers.pdf"
