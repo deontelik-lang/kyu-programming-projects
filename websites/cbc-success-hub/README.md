@@ -9,6 +9,10 @@ This website preserves the supplied CBC Success Hub green/red layout and adds re
 - The browser source contains only preview questions. Full question data and marking answers are kept server-side, outside the public web root.
 - Catalogue placeholders without complete question/answer PDFs are labelled “PDF coming soon” and cannot be purchased.
 
+## Free past-paper links
+- The homepage now includes selected external links to free KCSE question papers for 2013–2016, topical KCSE question compilations from earlier years, and a KCPE archive.
+- Past-paper files are linked from the external hosting site, not copied into this repository or the CBC Success Hub server. Availability and access terms can change; the page identifies the external source and links to KNEC's official Bookshop for publication details.
+
 ## Payment and access control
 - New orders remain **PENDING** until an authorised staff member confirms the receipt against the merchant’s M-Pesa/Paybill transaction records.
 - The server does not mark orders verified from a client-side timer, localStorage flag, or receipt code alone.
