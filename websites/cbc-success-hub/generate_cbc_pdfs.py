@@ -54,15 +54,7 @@ def P(text, style):
 def page_art(canvas,doc):
     canvas.saveState()
     w,h=A4
-    # Subtle diagonal watermark; the disclaimer remains legible above it.
-    try: canvas.setFillAlpha(0.075)
-    except Exception: pass
-    canvas.setFillColor(forest)
-    canvas.setFont(BOLD,25)
-    canvas.translate(w/2,h/2)
-    canvas.rotate(34)
-    canvas.drawCentredString(0,0,"PRACTICE MATERIAL")
-    canvas.restoreState()
+    # Keep the question area clear; branding appears in the header and footer.
     canvas.saveState()
     canvas.setStrokeColor(line); canvas.setLineWidth(.5)
     canvas.line(19*mm,15*mm,w-19*mm,15*mm)
