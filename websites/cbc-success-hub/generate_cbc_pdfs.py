@@ -10,6 +10,13 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, KeepTogether, HRFlowable
 
+try:
+    import arabic_reshaper
+    from bidi.algorithm import get_display
+except ImportError:
+    arabic_reshaper = None
+    get_display = None
+
 ROOT=Path("/var/lib/cbc-success-hub")
 PDFDIR=ROOT/"pdfs"
 DATA=json.loads((ROOT/"papers.json").read_text(encoding="utf-8"))
@@ -48,7 +55,11 @@ styles={
 }
 
 def P(text, style):
-    safe=escape(str(text)).replace("\n","<br/>")
+    raw=str(text)
+    # Shape embedded Arabic text for correct glyph joining and right-to-left display.
+    if arabic_reshaper is not None and get_display is not None and any("\\u0600" <= ch <= "\\u06ff" for ch in raw):
+        raw=get_display(arabic_reshaper.reshape(raw))
+    safe=escape(raw).replace("\\n","<br/>")
     return Paragraph(safe,styles[style])
 
 def page_art(canvas,doc):
