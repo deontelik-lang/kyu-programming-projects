@@ -1,17 +1,18 @@
 # CBC Success Hub — Original Design + Protected Exam PDF Bundles
 
-This website preserves the supplied CBC Success Hub green/red layout and adds realistic one-page previews for 14 original practice resources across KJSEA Grade 9, KPSEA Grade 6, Grades 7–8, Grade 10 transition practice, KCSE revision and teacher resources.
+This website preserves the supplied CBC Success Hub green/red layout, offers one-page free previews for practice resources, links to KCSE subject archives for 2016–2025, and provides 30 locked, subject-specific KCSE trend packs.
 
 ## Learner experience
 - Exactly one preview page is viewable online for free.
 - Each published bundle costs **KSh 30**.
 - After verification, learners receive two separate file links: a complete question paper PDF and a separate marking-scheme / worked-answer PDF.
-- The browser source contains only preview questions. Full question data and marking answers are kept server-side, outside the public web root.
+- The browser source contains only the two-question previews for free practice bundles. The 30 trend packs expose no questions or topic analysis in the browser; full questions, trend notes and worked marking answers remain server-side outside the public web root.
 - Catalogue placeholders without complete question/answer PDFs are labelled “PDF coming soon” and cannot be purchased.
 
-## Free past-paper links
-- The homepage now includes selected external links to free KCSE question papers for 2013–2016, topical KCSE question compilations from earlier years, and a KCPE archive.
-- Past-paper files are linked from the external hosting site, not copied into this repository or the CBC Success Hub server. Availability and access terms can change; the page identifies the external source and links to KNEC's official Bookshop for publication details.
+## KCSE past-paper archives and subject trends
+- The homepage links to external year archives for KCSE 2016 through 2025. Each archive page lists the subjects/papers available on that host; subject coverage and access terms vary by year.
+- Thirty additional locked 50-mark practice packs cover Mathematics Alternative A/B, English, Kiswahili, Biology, Chemistry, Physics, General Science, History and Government, Geography, CRE, IRE, HRE, Agriculture, Business Studies, Computer Studies, Home Science, French, German, Arabic, Music, Art and Design, Drawing and Design, Aviation Technology, Building Construction, Electricity, Metalwork, Power Mechanics, Woodwork and Kenya Sign Language.
+- The packs include subject-specific qualitative topic notes and original hard questions with a separate worked marking guide. The topic notes are not a statistically verified item-by-item count of every 2016–2025 question and are not guarantees about a future exam. The website links to outside archives rather than rehosting their past-paper files. For official publication information, it links to KNEC's Bookshop.
 
 ## Payment and access control
 - New orders remain **PENDING** until an authorised staff member confirms the receipt against the merchant’s M-Pesa/Paybill transaction records.
