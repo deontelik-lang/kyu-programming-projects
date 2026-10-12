@@ -56,9 +56,15 @@ styles={
 
 def P(text, style):
     raw=str(text)
-    # Shape embedded Arabic text for correct glyph joining and right-to-left display.
-    if arabic_reshaper is not None and get_display is not None and any("\\u0600" <= ch <= "\\u06ff" for ch in raw):
-        raw=get_display(arabic_reshaper.reshape(raw))
+    has_arabic=any("\\u0600" <= ch <= "\\u06ff" for ch in raw)
+    # Shape Arabic runs and use the Unicode sans face (which has a broader
+    # Arabic glyph set than the serif face used for most question text).
+    if has_arabic:
+        if arabic_reshaper is not None and get_display is not None:
+            raw=get_display(arabic_reshaper.reshape(raw))
+        safe=escape(raw).replace("\\n","<br/>")
+        arabic_style=ParagraphStyle(style+"_arabic",parent=styles[style],fontName=REG)
+        return Paragraph(safe,arabic_style)
     safe=escape(raw).replace("\\n","<br/>")
     return Paragraph(safe,styles[style])
 
