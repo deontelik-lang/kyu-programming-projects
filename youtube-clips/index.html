@@ -49,7 +49,7 @@
 <div class="control"><label for="count">Number of clips</label><select id="count" class="field"><option value="1">1 clip</option><option value="2">2 clips</option><option value="3" selected>3 clips</option><option value="4">4 clips</option><option value="5">5 clips</option></select></div>
 <div class="control full"><label for="ratio">Output format</label><select id="ratio" class="field"><option value="vertical" selected>9:16 · TikTok / Shorts / Reels</option><option value="square">1:1 · Square post</option><option value="landscape">16:9 · YouTube</option></select></div>
 <div class="control full"><label for="start">Start point for the first clip <span class="mutedsmall">(seconds into the video)</span></label><div class="rangeinput"><input id="startSlider" type="range" min="0" max="600" value="0" step="1" aria-label="Start time slider"><input id="start" class="numberfield" type="number" min="0" max="7200" value="0" step="1" aria-label="Start time in seconds"></div><p class="fine">Clips are cut consecutively from this point. Example: 3 × 30 sec creates clips starting at 0s, 30s and 60s.</p></div>
-<div class="control full"><label>Clip method</label><div class="checkrow"><span>✦</span><span><b style="color:#e1dbff">Quick batch cuts</b><br>Split into consecutive segments. AI highlight detection and automatic captions are not connected in this version.</span></div></div>
+<div class="control full"><label>Clip method</label><div class="checkrow"><span>✦</span><span><b style="color:#e1dbff">Quick batch cuts</b><br>Split into consecutive segments. AI-powered highlight detection, smart reframing and subtitles run through the connected LumiClip service.</span></div></div>
 </div>
 <div class="actions"><button id="generateBtn" class="btn btn-primary" type="button">✂ Generate clips</button><button id="resetBtn" class="btn btn-secondary" type="button">Reset</button></div>
 <div id="status" class="status" role="status" aria-live="polite"></div>
@@ -79,33 +79,34 @@ fileInput.addEventListener("change",function(){const f=fileInput.files&&fileInpu
 const slider=$("startSlider"),start=$("start");slider.addEventListener("input",function(){start.value=slider.value});start.addEventListener("input",function(){const n=Math.max(0,Math.min(7200,Number(start.value)||0));if(n<=600)slider.value=n});
 function showStatus(message,isError,success){status.textContent=message;status.className="status show"+(isError?" err":success?" ok":"");}
 $("generateBtn").addEventListener("click",async function(){
-const f=fileInput.files&&fileInput.files[0];
-downloadBox.classList.remove("show");
-const rawUrl=urlInput.value.trim();
-const isYoutube=Boolean(getVideoId(rawUrl));
+const f=fileInput.files&&fileInput.files[0];downloadBox.classList.remove("show");
+const rawUrl=urlInput.value.trim();const isYoutube=Boolean(getVideoId(rawUrl));
 if(!f&&!isYoutube){showStatus("Paste a valid YouTube video link, or upload a video file you have permission to edit.",true);return}
 if(!$("rightsConfirm").checked){showStatus("Please confirm you own this video or have permission to download and edit it.",true);return}
 const startAt=Number(start.value),duration=Number($("duration").value),count=Number($("count").value);
 if(!Number.isFinite(startAt)||startAt<0){showStatus("Enter a valid start time in seconds.",true);return}
 if(startAt+duration*count>7200){showStatus("Your selected batch goes past the 2-hour safety limit. Reduce the start time, duration or clip count.",true);return}
 const settings={start:startAt,duration:duration,count:count,ratio:$("ratio").value};
-const btn=$("generateBtn");btn.disabled=true;btn.textContent="⏳ Preparing clips…";
-showStatus(isYoutube&&!f?"Fetching the authorized YouTube source, then rendering your clips. This can take a few minutes.":"Preparing your batch. Keep this tab open while the video is rendered.",false);
+const btn=$("generateBtn");btn.disabled=true;btn.textContent=isYoutube&&!f?"✦ Starting AI clipping…":"⏳ Preparing clips…";
+showStatus(isYoutube&&!f?"Sending your link to AI highlight detection. The service will select moments, reframe them and add subtitles.":"Preparing your batch. Keep this tab open while the video is rendered.",false);
 try{
 let response;
-if(!f&&isYoutube){
-response=await fetch("/api/generate-youtube",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...settings,url:rawUrl,rightsConfirmed:$("rightsConfirm").checked})});
-}else{
-const fd=new FormData();fd.append("video",f);Object.keys(settings).forEach(k=>fd.append(k,String(settings[k])));
-response=await fetch("/api/generate",{method:"POST",body:fd});
-}
+if(!f&&isYoutube){response=await fetch("/api/generate-youtube",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...settings,url:rawUrl,rightsConfirmed:$("rightsConfirm").checked})});}
+else{const fd=new FormData();fd.append("video",f);Object.keys(settings).forEach(k=>fd.append(k,String(settings[k])));response=await fetch("/api/generate",{method:"POST",body:fd});}
 let data={};try{data=await response.json()}catch(e){}
-if(!response.ok||!data.ok)throw new Error(data.error||"The server couldn't process this video. Try a smaller MP4 file.");
-$("downloadText").textContent=data.count+" clips · "+duration+" seconds each · "+$("ratio").selectedOptions[0].textContent+" · download expires in about 30 minutes.";
-const a=$("downloadLink");a.href=data.downloadUrl;a.setAttribute("download","clipforge-pack.zip");downloadBox.classList.add("show");
-showStatus("Batch complete. Your clip pack is ready to download.",false,true);downloadBox.scrollIntoView({behavior:"smooth",block:"nearest"})
-}catch(err){showStatus(err.message||"Something went wrong. Try again with a shorter or smaller source video.",true)}
-finally{btn.disabled=false;btn.textContent="✂ Generate clips"}
+if(!response.ok||!data.ok)throw new Error(data.error||"The server could not process this video. Try again.");
+if(data.provider==="lumiclip"){
+let project=null;
+for(let attempt=0;attempt<80;attempt++){await new Promise(resolve=>setTimeout(resolve,12000));const poll=await fetch("/api/lumiclip/projects/"+encodeURIComponent(data.projectId));let state={};try{state=await poll.json()}catch(e){}if(!poll.ok||!state.ok)throw new Error(state.error||"Could not check AI clipping progress.");project=state;showStatus("AI clipping: "+(state.step||state.status||"processing").replace(/_/g," ").toLowerCase()+" · checking again in 12 seconds…",false);if(["completed","completed_no_clips","failed"].includes(String(state.status).toLowerCase()))break;}
+if(!project)throw new Error("AI clipping is taking longer than expected. Your project may still be processing; try again shortly.");
+if(String(project.status).toLowerCase()==="failed")throw new Error(project.message||"The AI service could not process this video.");
+const clips=(project.clips||[]).filter(c=>c.download_url);if(!clips.length)throw new Error("AI processing finished but no downloadable clips were returned. Check project status and available credits.");
+const box=$("downloadBox");box.innerHTML="<b>✓ Your AI clips are ready</b><p id=\"downloadText\"></p><div id=\"aiClipList\" style=\"display:grid;gap:10px;margin-top:12px\"></div>";
+$("downloadText").textContent=clips.length+" AI-selected clips · subtitles and vertical reframing where available.";const list=$("aiClipList");
+clips.forEach((clip,index)=>{const row=document.createElement("div");row.style.cssText="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(255,255,255,.04)";if(clip.thumbnail_url){const img=document.createElement("img");img.src=clip.thumbnail_url;img.alt="";img.loading="lazy";img.style.cssText="width:84px;height:60px;object-fit:cover;border-radius:8px";row.appendChild(img)}const meta=document.createElement("div");meta.style.cssText="flex:1;min-width:0";const title=document.createElement("b");title.textContent=clip.title||("AI Clip "+(index+1));title.style.cssText="display:block;margin-bottom:4px";meta.appendChild(title);const detail=document.createElement("small");detail.textContent=(clip.duration?Math.round(clip.duration)+" sec":"AI highlight")+(clip.score!=null?" · score "+Math.round(Number(clip.score)*100)+"%":"");detail.style.color="var(--muted)";meta.appendChild(detail);row.appendChild(meta);const link=document.createElement("a");link.href=clip.download_url;link.target="_blank";link.rel="noopener noreferrer";link.textContent="Download";link.style.cssText="font-weight:700;color:#c4b5fd;white-space:nowrap";row.appendChild(link);list.appendChild(row)});
+box.classList.add("show");showStatus("AI-generated clips are ready. Download each clip below.",false,true);box.scrollIntoView({behavior:"smooth",block:"nearest"});
+}else{$("downloadText").textContent=data.count+" clips · "+duration+" seconds each · "+$("ratio").selectedOptions[0].textContent+" · download expires in about 30 minutes.";const link=$("downloadLink");link.href=data.downloadUrl;link.setAttribute("download","clipforge-pack.zip");downloadBox.classList.add("show");showStatus("Batch complete. Your clip pack is ready to download.",false,true);downloadBox.scrollIntoView({behavior:"smooth",block:"nearest"})}
+}catch(err){showStatus(err.message||"Something went wrong. Try again.",true)}finally{btn.disabled=false;btn.textContent="✂ Generate clips"}
 });
 $("resetBtn").addEventListener("click",function(){urlInput.value="";fileInput.value="";sourceId="";$("rightsConfirm").checked=false;preview.innerHTML='<div class="empty"><div class="playicon">▶</div><b>Your video preview appears here</b><small>Paste a valid YouTube URL and select “Preview video”.</small></div>';$("fileTitle").textContent="Choose a video to clip";$("fileMeta").textContent="MP4, MOV, WEBM or MKV · maximum 150 MB";$("duration").value="30";$("count").value="3";$("ratio").value="vertical";start.value="0";slider.value="0";previewError.classList.remove("show");status.classList.remove("show");downloadBox.classList.remove("show")});
 const box=$("uploadBox");["dragenter","dragover"].forEach(function(n){box.addEventListener(n,function(e){e.preventDefault();box.classList.add("drag")})});["dragleave","drop"].forEach(function(n){box.addEventListener(n,function(e){e.preventDefault();box.classList.remove("drag")})});box.addEventListener("drop",function(e){const f=e.dataTransfer.files&&e.dataTransfer.files[0];if(f){try{const dt=new DataTransfer();dt.items.add(f);fileInput.files=dt.files;fileInput.dispatchEvent(new Event("change"))}catch(err){showStatus("Tap Browse to select the file on this device.",true)}}});
