@@ -179,51 +179,94 @@ app.post("/api/generate", function(req, res, next) {
     return res.status(422).json({ ok: false, error: friendly });
   }
 });
-app.post("/api/generate-youtube", async function(req, res) {
-  let settings;
-  try { settings = validateSettings(req.body || {}); }
-  catch (e) { return res.status(400).json({ ok: false, error: e.message }); }
-  if (req.body && req.body.rightsConfirmed !== true) {
-    return res.status(400).json({ ok: false, error: "Please confirm you own this video or have permission to download and edit it." });
+async function lumiRequest(url, options) {
+  const key = process.env.LUMICLIP_API_KEY;
+  if (!key) {
+    const e = new Error("ClipForge needs its LumiClip API key before AI clipping can run. Add LUMICLIP_API_KEY to the BasicDeploy container environment, then restart the app.");
+    e.statusCode = 503;
+    throw e;
   }
+  const controller = new AbortController();
+  const timer = setTimeout(function(){controller.abort();}, 25000);
+  try {
+    const response = await fetch(url, {
+      method: (options && options.method) || "GET",
+      headers: Object.assign({ "Authorization": "Bearer " + key, "Accept": "application/json" }, options && options.headers || {}),
+      body: options && options.body ? JSON.stringify(options.body) : undefined,
+      signal: controller.signal
+    });
+    const text = await response.text();
+    let data = {};
+    try { data = text ? JSON.parse(text) : {}; } catch (e) { data = {}; }
+    if (!response.ok) {
+      console.error("LumiClip API error:", response.status, JSON.stringify(data).slice(0, 500));
+      const err = new Error(response.status === 401 || response.status === 403
+        ? "The LumiClip API key was rejected. Check the key in BasicDeploy environment settings."
+        : (response.status === 429 ? "LumiClip has rate-limited this request or the available credits are exhausted. Check your LumiClip account usage."
+        : "LumiClip could not start or retrieve this job. Please try again shortly."));
+      err.statusCode = response.status === 429 ? 429 : 502;
+      throw err;
+    }
+    return data;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+app.post("/api/generate-youtube", async function(req, res) {
   const rawUrl = String((req.body && req.body.url) || "").trim();
   let parsed;
   try { parsed = new URL(rawUrl); } catch (e) { return res.status(400).json({ ok: false, error: "Paste a valid YouTube video link." }); }
   const host = parsed.hostname.toLowerCase().replace(/^www\./, "").replace(/^m\./, "");
-  const allowedHosts = ["youtube.com", "youtu.be", "youtube-nocookie.com"];
-  if (!["https:", "http:"].includes(parsed.protocol) || !allowedHosts.includes(host)) {
+  if (!["https:", "http:"].includes(parsed.protocol) || !["youtube.com", "youtu.be", "youtube-nocookie.com"].includes(host)) {
     return res.status(400).json({ ok: false, error: "For safety, this source field accepts YouTube links only." });
   }
   const videoId = host === "youtu.be" ? parsed.pathname.split("/").filter(Boolean)[0] : (parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).slice(-1)[0]);
-  if (!/^[A-Za-z0-9_-]{11}$/.test(videoId || "")) {
-    return res.status(400).json({ ok: false, error: "Paste a direct link to one YouTube video, not a playlist or channel." });
+  if (!/^[A-Za-z0-9_-]{11}$/.test(videoId || "")) return res.status(400).json({ ok: false, error: "Paste a direct link to one YouTube video, not a playlist or channel." });
+  if (req.body && req.body.rightsConfirmed !== true) return res.status(400).json({ ok: false, error: "Please confirm you own this video or have permission to process it." });
+  const start = Number(req.body.start);
+  const duration = Number(req.body.duration);
+  const count = Number(req.body.count);
+  if (!Number.isFinite(start) || start < 0 || start > 7200 || ![15,30,45,60].includes(duration) || !Number.isInteger(count) || count < 1 || count > 5) {
+    return res.status(400).json({ ok: false, error: "Please check your start time and clip settings." });
   }
-  if (!ffmpegPath || !fs.existsSync(ffmpegPath)) return res.status(503).json({ ok: false, error: "The video processor isn't available on this server yet." });
-  const prefix = path.join(UPLOAD_DIR, crypto.randomBytes(16).toString("hex"));
+  if (!process.env.LUMICLIP_API_KEY) {
+    return res.status(503).json({ ok: false, error: "AI clipping is integrated, but it needs your LumiClip API key. Add LUMICLIP_API_KEY in BasicDeploy container environment settings, then restart the app." });
+  }
   try {
-    await runYtDlp([
-      "--no-playlist", "--no-warnings", "--no-part", "--max-filesize", "150M",
-      "--format", "bestvideo[height<=1080]+bestaudio/best[height<=1080]",
-      "--merge-output-format", "mp4", "--restrict-filenames", "--socket-timeout", "20",
-      "--retries", "1", "-o", prefix + ".%(ext)s", "https://www.youtube.com/watch?v=" + videoId
-    ]);
-    const candidates = fs.readdirSync(UPLOAD_DIR)
-      .filter(function(name){ return name.startsWith(path.basename(prefix) + "."); })
-      .map(function(name){ return path.join(UPLOAD_DIR, name); })
-      .filter(function(p){ try { return fs.statSync(p).isFile(); } catch(e) { return false; } });
-    if (!candidates.length) throw new Error("No source file was downloaded.");
-    const sourcePath = candidates.find(function(p){return path.extname(p).toLowerCase() === ".mp4";}) || candidates[0];
-    const otherFiles = candidates.filter(function(p){return p !== sourcePath;});
-    otherFiles.forEach(function(p){fs.rm(p,{force:true},function(){});});
-    const result = await renderClipPack(sourcePath, settings, candidates);
-    result.source = "youtube";
-    return res.json(result);
+    const payload = { url: "https://www.youtube.com/watch?v=" + videoId };
+    if (start > 0) payload.start_time = start;
+    payload.end_time = start + duration * count;
+    const data = await lumiRequest("https://api.lumiclip.ai/api/v1/clips/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: payload });
+    const projectId = data.project_id || data.id;
+    if (!projectId || !/^[A-Za-z0-9_-]{8,100}$/.test(String(projectId))) {
+      console.error("Unexpected LumiClip response:", JSON.stringify(data).slice(0, 800));
+      return res.status(502).json({ ok: false, error: "The AI clipping service returned an unexpected response. Please try again." });
+    }
+    return res.status(202).json({ ok: true, provider: "lumiclip", projectId, status: data.status || "processing", message: data.message || "AI is finding highlights, reframing clips and adding captions." });
   } catch (error) {
-    const prefixName = path.basename(prefix) + ".";
-    fs.readdirSync(UPLOAD_DIR).filter(function(name){return name.startsWith(prefixName);}).forEach(function(name){fs.rm(path.join(UPLOAD_DIR,name),{force:true},function(){});});
-    const message = String(error && error.message || "");
-    console.error("YouTube clip generation failed:", message.slice(-1000));
-    return res.status(422).json({ ok: false, error: message.startsWith("This video") || message.startsWith("The source") || message.startsWith("Couldn't fetch") ? message : "Could not prepare this YouTube source. Try a public video you have permission to edit, or upload the original file exported from YouTube Studio." });
+    return res.status(error.statusCode || 502).json({ ok: false, error: error.message || "Could not start AI clip generation." });
+  }
+});
+app.get("/api/lumiclip/projects/:projectId", async function(req, res) {
+  const id = String(req.params.projectId || "");
+  if (!/^[A-Za-z0-9_-]{8,100}$/.test(id)) return res.status(400).json({ ok: false, error: "Invalid project ID." });
+  try {
+    const data = await lumiRequest("https://api.lumiclip.ai/api/v1/projects/" + encodeURIComponent(id));
+    const clips = Array.isArray(data.clips) ? data.clips.map(function(c) {
+      return {
+        id: c.id,
+        title: c.title || "AI clip",
+        duration: c.duration,
+        score: c.score,
+        reason: c.reason,
+        thumbnail_url: c.thumbnail_url,
+        download_url: c.download_url || c.video_url || null,
+        clip_status: c.clip_status || c.status || "processing"
+      };
+    }) : [];
+    return res.json({ ok: true, id: data.id || id, status: data.status || "processing", step: data.step || "", message: data.message || "", clips });
+  } catch (error) {
+    return res.status(error.statusCode || 502).json({ ok: false, error: error.message || "Couldn't check AI clipping progress." });
   }
 });
 app.use(function(err, req, res, next) {
