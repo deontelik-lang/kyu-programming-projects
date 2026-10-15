@@ -20,16 +20,16 @@
 <section class="hero">
 <div class="eyebrow"><span class="spark">✦</span> LONG VIDEO IN. SHORT CLIPS OUT.</div>
 <h1>Make every moment<br> <span class="grad">worth scrolling for.</span></h1>
-<p>Preview a YouTube video, choose your clip settings, then export share-ready shorts from a video file you have permission to edit.</p>
+<p>Paste a YouTube link you own or have permission to edit, or upload your original video. ClipForge can fetch an eligible public source, cut a batch, and package the shorts for download.</p>
 <div class="stats"><span><b>↗</b> Vertical-ready exports</span><span><b>◈</b> Batch up to 5 clips</span><span><b>✓</b> No account required</span></div>
 </section>
 <section class="workspace" aria-label="Clip creation workspace">
 <div class="card">
 <div class="cardhead"><h2>Source video</h2><span class="step">STEP 01 / SOURCE</span></div>
 <div class="cardbody">
-<div class="labelrow"><label for="youtubeUrl">Paste a YouTube link</label><span class="mutedsmall">Preview only</span></div>
+<div class="labelrow"><label for="youtubeUrl">Paste a YouTube link</label><span class="mutedsmall">Link or upload</span></div>
 <div class="linkrow"><input id="youtubeUrl" class="field" type="url" placeholder="https://www.youtube.com/watch?v=..." autocomplete="url"><button id="previewBtn" class="btn btn-secondary" type="button">Preview video ↗</button></div>
-<p class="hint">YouTube links load a preview. To export a file, upload the original video file you own or are licensed to edit.</p>
+<p class="hint">Paste a direct public YouTube video link to generate clips without a separate upload, where source access is available. Or upload your original video file.</p>
 <div id="preview" class="preview"><div class="empty"><div class="playicon">▶</div><b>Your video preview appears here</b><small>Paste a valid YouTube URL and select “Preview video”.</small></div></div>
 <div id="previewError" class="toast" role="status"></div>
 <div class="dividerlabel">OR UPLOAD A VIDEO FILE</div>
@@ -37,7 +37,8 @@
 <span class="uploadico">⇧</span><span class="uploadtext"><b id="fileTitle">Choose a video to clip</b><span id="fileMeta">MP4, MOV, WEBM or MKV · maximum 150 MB</span></span><span class="uploadcta">Browse</span>
 </label>
 <input class="fileinput" id="videoFile" name="video" type="file" accept="video/mp4,video/quicktime,video/webm,video/x-matroska,.mp4,.mov,.webm,.mkv">
-<div class="hint">Your upload is processed temporarily to make clips and then removed automatically. Large videos may take longer on a free server.</div>
+<div class="hint">Uploaded files and fetched source videos are processed temporarily. Free-server limits apply.</div>
+<label class="checkrow" style="margin-top:13px;cursor:pointer"><input id="rightsConfirm" type="checkbox"><span><b style="color:#e1dbff">I own this video or have permission to download and edit it.</b><br>Only process content you are authorized to use. Some YouTube videos cannot be accessed by the server.</span></label>
 </div>
 </div>
 <div class="card rightcard">
@@ -77,8 +78,36 @@ $("previewBtn").addEventListener("click",function(){const id=getVideoId(urlInput
 fileInput.addEventListener("change",function(){const f=fileInput.files&&fileInput.files[0];if(!f){$("fileTitle").textContent="Choose a video to clip";$("fileMeta").textContent="MP4, MOV, WEBM or MKV · maximum 150 MB";return}if(f.size>150*1024*1024){fileInput.value="";showStatus("That file is larger than 150 MB. Choose a smaller video.",true);return}$("fileTitle").textContent=f.name;$("fileMeta").textContent=(f.size/1024/1024).toFixed(1)+" MB · ready to process";downloadBox.classList.remove("show");status.classList.remove("show");});
 const slider=$("startSlider"),start=$("start");slider.addEventListener("input",function(){start.value=slider.value});start.addEventListener("input",function(){const n=Math.max(0,Math.min(7200,Number(start.value)||0));if(n<=600)slider.value=n});
 function showStatus(message,isError,success){status.textContent=message;status.className="status show"+(isError?" err":success?" ok":"");}
-$("generateBtn").addEventListener("click",async function(){const f=fileInput.files&&fileInput.files[0];downloadBox.classList.remove("show");if(!f){showStatus(sourceId?"Upload the source video file you own or have permission to edit. The YouTube link is a preview, not a downloadable source.":"Paste a YouTube link to preview it, then upload a video file you have permission to edit.",true);return}const startAt=Number(start.value),duration=Number($("duration").value),count=Number($("count").value);if(!Number.isFinite(startAt)||startAt<0){showStatus("Enter a valid start time in seconds.",true);return}if(startAt+duration*count>7200){showStatus("Your selected batch goes past the 2-hour safety limit. Reduce the start time, duration or clip count.",true);return}const fd=new FormData();fd.append("video",f);fd.append("start",String(startAt));fd.append("duration",String(duration));fd.append("count",String(count));fd.append("ratio",$("ratio").value);const btn=$("generateBtn");btn.disabled=true;btn.textContent="⏳ Processing video…";showStatus("Preparing your batch. Keep this tab open while the video is rendered.",false);try{const response=await fetch("/api/generate",{method:"POST",body:fd});let data={};try{data=await response.json()}catch(e){}if(!response.ok||!data.ok)throw new Error(data.error||"The server couldn't process this video. Try a smaller MP4 file.");$("downloadText").textContent=data.count+" clips · "+duration+" seconds each · "+$("ratio").selectedOptions[0].textContent+" · download expires in about 30 minutes.";const a=$("downloadLink");a.href=data.downloadUrl;a.setAttribute("download","clipforge-pack.zip");downloadBox.classList.add("show");showStatus("Batch complete. Your clip pack is ready to download.",false,true);downloadBox.scrollIntoView({behavior:"smooth",block:"nearest"})}catch(err){showStatus(err.message||"Something went wrong. Try again with a shorter MP4 file.",true)}finally{btn.disabled=false;btn.textContent="✂ Generate clips"}});
-$("resetBtn").addEventListener("click",function(){urlInput.value="";fileInput.value="";sourceId="";preview.innerHTML='<div class="empty"><div class="playicon">▶</div><b>Your video preview appears here</b><small>Paste a valid YouTube URL and select “Preview video”.</small></div>';$("fileTitle").textContent="Choose a video to clip";$("fileMeta").textContent="MP4, MOV, WEBM or MKV · maximum 150 MB";$("duration").value="30";$("count").value="3";$("ratio").value="vertical";start.value="0";slider.value="0";previewError.classList.remove("show");status.classList.remove("show");downloadBox.classList.remove("show")});
+$("generateBtn").addEventListener("click",async function(){
+const f=fileInput.files&&fileInput.files[0];
+downloadBox.classList.remove("show");
+const rawUrl=urlInput.value.trim();
+const isYoutube=Boolean(getVideoId(rawUrl));
+if(!f&&!isYoutube){showStatus("Paste a valid YouTube video link, or upload a video file you have permission to edit.",true);return}
+if(!$("rightsConfirm").checked){showStatus("Please confirm you own this video or have permission to download and edit it.",true);return}
+const startAt=Number(start.value),duration=Number($("duration").value),count=Number($("count").value);
+if(!Number.isFinite(startAt)||startAt<0){showStatus("Enter a valid start time in seconds.",true);return}
+if(startAt+duration*count>7200){showStatus("Your selected batch goes past the 2-hour safety limit. Reduce the start time, duration or clip count.",true);return}
+const settings={start:startAt,duration:duration,count:count,ratio:$("ratio").value};
+const btn=$("generateBtn");btn.disabled=true;btn.textContent="⏳ Preparing clips…";
+showStatus(isYoutube&&!f?"Fetching the authorized YouTube source, then rendering your clips. This can take a few minutes.":"Preparing your batch. Keep this tab open while the video is rendered.",false);
+try{
+let response;
+if(!f&&isYoutube){
+response=await fetch("/api/generate-youtube",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...settings,url:rawUrl,rightsConfirmed:$("rightsConfirm").checked})});
+}else{
+const fd=new FormData();fd.append("video",f);Object.keys(settings).forEach(k=>fd.append(k,String(settings[k])));
+response=await fetch("/api/generate",{method:"POST",body:fd});
+}
+let data={};try{data=await response.json()}catch(e){}
+if(!response.ok||!data.ok)throw new Error(data.error||"The server couldn't process this video. Try a smaller MP4 file.");
+$("downloadText").textContent=data.count+" clips · "+duration+" seconds each · "+$("ratio").selectedOptions[0].textContent+" · download expires in about 30 minutes.";
+const a=$("downloadLink");a.href=data.downloadUrl;a.setAttribute("download","clipforge-pack.zip");downloadBox.classList.add("show");
+showStatus("Batch complete. Your clip pack is ready to download.",false,true);downloadBox.scrollIntoView({behavior:"smooth",block:"nearest"})
+}catch(err){showStatus(err.message||"Something went wrong. Try again with a shorter or smaller source video.",true)}
+finally{btn.disabled=false;btn.textContent="✂ Generate clips"}
+});
+$("resetBtn").addEventListener("click",function(){urlInput.value="";fileInput.value="";sourceId="";$("rightsConfirm").checked=false;preview.innerHTML='<div class="empty"><div class="playicon">▶</div><b>Your video preview appears here</b><small>Paste a valid YouTube URL and select “Preview video”.</small></div>';$("fileTitle").textContent="Choose a video to clip";$("fileMeta").textContent="MP4, MOV, WEBM or MKV · maximum 150 MB";$("duration").value="30";$("count").value="3";$("ratio").value="vertical";start.value="0";slider.value="0";previewError.classList.remove("show");status.classList.remove("show");downloadBox.classList.remove("show")});
 const box=$("uploadBox");["dragenter","dragover"].forEach(function(n){box.addEventListener(n,function(e){e.preventDefault();box.classList.add("drag")})});["dragleave","drop"].forEach(function(n){box.addEventListener(n,function(e){e.preventDefault();box.classList.remove("drag")})});box.addEventListener("drop",function(e){const f=e.dataTransfer.files&&e.dataTransfer.files[0];if(f){try{const dt=new DataTransfer();dt.items.add(f);fileInput.files=dt.files;fileInput.dispatchEvent(new Event("change"))}catch(err){showStatus("Tap Browse to select the file on this device.",true)}}});
 })();
 </script>
