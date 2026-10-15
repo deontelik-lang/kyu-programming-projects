@@ -1,0 +1,19 @@
+{
+  "name": "clipforge-youtube-clips",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ClipForge web app: browser-based YouTube preview and uploaded video segment export.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "ffmpeg-static": "^5.2.0",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1"
+  }
+}
