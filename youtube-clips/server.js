@@ -75,7 +75,7 @@ function runFfmpeg(args, timeout) {
 }
 function runYtDlp(args) {
   return new Promise(function(resolve, reject) {
-    execFile("python3", ["-m", "yt_dlp"].concat(args), { timeout: 180000, maxBuffer: 2 * 1024 * 1024 }, function(err, stdout, stderr) {
+    execFile("python3", ["-m", "yt_dlp"].concat(args), { timeout: 600000, maxBuffer: 2 * 1024 * 1024 }, function(err, stdout, stderr) {
       if (err) {
         const msg = String(stderr || err.message || "");
         if (/Sign in to confirm|age-restricted|private video|Video unavailable|HTTP Error 403|not available/i.test(msg)) {
@@ -223,28 +223,26 @@ app.post("/api/generate-youtube", async function(req, res) {
   const videoId = host === "youtu.be" ? parsed.pathname.split("/").filter(Boolean)[0] : (parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).slice(-1)[0]);
   if (!/^[A-Za-z0-9_-]{11}$/.test(videoId || "")) return res.status(400).json({ ok: false, error: "Paste a direct link to one YouTube video, not a playlist or channel." });
   if (req.body && req.body.rightsConfirmed !== true) return res.status(400).json({ ok: false, error: "Please confirm you own this video or have permission to process it." });
-  const start = Number(req.body.start);
-  const duration = Number(req.body.duration);
-  const count = Number(req.body.count);
-  if (!Number.isFinite(start) || start < 0 || start > 7200 || ![15,30,45,60].includes(duration) || !Number.isInteger(count) || count < 1 || count > 5) {
-    return res.status(400).json({ ok: false, error: "Please check your start time and clip settings." });
-  }
-  if (!process.env.LUMICLIP_API_KEY) {
-    return res.status(503).json({ ok: false, error: "AI clipping is integrated, but it needs your LumiClip API key. Add LUMICLIP_API_KEY in BasicDeploy container environment settings, then restart the app." });
-  }
+  let settings;
+  try { settings = validateSettings(req.body || {}); }
+  catch (e) { return res.status(400).json({ ok: false, error: e.message }); }
+  const base = path.join(UPLOAD_DIR, crypto.randomBytes(16).toString("hex"));
+  let sourcePath = null;
   try {
-    const payload = { url: "https://www.youtube.com/watch?v=" + videoId };
-    if (start > 0) payload.start_time = start;
-    payload.end_time = start + duration * count;
-    const data = await lumiRequest("https://api.lumiclip.ai/api/v1/clips/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: payload });
-    const projectId = data.project_id || data.id;
-    if (!projectId || !/^[A-Za-z0-9_-]{8,100}$/.test(String(projectId))) {
-      console.error("Unexpected LumiClip response:", JSON.stringify(data).slice(0, 800));
-      return res.status(502).json({ ok: false, error: "The AI clipping service returned an unexpected response. Please try again." });
-    }
-    return res.status(202).json({ ok: true, provider: "lumiclip", projectId, status: data.status || "processing", message: data.message || "AI is finding highlights, reframing clips and adding captions." });
+    await runYtDlp(["--no-playlist", "--no-warnings", "--max-filesize", "150M", "-f", "best[height<=720][ext=mp4]/best[height<=720]/best", "-o", base + ".%(ext)s", "--print", "after_move:filepath", "https://www.youtube.com/watch?v=" + videoId]);
+    const candidates = [base + ".mp4", base + ".webm", base + ".mkv"];
+    sourcePath = candidates.find(function(p) { return fs.existsSync(p) && fs.statSync(p).size > 0; });
+    if (!sourcePath) throw new Error("The video could not be downloaded in a supported format. Try uploading the original video file instead.");
+    const result = await renderClipPack(sourcePath, settings, [sourcePath]);
+    return res.json(result);
   } catch (error) {
-    return res.status(error.statusCode || 502).json({ ok: false, error: error.message || "Could not start AI clip generation." });
+    if (sourcePath) fs.rm(sourcePath, { force: true }, function(){});
+    console.error("YouTube processing failed:", String(error && error.message || error).slice(-700));
+    const message = String(error && error.message || "");
+    const friendly = /Sign in to confirm|age-restricted|private video|Video unavailable|HTTP Error 403|not available/i.test(message)
+      ? "YouTube cannot provide this video to the server. Try a public video you own or upload your original video file."
+      : (/larger than|max-filesize/i.test(message) ? "This source is over the 150 MB limit for the free server. Upload a smaller authorized video file." : (message || "Could not process this YouTube link. Try uploading the original video file instead."));
+    return res.status(422).json({ ok: false, error: friendly });
   }
 });
 app.get("/api/lumiclip/projects/:projectId", async function(req, res) {
